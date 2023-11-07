@@ -3,15 +3,21 @@
  */
 public class Collatz {
 
-    /** Buggy implementation of nextNumber! */
+    /**
+     * Returns for given integer n, the next number in Collatz sequence, i.e.
+     * n/2 if n is even
+     * 3n + 1 if n is odd
+     * @param an integer n
+     * @return the next number in Collatz sequence
+     */
     public static int nextNumber(int n) {
-        if (n  == 128) {
-            return 1;
-        } else if (n == 5) {
-            return 3 * n + 1;
-        } else {
-            return n * 2;
+        if (n % 2 == 0) {
+            return n / 2;
         }
+        if (n % 2 != 0) {
+            return 3 * n + 1;
+        }
+        return 1;
     }
 
     public static void main(String[] args) {
