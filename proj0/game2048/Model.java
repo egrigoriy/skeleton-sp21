@@ -5,7 +5,7 @@ import java.util.Observable;
 
 
 /** The state of a game of 2048.
- *  @author TODO: YOUR NAME HERE
+ *  @author Grigoriy Emiliyanov
  */
 public class Model extends Observable {
     /** Current contents of the board. */
@@ -110,15 +110,113 @@ public class Model extends Observable {
         boolean changed;
         changed = false;
 
-        // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-
+        if (atLeastOneMoveExists(this.board)) {
+            board.setViewingPerspective(side);
+            changed = tiltBoardToUp();
+            this.board.setViewingPerspective(Side.NORTH);
+        }
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
+    }
+
+    /**
+     * Tilt whole board to up and return true if any of tiles was moved
+     * @return true, if any of tiles moved, otherwise false
+     */
+    public boolean tiltBoardToUp() {
+        boolean someColumnChanged = false;
+        for (int col = 0; col < this.board.size(); col++) {
+            boolean columnChanged = tiltColumnToUp(col);
+            someColumnChanged = columnChanged || someColumnChanged;
+        }
+        return someColumnChanged;
+    }
+    /**
+     * Tilt single column to up, update score respectively and return true if any of tiles was moved
+     * @return true, if any of tiles was moved, otherwise false
+     */
+    public boolean tiltColumnToUp(int col) {
+        boolean changed = false;
+        boolean wasUpperTileMerged = false;
+        for (int startRow = topRow(); startRow >= 0; startRow--) {
+            if (!isEmptyTileAt(col, startRow)) {
+                int endRow = onWhichRowShouldEndUpTile(col, startRow, wasUpperTileMerged);
+                if (endRow != startRow) {
+                    Tile tileToMove = this.board.tile(col, startRow);
+                    wasUpperTileMerged = this.board.move(col, endRow, tileToMove);
+                    changed = true;
+                    updateScore(wasUpperTileMerged, tileToMove.value());
+                }
+            }
+        }
+        return changed;
+    }
+
+    /** Update score with value if there was a move */
+    public void updateScore(boolean wasAMove, int value) {
+        if (wasAMove) {
+            score += 2 * value;
+        }
+    }
+
+    /** Returns the row on which tile(col, row) should end up */
+    private int onWhichRowShouldEndUpTile(int col, int row, boolean wasUpperMerged) {
+        if (isTopRow(row)) {
+            return topRow();
+        }
+        int endRow = row;
+        while (isBellowTopRow(endRow) && canMoveOneMoreRowUp(col, row, endRow, wasUpperMerged)) {
+            endRow++;
+        }
+        return endRow;
+    }
+
+    /** Returns true if ONE of the conditions are met:
+     * 1. empty tile at upper row
+     * 1. tiles at (c1, r1) and (c2, r2) have same value
+     * 2. the upper tile was not merged,
+     * otherwise false */
+    public boolean canMoveOneMoreRowUp(int c, int initialRow, int r2, boolean wasUpperMerged) {
+        int upperRow = r2 + 1;
+        return isEmptyTileAt(c, upperRow) || canMerge(c, initialRow, c, upperRow, wasUpperMerged);
+    }
+
+    /** Returns true if BOTH conditions are met:
+     * 1. tiles at (c1, r1) and (c2, r2) have same value
+     * 2. the upper tile was not merged,
+     * otherwise false */
+    public boolean canMerge(int c1, int r1, int c2, int r2, boolean wasUpperMerged) {
+        return (sameTileValuesAt(c1, r1, c2, r2) && !wasUpperMerged);
+    }
+
+    /** Returns the number of the top row */
+    private int topRow() {
+        return this.board.size() - 1;
+    }
+
+    /** Returns true if given row is bellow top one, otherwise false */
+    private boolean isBellowTopRow(int row) {
+        return row < topRow();
+    }
+
+    /** Returns true if given row is top one, otherwise false */
+    private boolean isTopRow(int row) {
+        return row == topRow();
+    }
+
+    /** Returns true if tile at (c, r) is null, otherwise false */
+    private boolean isEmptyTileAt(int c, int r) {
+       return (this.board.tile(c, r) == null) ;
+    }
+
+    /** Returns true if tiles at (c1, r1) and (c2, r2) have same value, otherwise false */
+    private boolean sameTileValuesAt(int c1, int r1, int c2, int r2) {
+        return this.board.tile(c1, r1).value() == this.board.tile(c2, r2).value();
     }
 
     /** Checks if the game is over and sets the gameOver variable
@@ -137,7 +235,13 @@ public class Model extends Observable {
      *  Empty spaces are stored as null.
      * */
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
+        for (int col = 0; col < b.size(); col++) {
+            for (int row = 0; row < b.size(); row++) {
+                if (b.tile(col, row) == null) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -147,10 +251,20 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
+        for (int col = 0; col < b.size(); col++) {
+            for (int row = 0; row < b.size(); row++) {
+                if (isMaxTile(b.tile(col, row))) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
+    /** Returns true if the given tile has MAX_PIECE value */
+    public static boolean isMaxTile(Tile t) {
+        return t != null && (t.value() == MAX_PIECE);
+    }
     /**
      * Returns true if there are any valid moves on the board.
      * There are two ways that there can be valid moves:
@@ -158,11 +272,49 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
+        return emptySpaceExists(b) || twoAdjacentTilesSameValue(b);
+    }
+
+    /**
+     * Returns true if there are two adjacent tiles with the same value, otherwise false.
+     * @param b a board
+     * @return true if there are two adjacent tiles with the same value, otherwise false
+     */
+    private static boolean twoAdjacentTilesSameValue(Board b) {
+        boolean sameValuesVertically = twoVerticallyAdjacentTilesWithSameValues(b);
+        boolean sameValuesHorizontally = twoHorizontallyAdjacentTilesWithSameValues(b);
+        return sameValuesVertically || sameValuesHorizontally;
+    }
+
+    /**
+     * Returns true if there are two vertically adjacent tiles with the same value, otherwise false.
+     * @param b a board
+     * @return true if there are two vertically adjacent tiles with the same value, otherwise false
+     */
+    private static boolean twoVerticallyAdjacentTilesWithSameValues(Board b) {
+        for (int c = 0; c < b.size(); c++) {
+            for (int r = 0; r < b.size() - 1; r++) {
+                int currentRowValue = b.tile(c, r).value();
+                int upperRowValue = b.tile(c, r + 1).value();
+                if (currentRowValue == upperRowValue) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
-
+    /**
+     * Returns true if there are two horizontally adjacent tiles with the same value, otherwise false.
+     * @param b a board
+     * @return true if there are two horizontally  adjacent tiles with the same value, otherwise false
+     */
+    private static boolean twoHorizontallyAdjacentTilesWithSameValues(Board b) {
+        b.setViewingPerspective(Side.WEST);
+        boolean sameValues = twoVerticallyAdjacentTilesWithSameValues(b);
+        b.setViewingPerspective(Side.NORTH);
+        return sameValues;
+    }
     @Override
      /** Returns the model as a string, used for debugging. */
     public String toString() {
