@@ -73,7 +73,6 @@ public class TimeSLList {
         sizes.addLast(16000);
         sizes.addLast(32000);
         sizes.addLast(64000);
-        sizes.addLast(128000);
         return sizes;
     }
 }
