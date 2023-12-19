@@ -100,7 +100,7 @@ public class LinkedListDeque<T> implements Deque<T> {
         Node<T> cursor = getFirstNode();
         int i = 0;
         while (cursor != sentinel) {
-            if (i == 0) {
+            if (i == index) {
                 return cursor.item;
             }
             i++;
