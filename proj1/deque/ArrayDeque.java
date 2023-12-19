@@ -49,7 +49,7 @@ public class ArrayDeque<T> implements Deque<T> {
     @Override
     public T removeLast() {
         if (size == 0) return null;
-        
+
         T last = items[size - 1];
         size--;
         items[size] = null;
@@ -58,6 +58,8 @@ public class ArrayDeque<T> implements Deque<T> {
 
     @Override
     public T get(int index) {
+        if (size == 0) return null;
+
         return items[index -1];
     }
 }
