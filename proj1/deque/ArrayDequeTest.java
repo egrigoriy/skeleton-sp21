@@ -107,7 +107,7 @@ public class ArrayDequeTest {
 
     @Test
     /* Add large number of elements to deque; check if order is correct. */
-    public void bigLLDequeTest() {
+    public void bigADequeTest() {
 
         // System.out.println("Make sure to uncomment the lines below (and delete this print statement).");
         ArrayDeque<Integer> lld1 = new ArrayDeque<>();

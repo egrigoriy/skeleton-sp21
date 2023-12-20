@@ -1,11 +1,10 @@
 package gh2;
 
 // TOD: uncomment the following import once you're ready to start this portion
- import deque.Deque;
+import deque.Deque;
 // TOD: maybe more imports
 
 import deque.ArrayDeque;
-import deque.Deque;
 
 //Note: This file will not compile until you complete the Deque implementations
 public class GuitarString {

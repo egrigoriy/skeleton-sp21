@@ -23,7 +23,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         return getItRecursive(getFirstNode(), index);
     }
 
-    public T getItRecursive(Node<T> node, int index) {
+    private T getItRecursive(Node<T> node, int index) {
         if (index == 0) {
             return node.item;
         }
@@ -142,7 +142,6 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
      Read here for more information)
      * */
     public boolean equals(Object o) {
-
         if (!(o instanceof Deque)) {
             return false;
         }
@@ -158,7 +157,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         }
 
         for (int i = 0; i < size(); i++) {
-            if (get(i) != other.get(i)) {
+            if (!get(i).equals(other.get(i))) {
                 return false;
             }
         }
