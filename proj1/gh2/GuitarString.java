@@ -1,8 +1,8 @@
 package gh2;
 
-// TODO: uncomment the following import once you're ready to start this portion
-// import deque.Deque;
-// TODO: maybe more imports
+// TOD: uncomment the following import once you're ready to start this portion
+ import deque.Deque;
+// TOD: maybe more imports
 
 import deque.ArrayDeque;
 import deque.Deque;
@@ -16,26 +16,27 @@ public class GuitarString {
     private static final double DECAY = .996; // energy decay factor
 
     /* Buffer for storing sound data. */
-    // TODO: uncomment the following line once you're ready to start this portion
-     private Deque<Double> buffer;
+    // TOD: uncomment the following line once you're ready to start this portion
+    private Deque<Double> buffer;
 
     /* Create a guitar string of the given frequency.  */
     public GuitarString(double frequency) {
-        // TODO: Create a buffer with capacity = SR / frequency. You'll need to
+        // TOD: Create a buffer with capacity = SR / frequency. You'll need to
         //       cast the result of this division operation into an int. For
         //       better accuracy, use the Math.round() function before casting.
         //       Your should initially fill your buffer array with zeros.
         buffer = new ArrayDeque<>();
-        int size = (int) Math.round(SR/frequency);
+        int size = (int) Math.round(SR / frequency);
+
         for (int i = 0; i < size; i++) {
-           buffer.addLast(0.0);
+            buffer.addLast(0.0);
         }
     }
 
 
     /* Pluck the guitar string by replacing the buffer with white noise. */
     public void pluck() {
-        // TODO: Dequeue everything in buffer, and replace with random numbers
+        // TOD: Dequeue everything in buffer, and replace with random numbers
         //       between -0.5 and 0.5. You can get such a number by using:
         //       double r = Math.random() - 0.5;
         //
@@ -57,7 +58,7 @@ public class GuitarString {
      * the Karplus-Strong algorithm.
      */
     public void tic() {
-        // TODO: Dequeue the front sample and enqueue a new sample that is
+        // TOD: Dequeue the front sample and enqueue a new sample that is
         //       the average of the two multiplied by the DECAY factor.
         //       **Do not call StdAudio.play().**
         double first = buffer.get(0);
@@ -65,13 +66,13 @@ public class GuitarString {
 
         double newSample = 0.996 * 0.5 * (first + second);
         buffer.removeFirst();
-        buffer.addFirst(newSample);
+        buffer.addLast(newSample);
     }
 
     /* Return the double at the front of the buffer. */
     public double sample() {
-        // TODO: Return the correct thing.
+        // TOD: Return the correct thing.
         return buffer.get(0);
     }
 }
-    // TODO: Remove all comments that say TODO when you're done.
+    // TOD: Remove all comments that say TOD when you're done.

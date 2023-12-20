@@ -17,7 +17,20 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
       * Same as get, but uses recursion.
       * */
     public T getRecursive(int index) {
-        return null;
+        if (size() == 0) {
+            return null;
+        }
+        return getItRecursive(getFirstNode(), index);
+    }
+
+    public T getItRecursive(Node<T> node, int index) {
+        if (index == 0) {
+            return node.item;
+        }
+        if (node.next == sentinel) {
+            return null;
+        }
+        return getItRecursive(node.next, index - 1);
     }
 
     @Override
@@ -116,9 +129,40 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         private Node<T> prev;
         private Node<T> next;
 
-         public Node(T item) {
+        private Node(T item) {
             this.item = item;
-         }
+        }
+    }
+
+    /**
+     *  Returns whether or not the parameter o is equal to the Deque.
+     o is considered equal if it is a Deque and if it contains the same contents
+     (as goverened by the generic T’s equals method) in the same order.
+     *  (ADDED 2/12: You’ll need to use the instance of keywords for this.
+     Read here for more information)
+     * */
+    public boolean equals(Object o) {
+
+        if (!(o instanceof Deque)) {
+            return false;
+        }
+
+        Deque<T> other = (Deque<T>) o;
+
+        if (other == this) {
+            return true;
+        }
+
+        if (size() != other.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < size(); i++) {
+            if (get(i) != other.get(i)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -130,7 +174,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         private Node<T> cursor = getFirstNode();
         @Override
         public boolean hasNext() {
-            return cursor.next != sentinel;
+            return cursor != sentinel;
         }
 
         @Override

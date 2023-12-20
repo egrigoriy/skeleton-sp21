@@ -1,6 +1,10 @@
 package deque;
 
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Iterator;
+
 import static org.junit.Assert.*;
 
 
@@ -121,5 +125,39 @@ public class LinkedListDequeTest {
         for (double i = 999999; i > 500000; i--) {
             assertEquals("Should have the same value", i, (double) lld1.removeLast(), 0.0);
         }
+    }
+
+    @Test
+    public void getRecursiveTest() {
+        LinkedListDeque<Integer> lld = new LinkedListDeque<>();
+        lld.addLast(0);
+        lld.removeFirst(); // ==> 0
+        lld.addLast(2);
+        lld.removeFirst(); // ==> 2
+        lld.addLast(4);
+        int actual = lld.getRecursive(0);
+        int expected = 4;
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void iteratorTest() {
+        LinkedListDeque<Integer> lld = new LinkedListDeque<>();
+        Iterator<Integer> iter = lld.iterator();
+
+        assertEquals(false, iter.hasNext());
+
+        lld.addLast(1);
+        lld.addLast(2);
+        lld.addLast(3);
+        iter = lld.iterator();
+
+        assertEquals(true, iter.hasNext());
+        assertEquals(Integer.valueOf(1), iter.next());
+        assertEquals(true, iter.hasNext());
+        assertEquals(Integer.valueOf(2), iter.next());
+        assertEquals(true, iter.hasNext());
+        assertEquals(Integer.valueOf(3), iter.next());
+        assertEquals(false, iter.hasNext());
     }
 }

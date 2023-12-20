@@ -49,13 +49,4 @@ public interface Deque<T> {
      */
     T get(int index);
 
-//    /**
-//     *  Returns whether or not the parameter o is equal to the Deque.
-//     o is considered equal if it is a Deque and if it contains the same contents
-//     (as goverened by the generic T’s equals method) in the same order.
-//     *  (ADDED 2/12: You’ll need to use the instance of keywords for this.
-//     Read here for more information)
-//     * */
-//    public boolean equals(Object o);
-//
 }
