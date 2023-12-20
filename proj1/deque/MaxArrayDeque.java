@@ -1,16 +1,17 @@
-package gh2;
+package deque;
 
 import deque.ArrayDeque;
 
 import java.util.Comparator;
 
 public class MaxArrayDeque<T> extends ArrayDeque<T> {
+    private Comparator<T> comparator;
     /**
      * Creates a MaxArrayDeque with the given Comparator.
      * @param c
      */
     public MaxArrayDeque(Comparator<T> c) {
-
+        comparator = c;
     }
 
     /**
@@ -20,6 +21,9 @@ public class MaxArrayDeque<T> extends ArrayDeque<T> {
      * @return
      */
     public T max() {
+        if (size() == 0) {
+            return null;
+        }
         return null;
     }
 
@@ -30,6 +34,9 @@ public class MaxArrayDeque<T> extends ArrayDeque<T> {
      * @return
      */
     public T max(Comparator<T> c) {
+        if (size() == 0) {
+            return null;
+        }
         return null;
     }
 }

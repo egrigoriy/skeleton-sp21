@@ -2,17 +2,17 @@ package deque;
 
 import java.util.Iterator;
 
-public class ArrayDeque<T> implements Deque<T> {
+public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private T[] items;
     private int size;
 
     public ArrayDeque() {
-        items = (T[])new Object[8];
+        items = (T[]) new Object[8];
         size = 0;
     }
 
     private void resize(int capacity) {
-        T[] newArray = (T[])new Object[capacity];
+        T[] newArray = (T[]) new Object[capacity];
         System.arraycopy(items, 0, newArray, 0, size);
         items = newArray;
     }
@@ -53,7 +53,9 @@ public class ArrayDeque<T> implements Deque<T> {
 
     @Override
     public T removeFirst() {
-        if (size == 0) return null;
+        if (size == 0) {
+            return null;
+        }
 
         if ((size < items.length / 8) && (size > 8)) {
             resize(size);
@@ -67,7 +69,9 @@ public class ArrayDeque<T> implements Deque<T> {
 
     @Override
     public T removeLast() {
-        if (size == 0) return null;
+        if (size == 0) {
+            return null;
+        }
 
         if ((size < items.length / 8) && (size > 8)) {
             resize(size);
@@ -81,9 +85,30 @@ public class ArrayDeque<T> implements Deque<T> {
 
     @Override
     public T get(int index) {
-        if ((size == 0) || (index < 0)) return null;
+        if ((size == 0) || (index < 0)) {
+            return null;
+        }
         return items[index];
     }
 
 
+    @Override
+    public Iterator<T> iterator() {
+        return new ArrayDequeIterator();
+    }
+
+    private class ArrayDequeIterator implements Iterator<T> {
+        private int i = 0;
+        @Override
+        public boolean hasNext() {
+            return i < size();
+        }
+
+        @Override
+        public T next() {
+            T nextItem = items[i];
+            i++;
+            return nextItem;
+        }
+    }
 }

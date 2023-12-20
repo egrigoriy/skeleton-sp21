@@ -6,9 +6,9 @@ import edu.princeton.cs.algs4.StdAudio;
 import edu.princeton.cs.algs4.StdDraw;
 
 public class GuitarHero {
-    public static final double CONCERT_A = 440.0;
-    public static final String keyboard = "q2we4r5ty7u8i9op-[=zxdcfvgbnjmk,.;/' ";
-    public Deque<GuitarString> strings;
+    private static final double CONCERT_A = 440.0;
+    private static String keyboard = "q2we4r5ty7u8i9op-[=zxdcfvgbnjmk,.;/' ";
+    private Deque<GuitarString> strings;
 
     public GuitarHero() {
         int size = keyboard.length();
@@ -26,7 +26,7 @@ public class GuitarHero {
             if (StdDraw.hasNextKeyTyped()) {
                 char key = StdDraw.nextKeyTyped();
                 int index = keyboard.indexOf(key);
-                if (index != -1 ) {
+                if (index != -1) {
                     gh.pluckString(index);
                 }
             }
@@ -56,7 +56,7 @@ public class GuitarHero {
 
     private void tic() {
         for (int i = 0; i < strings.size(); i++) {
-           strings.get(i).tic();
+            strings.get(i).tic();
         }
     }
 }
