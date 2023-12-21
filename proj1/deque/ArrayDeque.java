@@ -5,15 +5,30 @@ import java.util.Iterator;
 public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private T[] items;
     private int size;
+    private int nextFirst;
+    private int nextLast;
+    private Ring ring;
 
     public ArrayDeque() {
-        items = (T[]) new Object[8];
+        int capacity = 8;
+        items = (T[]) new Object[capacity];
+        nextFirst = capacity / 2;
+        nextLast = nextFirst + 1;
         size = 0;
+        ring = new Ring(capacity);
     }
 
     private void resize(int capacity) {
         T[] newArray = (T[]) new Object[capacity];
-        System.arraycopy(items, 0, newArray, 0, size);
+
+        for (int i = 0; i < size; i++) {
+            int ringIndex = ring.getRingIndexWithShift(i, getFirstIndex());
+            newArray[i] = items[ringIndex];
+        }
+        ring = new Ring(capacity);
+        nextFirst = ring.getPrev(0);
+        nextLast = ring.getNext(size - 1);
+
         items = newArray;
     }
     @Override
@@ -21,17 +36,33 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (size == items.length) {
             resize(size * 2);
         }
-        System.arraycopy(items, 0, items, 1, size);
-        items[0] = item;
+        items[nextFirst] = item;
+        tickNextFirst();
         size++;
     }
 
+    private void tickNextFirst() {
+        nextFirst = ring.getPrev(nextFirst);
+    }
+
+    private void tickNextLast() {
+        nextLast = ring.getNext(nextLast);
+    }
+
+    private int getFirstIndex() {
+        return ring.getNext(nextFirst);
+    }
+
+    private int getLastIndex() {
+        return ring.getPrev(nextLast);
+    }
     @Override
     public void addLast(T item) {
         if (size == items.length) {
             resize(size * 2);
         }
-        items[size] = item;
+        items[nextLast] = item;
+        tickNextLast();
         size++;
     }
 
@@ -61,9 +92,11 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             resize(size);
         }
 
-        T first = items[0];
+        int firstIndex = getFirstIndex();
+        T first = items[firstIndex];
+        items[firstIndex] = null;
+        nextFirst = firstIndex;
         size--;
-        System.arraycopy(items, 1, items, 0, size);
         return first;
     }
 
@@ -73,13 +106,15 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             return null;
         }
 
-        if ((size < items.length / 8) && (size > 8)) {
+        if ((size < items.length / 4) && (size > 4)) {
             resize(size);
         }
 
-        T last = items[size - 1];
+        int lastIndex = getLastIndex();
+        T last = items[lastIndex];
+        items[lastIndex] =  null;
+        nextLast = lastIndex;
         size--;
-        items[size] = null;
         return last;
     }
 
@@ -88,7 +123,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if ((size == 0) || (index < 0)) {
             return null;
         }
-        return items[index];
+
+        int start = getFirstIndex();
+        int ringIndex = ring.getRingIndexWithShift(index, start);
+        return items[ringIndex];
     }
 
     /**
@@ -128,16 +166,16 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     private class ArrayDequeIterator implements Iterator<T> {
-        private int i = 0;
+        private int i = getFirstIndex();
         @Override
         public boolean hasNext() {
-            return i < size();
+            return i != getLastIndex();
         }
 
         @Override
         public T next() {
             T nextItem = items[i];
-            i++;
+            i = ring.getNext(i);
             return nextItem;
         }
     }

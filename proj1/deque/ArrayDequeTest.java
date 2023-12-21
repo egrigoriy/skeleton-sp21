@@ -2,6 +2,8 @@ package deque;
 
 import org.junit.Test;
 
+import java.util.Iterator;
+
 import static org.junit.Assert.*;
 
 
@@ -53,6 +55,20 @@ public class ArrayDequeTest {
 		// should be empty
 		assertTrue("lld1 should be empty after removal", lld1.isEmpty());
     }
+
+    @Test
+    public void getTest() {
+
+        // System.out.println("Make sure to uncomment the lines below (and delete this print statement).");
+        ArrayDeque<Integer> lld1 = new ArrayDeque<>();
+        lld1.addFirst(10);
+        lld1.addFirst(20);
+        lld1.addFirst(30);
+
+        assertEquals(Integer.valueOf(10), lld1.get(2));
+
+    }
+
 
     @Test
     /* Tests removing from an empty deque */
@@ -107,6 +123,25 @@ public class ArrayDequeTest {
 
     @Test
     /* Add large number of elements to deque; check if order is correct. */
+    public void resizeADequeTest() {
+
+        // System.out.println("Make sure to uncomment the lines below (and delete this print statement).");
+        ArrayDeque<Integer> lld1 = new ArrayDeque<>();
+        int halfSize = 10;
+        for (int i = 0; i < 2 * halfSize; i++) {
+            lld1.addLast(i);
+        }
+
+        for (double i = 0; i < halfSize; i++) {
+            assertEquals("Should have the same value", i, (double) lld1.removeFirst(), 0.0);
+        }
+
+        for (double i = halfSize * 2 - 1; i > halfSize; i--) {
+            assertEquals("Should have the same value", i, (double) lld1.removeLast(), 0.0);
+        }
+}
+    @Test
+    /* Add large number of elements to deque; check if order is correct. */
     public void bigADequeTest() {
 
         // System.out.println("Make sure to uncomment the lines below (and delete this print statement).");
@@ -122,5 +157,19 @@ public class ArrayDequeTest {
         for (double i = 999999; i > 500000; i--) {
             assertEquals("Should have the same value", i, (double) lld1.removeLast(), 0.0);
         }
+    }
+
+    @Test
+    public void iteratorTest() {
+        ArrayDeque<Integer> lld1 = new ArrayDeque<>();
+        for (int i = 0; i < 7; i++) {
+            lld1.addLast(i);
+        }
+
+        Iterator<Integer> iterator = lld1.iterator();
+        for (int i = 0; i < 7; i++) {
+            assertEquals(Integer.valueOf(i), iterator.next());
+        }
+
     }
 }
