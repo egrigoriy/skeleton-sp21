@@ -65,6 +65,7 @@ public class ArrayDequeTest {
         lld1.addFirst(20);
         lld1.addFirst(30);
 
+        assertEquals(Integer.valueOf(30), lld1.get(0));
         assertEquals(Integer.valueOf(10), lld1.get(2));
 
     }
@@ -162,13 +163,16 @@ public class ArrayDequeTest {
     @Test
     public void iteratorTest() {
         ArrayDeque<Integer> lld1 = new ArrayDeque<>();
+        Iterator<Integer> iterator = lld1.iterator();
+        assertEquals(false, iterator.hasNext());
+
         for (int i = 0; i < 7; i++) {
             lld1.addLast(i);
         }
 
-        Iterator<Integer> iterator = lld1.iterator();
         for (int i = 0; i < 7; i++) {
-            assertEquals(Integer.valueOf(i), iterator.next());
+            Integer actual = iterator.next();
+            assertEquals(Integer.valueOf(i), actual);
         }
 
     }

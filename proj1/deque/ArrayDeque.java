@@ -5,15 +5,11 @@ import java.util.Iterator;
 public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private T[] items;
     private int size;
-    private int nextFirst;
-    private int nextLast;
     private Ring ring;
 
     public ArrayDeque() {
         int capacity = 8;
         items = (T[]) new Object[capacity];
-        nextFirst = capacity / 2;
-        nextLast = nextFirst + 1;
         size = 0;
         ring = new Ring(capacity);
     }
@@ -22,12 +18,12 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         T[] newArray = (T[]) new Object[capacity];
 
         for (int i = 0; i < size; i++) {
-            int ringIndex = ring.getRingIndexWithShift(i, getFirstIndex());
+            int ringIndex = ring.getRingIndexWithShift(i, ring.getFirstIndex());
             newArray[i] = items[ringIndex];
         }
         ring = new Ring(capacity);
-        nextFirst = ring.getPrev(0);
-        nextLast = ring.getNext(size - 1);
+        ring.nextFirst = ring.getPrev(0);
+        ring.nextLast = ring.getNext(size - 1);
 
         items = newArray;
     }
@@ -36,33 +32,18 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (size == items.length) {
             resize(size * 2);
         }
-        items[nextFirst] = item;
-        tickNextFirst();
+        items[ring.getNextFirst()] = item;
+        ring.tickNextFirst();
         size++;
     }
 
-    private void tickNextFirst() {
-        nextFirst = ring.getPrev(nextFirst);
-    }
-
-    private void tickNextLast() {
-        nextLast = ring.getNext(nextLast);
-    }
-
-    private int getFirstIndex() {
-        return ring.getNext(nextFirst);
-    }
-
-    private int getLastIndex() {
-        return ring.getPrev(nextLast);
-    }
     @Override
     public void addLast(T item) {
         if (size == items.length) {
             resize(size * 2);
         }
-        items[nextLast] = item;
-        tickNextLast();
+        items[ring.getNextLast()] = item;
+        ring.tickNextLast();
         size++;
     }
 
@@ -74,7 +55,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     @Override
     public void printDeque() {
         for (int i = 0; i < size; i++) {
-            System.out.print(items[i]);
+            System.out.print(get(i));
             if (i < size - 1) {
                 System.out.print(" ");
             }
@@ -92,10 +73,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             resize(size);
         }
 
-        int firstIndex = getFirstIndex();
+        int firstIndex = ring.getFirstIndex();
         T first = items[firstIndex];
         items[firstIndex] = null;
-        nextFirst = firstIndex;
+        ring.nextFirst = firstIndex;
         size--;
         return first;
     }
@@ -110,10 +91,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             resize(size);
         }
 
-        int lastIndex = getLastIndex();
+        int lastIndex = ring.getLastIndex();
         T last = items[lastIndex];
         items[lastIndex] =  null;
-        nextLast = lastIndex;
+        ring.nextLast = lastIndex;
         size--;
         return last;
     }
@@ -124,9 +105,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             return null;
         }
 
-        int start = getFirstIndex();
-        int ringIndex = ring.getRingIndexWithShift(index, start);
-        return items[ringIndex];
+        return items[ring.linearToStorageIndex(index)];
     }
 
     /**
@@ -166,16 +145,16 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     private class ArrayDequeIterator implements Iterator<T> {
-        private int i = getFirstIndex();
+        private int i = 0;
         @Override
         public boolean hasNext() {
-            return i != getLastIndex();
+            return i < size;
         }
 
         @Override
         public T next() {
-            T nextItem = items[i];
-            i = ring.getNext(i);
+            T nextItem = get(i);
+            i++;
             return nextItem;
         }
     }

@@ -1,6 +1,5 @@
 package deque;
 
-import jh61b.junit.In;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -34,7 +33,7 @@ public class RingTest {
     @Test
     public void prevEdge() {
         Ring r = new Ring(13);
-        assertEquals(12 , r.getPrev(0));
+        assertEquals(12, r.getPrev(0));
     }
 
     @Test
