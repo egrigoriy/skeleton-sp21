@@ -3,110 +3,114 @@ package deque;
 import java.util.Iterator;
 
 public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
+    private final int EXPAND_FACTOR = 2;
+    private final int SHRINK_FACTOR = 4;
     private T[] items;
-    private int size;
     private Ring ring;
 
     public ArrayDeque() {
         int capacity = 8;
         items = (T[]) new Object[capacity];
-        size = 0;
-        ring = new Ring(capacity);
+        ring = new Ring(capacity, 0);
     }
 
     private void resize(int capacity) {
         T[] newArray = (T[]) new Object[capacity];
 
-        for (int i = 0; i < size; i++) {
-            int ringIndex = ring.getRingIndexWithShift(i, ring.getFirstIndex());
-            newArray[i] = items[ringIndex];
+        for (int i = 0; i < size(); i++) {
+            newArray[i] = items[ring.indexToStorageIndex(i)];
         }
-        ring = new Ring(capacity);
-        ring.nextFirst = ring.getPrev(0);
-        ring.nextLast = ring.getNext(size - 1);
+
+        ring = new Ring(capacity, size());
 
         items = newArray;
     }
     @Override
     public void addFirst(T item) {
-        if (size == items.length) {
-            resize(size * 2);
+        if (shouldExpand()) {
+            resize(items.length * EXPAND_FACTOR);
         }
         items[ring.getNextFirst()] = item;
         ring.tickNextFirst();
-        size++;
     }
 
     @Override
     public void addLast(T item) {
-        if (size == items.length) {
-            resize(size * 2);
+        if (shouldExpand()) {
+            resize(items.length * EXPAND_FACTOR);
         }
         items[ring.getNextLast()] = item;
         ring.tickNextLast();
-        size++;
+    }
+
+    @Override
+    public T removeFirst() {
+        if (size() == 0) {
+            return null;
+        }
+
+        if (shouldShrink()) {
+            resize(items.length / SHRINK_FACTOR);
+        }
+
+        int firstIndex = ring.getFirstIndex();
+        T first = items[firstIndex];
+        items[firstIndex] = null;
+        ring.backNextFirst();
+        return first;
+    }
+
+    @Override
+    public T removeLast() {
+        if (size() == 0) {
+            return null;
+        }
+
+        if (shouldShrink()) {
+            resize(items.length * SHRINK_FACTOR);
+        }
+
+        int lastIndex = ring.getLastIndex();
+        T last = items[lastIndex];
+        items[lastIndex] =  null;
+        ring.backNextLast();
+        return last;
     }
 
     @Override
     public int size() {
-        return size;
+        return ring.size();
+    }
+
+    @Override
+    public T get(int index) {
+        if ((size() == 0) || (index < 0)) {
+            return null;
+        }
+
+        return items[ring.indexToStorageIndex(index)];
     }
 
     @Override
     public void printDeque() {
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size(); i++) {
             System.out.print(get(i));
-            if (i < size - 1) {
+            if (i < size() - 1) {
                 System.out.print(" ");
             }
         }
         System.out.println();
     }
 
-    @Override
-    public T removeFirst() {
-        if (size == 0) {
-            return null;
-        }
 
-        if ((size < items.length / 4) && (size > 8)) {
-            resize(size);
-        }
-
-        int firstIndex = ring.getFirstIndex();
-        T first = items[firstIndex];
-        items[firstIndex] = null;
-        ring.nextFirst = firstIndex;
-        size--;
-        return first;
+    private boolean shouldShrink() {
+       return (size() < items.length / 4) && (size() > 8) ;
     }
 
-    @Override
-    public T removeLast() {
-        if (size == 0) {
-            return null;
-        }
-
-        if ((size < items.length / 4) && (size > 4)) {
-            resize(size);
-        }
-
-        int lastIndex = ring.getLastIndex();
-        T last = items[lastIndex];
-        items[lastIndex] =  null;
-        ring.nextLast = lastIndex;
-        size--;
-        return last;
+    private boolean shouldExpand() {
+        return size() == items.length;
     }
 
-    @Override
-    public T get(int index) {
-        if ((size == 0) || (index < 0)) {
-            return null;
-        }
-
-        return items[ring.linearToStorageIndex(index)];
-    }
 
     /**
      * Returns whether or not the parameter o is equal to the Deque.
@@ -148,7 +152,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         private int i = 0;
         @Override
         public boolean hasNext() {
-            return i < size;
+            return i < size();
         }
 
         @Override

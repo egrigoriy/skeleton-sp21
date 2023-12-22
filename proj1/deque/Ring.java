@@ -2,75 +2,63 @@ package deque;
 
 public class Ring {
     private int capacity;
-    public int nextFirst;
-    public int nextLast;
+    private CyclicCursor first;
+    private CyclicCursor last;
 
-    public Ring(int capacity) {
+    private int size;
+
+    public Ring(int capacity, int size) {
         this.capacity = capacity;
-        nextFirst = capacity / 2;
-        nextLast = nextFirst + 1;
+        this.size = size;
+        first = new CyclicCursor(capacity, CyclicCursor.DIR.BACK, 0);
+        last = new CyclicCursor(capacity, CyclicCursor.DIR.FORTH, size - 1);
     }
 
+    public int size() {
+        return size;
+    }
     public int getNextFirst() {
-        return nextFirst;
+        return first.getNextPosition();
     }
 
     public int getNextLast() {
-        return nextLast;
-    }
-
-    public int getNext(int i) {
-        return (i + 1) % capacity;
-    }
-
-    public int getPrev(int i) {
-        i = i - 1;
-        if (i == -1) {
-            i = capacity - 1;
-        }
-        return i;
+        return last.getNextPosition();
     }
 
     public void tickNextFirst() {
-        nextFirst = getPrev(nextFirst);
+        first.advance();
+        size++;
+    }
+
+    public void backNextFirst() {
+        first.back();
+        size--;
+    }
+
+    public void backNextLast() {
+        last.back();
+        size--;
     }
 
     public void tickNextLast() {
-        nextLast = getNext(nextLast);
+        last.advance();
+        size++;
     }
 
     public int getFirstIndex() {
-        return getNext(nextFirst);
+        return first.getPosition();
     }
 
     public int getLastIndex() {
-        return getPrev(nextLast);
+        return last.getPosition();
     }
 
-    public int linearToStorageIndex(int index) {
+    public int indexToStorageIndex(int index) {
         int start = getFirstIndex();
         return getRingIndexWithShift(index, start);
     }
 
-    /**
-     * Returns the linear index of an item within a ring
-     *
-     * @param ringIndex in the ring structure
-     * @param start 0-th position in the ring
-     * @return
-     */
-    public int getLinearIndexWithShift(int ringIndex, int start) {
-        if (ringIndex < start) {
-            return capacity + (ringIndex - start);
-        }
-        return ringIndex - start;
-    }
-
-    public int getRingIndexWithShift(int linearIndex, int start) {
+    private int getRingIndexWithShift(int linearIndex, int start) {
         return (start + linearIndex) % capacity;
     }
-
-    /**
-     * Returns ring index if 0-position is start
-     * */
 }
