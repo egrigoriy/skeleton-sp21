@@ -117,7 +117,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     private int minusOne(int i) {
-       return (i != 0) ? i - 1 : items.length - 1;
+        return (i != 0) ? i - 1 : items.length - 1;
     }
 
     private int plusOne(int i) {
@@ -148,7 +148,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     private boolean shouldShrink() {
-        return (size() <= items.length / 4);
+        return (size <= items.length / 4) && (size > 4);
     }
 
     private boolean shouldExpand() {

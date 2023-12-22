@@ -1,5 +1,6 @@
 package deque;
 
+import org.checkerframework.checker.units.qual.A;
 import org.junit.Test;
 
 import java.util.Iterator;
@@ -176,5 +177,23 @@ public class ArrayDequeTest {
             assertEquals(Integer.valueOf(i), actual);
         }
 
+    }
+
+    @Test
+    public void basicGet() {
+        ArrayDeque<Integer> ad = new ArrayDeque<>();
+        ad.addFirst(0);
+        assertEquals(Integer.valueOf(0), ad.removeFirst());
+        ad.addFirst(2);
+        assertEquals(Integer.valueOf(2), ad.get(0));
+        assertEquals(Integer.valueOf(2), ad.get(0));
+        ad.addLast(5);
+        ad.addLast(6);
+        assertEquals(Integer.valueOf(6), ad.removeLast());
+        ad.addLast(8);
+        assertEquals(Integer.valueOf(2), ad.removeFirst());
+        assertEquals(Integer.valueOf(5), ad.removeFirst());
+        assertEquals(Integer.valueOf(8), ad.removeFirst());
+        ad.addLast(12);
     }
 }
