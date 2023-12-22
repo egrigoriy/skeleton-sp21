@@ -102,9 +102,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         System.out.println();
     }
 
-
     private boolean shouldShrink() {
-       return (size() < items.length / 4) && (size() > 4) ;
+        return (size() < items.length / 4) && (size() > 4);
     }
 
     private boolean shouldExpand() {

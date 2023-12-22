@@ -2,8 +2,6 @@ package deque;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class RingTest {
     @Test
     public void canCreateARing() {
