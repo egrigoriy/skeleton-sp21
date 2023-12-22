@@ -2,31 +2,26 @@ package deque;
 
 import java.util.Iterator;
 
-public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
+public class ArrayDeque2<T> implements Deque<T>, Iterable<T> {
     private final int EXPAND_FACTOR = 2;
     private final int SHRINK_FACTOR = 4;
-    private int size;
     private T[] items;
-    private int nextFirst;
-    private int nextLast;
+    private Ring ring;
 
-    public ArrayDeque() {
+    public ArrayDeque2() {
         int capacity = 8;
         items = (T[]) new Object[capacity];
-        nextFirst = capacity / 2;
-        nextLast = nextFirst + 1;
-        size = 0;
+        ring = new Ring(capacity, 0);
     }
 
     private void resize(int capacity) {
         T[] newArray = (T[]) new Object[capacity];
 
         for (int i = 0; i < size(); i++) {
-            int storageIndex = indexToStorageIndex(i);
-            newArray[i] = items[storageIndex];
+            newArray[i] = items[ring.indexToStorageIndex(i)];
         }
-        nextFirst = capacity - 1;
-        nextLast = size;
+
+        ring = new Ring(capacity, size());
 
         items = newArray;
     }
@@ -35,9 +30,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (shouldExpand()) {
             resize(items.length * EXPAND_FACTOR);
         }
-        items[nextFirst] = item;
-        tickNextFirst();
-        size++;
+        items[ring.getNextFirst()] = item;
+        ring.tickNextFirst();
     }
 
     @Override
@@ -45,9 +39,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (shouldExpand()) {
             resize(items.length * EXPAND_FACTOR);
         }
-        items[nextLast] = item;
-        tickNextLast();
-        size++;
+        items[ring.getNextLast()] = item;
+        ring.tickNextLast();
     }
 
     @Override
@@ -60,11 +53,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             resize(items.length / SHRINK_FACTOR);
         }
 
-        int firstIndex = getFirstIndex();
+        int firstIndex = ring.getFirstIndex();
         T first = items[firstIndex];
         items[firstIndex] = null;
-        backNextFirst();
-        size--;
+        ring.backNextFirst();
         return first;
     }
 
@@ -78,17 +70,16 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             resize(items.length / SHRINK_FACTOR);
         }
 
-        int lastIndex = getLastIndex();
+        int lastIndex = ring.getLastIndex();
         T last = items[lastIndex];
         items[lastIndex] =  null;
-        backNextLast();
-        size--;
+        ring.backNextLast();
         return last;
     }
 
     @Override
     public int size() {
-        return size;
+        return ring.size();
     }
 
     @Override
@@ -97,43 +88,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             return null;
         }
 
-        return items[indexToStorageIndex(index)];
-    }
-
-    private void tickNextFirst() {
-        nextFirst = minusOne(nextFirst);
-    }
-
-    private void backNextFirst() {
-        nextFirst = plusOne(nextFirst);
-    }
-
-    private void tickNextLast() {
-        nextLast = plusOne(nextLast);
-    }
-
-    private void backNextLast() {
-        nextLast = minusOne(nextLast);
-    }
-
-    private int minusOne(int i) {
-       return (i != 0) ? i - 1 : items.length - 1;
-    }
-
-    private int plusOne(int i) {
-        return (i + 1) % items.length;
-    }
-
-    private int getFirstIndex() {
-        return plusOne(nextFirst);
-    }
-
-    private int getLastIndex() {
-        return minusOne(nextLast);
-    }
-
-    private int indexToStorageIndex(int index) {
-        return (getFirstIndex() + index) % items.length;
+        return items[ring.indexToStorageIndex(index)];
     }
 
     @Override
@@ -185,6 +140,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         }
         return true;
     }
+
 
     @Override
     public Iterator<T> iterator() {
