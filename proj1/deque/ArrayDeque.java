@@ -67,7 +67,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         }
 
         if (shouldShrink()) {
-            resize(items.length * SHRINK_FACTOR);
+            resize(items.length / SHRINK_FACTOR);
         }
 
         int lastIndex = ring.getLastIndex();
@@ -104,7 +104,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
 
     private boolean shouldShrink() {
-       return (size() < items.length / 4) && (size() > 8) ;
+       return (size() < items.length / 4) && (size() > 4) ;
     }
 
     private boolean shouldExpand() {
