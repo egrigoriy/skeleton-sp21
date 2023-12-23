@@ -18,6 +18,13 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         size = 0;
     }
 
+    /**
+     * Resizes the items array to given capacity.
+     * Items sequence is slided in a such a way,
+     * that first one is at position 0, and the last one is at position size
+     *
+     * @param capacity new capacity for items
+     */
     private void resize(int capacity) {
         T[] newArray = (T[]) new Object[capacity];
 
@@ -100,38 +107,84 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         return items[indexToStorageIndex(index)];
     }
 
+    /**
+     * Advance nextFirst pointer with one position.
+     * The "advance" is done by decreasing the index.
+     * The circularity is assured.
+     * */
     private void tickNextFirst() {
         nextFirst = minusOne(nextFirst);
     }
 
+    /**
+     * Moves back nextFirst pointer with one position.
+     * The "backward" is done by increasing the index.
+     * The circularity is assured.
+     */
     private void backNextFirst() {
         nextFirst = plusOne(nextFirst);
     }
 
+    /**
+     * Advance nextLast pointer with one position.
+     * The "advance" is done by increasing the index.
+     * The circularity is assured.
+     * */
     private void tickNextLast() {
         nextLast = plusOne(nextLast);
     }
 
+    /**
+     * Moves back nextLast pointer with one position.
+     * The "backward" is done by decreasing the index.
+     * The circularity is assured.
+     */
     private void backNextLast() {
         nextLast = minusOne(nextLast);
     }
 
+    /**
+     * Returns the value of a given index decremented by 1.
+     * Circularity is assured.
+     * @param i given index
+     * @return index decremented by one
+     */
     private int minusOne(int i) {
         return (i != 0) ? i - 1 : items.length - 1;
     }
 
+    /**
+     * Returns the value of a given index incremented by 1.
+     * Circularity is assured.
+     * @param i given index
+     * @return index incremented by one
+     */
     private int plusOne(int i) {
         return (i + 1) % items.length;
     }
 
+    /**
+     * Returns the index of the first item
+     * @return index of the first item
+     */
     private int getFirstIndex() {
         return plusOne(nextFirst);
     }
 
+    /**
+     * Returns the index of the last item
+     * @return index of the last item
+     */
     private int getLastIndex() {
         return minusOne(nextLast);
     }
 
+    /**
+     * Returns the storage index corresponding to the given order index.
+     * Circularity is assured.
+     * @param index
+     * @return
+     */
     private int indexToStorageIndex(int index) {
         return (getFirstIndex() + index) % items.length;
     }
