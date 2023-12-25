@@ -39,16 +39,20 @@ public class TestArrayDequeEC {
             if (n < 0.5) {
                 actual = student.removeFirst();
                 expected = reference.removeFirst();
+                message += "removeFirst()";
                 if (expected != actual) {
-                    message += "removeFirst()";
                     assertEquals(message, expected, actual);
+                } else {
+                    message += "\n";
                 }
             } else {
                 actual = student.removeLast();
                 expected = reference.removeLast();
+                message += "removeLast()";
                 if (expected != actual) {
-                    message += "removeLast()";
                     assertEquals(message, expected, actual);
+                } else {
+                    message += "\n";
                 }
             }
         }
