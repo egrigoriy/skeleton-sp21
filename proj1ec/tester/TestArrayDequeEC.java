@@ -8,59 +8,59 @@ import student.StudentArrayDeque;
 
 public class TestArrayDequeEC {
     @Test
-    public void enqueueBothSidesThenDequeBothSides() {
-//        Your test should randomly call StudentArrayDeque and ArrayDequeSolution methods
-//        until they disagree on an output.
-
+    public void testRandomAddRemove() {
         StudentArrayDeque<Integer> student = new StudentArrayDeque<>();
         ArrayDequeSolution<Integer> reference = new ArrayDequeSolution<>();
-        String message = "";
+        StringBuilder message = new StringBuilder();
 
         int numberOfOperations = 10;
+
+        randomlyAddFirstLast(numberOfOperations, reference, student, message);
+        assertEqualWhenRandomlyRemoveFirstLast(numberOfOperations, reference, student, message);
+    }
+
+    private void randomlyAddFirstLast(int numberOfOperations, ArrayDequeSolution<Integer> reference, StudentArrayDeque<Integer> student, StringBuilder message) {
         for (int i = 0; i < numberOfOperations; i++) {
             double n = StdRandom.uniform();
             if (n < 0.5) {
                 student.addFirst(i);
                 reference.addFirst(i);
-                message += "addFirst(" + i + ")" + "\n";
+                message.append("addFirst(" + i + ")\n");
             } else {
                 student.addLast(i);
                 reference.addLast(i);
-                message += "addLast(" + i + ")" + "\n";
-            }
-        }
-        Integer expected = reference.size();
-        Integer actual = student.size();
-        assertEquals(expected, actual);
-
-
-        for (int i = 0; i < numberOfOperations; i++) {
-            double n = StdRandom.uniform();
-            if (n < 0.5) {
-                actual = student.removeFirst();
-                expected = reference.removeFirst();
-                message += "removeFirst()";
-                if (expected != actual) {
-                    assertEquals(message, expected, actual);
-                } else {
-                    message += "\n";
-                }
-            } else {
-                actual = student.removeLast();
-                expected = reference.removeLast();
-                message += "removeLast()";
-                if (expected != actual) {
-                    assertEquals(message, expected, actual);
-                } else {
-                    message += "\n";
-                }
+                message.append("addLast(" + i + ")\n");
             }
         }
     }
 
-    // generate random number
-    // if result 0 test addFirst
-    // if result 1 test removeFirst
-    // if result 2 test addLast
-    // if result 3 test removeLast
+    private void assertEqualWhenRandomlyRemoveFirstLast(int numberOfOperations,
+                                                        ArrayDequeSolution<Integer> reference,
+                                                        StudentArrayDeque<Integer> student,
+                                                        StringBuilder message) {
+        for (int i = 0; i < numberOfOperations; i++) {
+            Integer actual;
+            Integer expected;
+            double n = StdRandom.uniform();
+            if (n < 0.5) {
+                actual = student.removeFirst();
+                expected = reference.removeFirst();
+                message.append("removeFirst()");
+                assertEqualsOrAppendMessage(message, expected, actual);
+            } else {
+                actual = student.removeLast();
+                expected = reference.removeLast();
+                message.append("removeLast()");
+                assertEqualsOrAppendMessage(message, expected, actual);
+            }
+        }
+    }
+
+    public void assertEqualsOrAppendMessage(StringBuilder message, Integer expected, Integer actual) {
+        if (!expected.equals(actual)) {
+            assertEquals(message.toString(), expected, actual);
+        } else {
+            message.append("\n");
+        }
+    }
 }
