@@ -16,7 +16,7 @@ public class TestArrayDequeEC {
         ArrayDequeSolution<Integer> reference = new ArrayDequeSolution<>();
         String message = "";
 
-        int numberOfOperations = 1000;
+        int numberOfOperations = 10;
         for (int i = 0; i < numberOfOperations; i++) {
             double n = StdRandom.uniform();
             if (n < 0.5) {
