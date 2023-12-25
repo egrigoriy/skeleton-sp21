@@ -26,7 +26,7 @@ public class TestArrayDequeEC {
             } else {
                 student.addLast(i);
                 reference.addLast(i);
-                message += "addFirst(" + i + ")" + "\n";
+                message += "addLast(" + i + ")" + "\n";
             }
         }
         Integer expected = reference.size();
