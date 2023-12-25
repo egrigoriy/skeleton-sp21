@@ -16,7 +16,8 @@ public class TestArrayDequeEC {
         ArrayDequeSolution<Integer> reference = new ArrayDequeSolution<>();
         String message = "";
 
-        for (int i = 0; i < 1000; i++) {
+        int numberOfOperations = 1000;
+        for (int i = 0; i < numberOfOperations; i++) {
             double n = StdRandom.uniform();
             if (n < 0.5) {
                 student.addFirst(i);
@@ -28,12 +29,12 @@ public class TestArrayDequeEC {
                 message += "addFirst(" + i + ")" + "\n";
             }
         }
-        int expected = reference.size();
-        int actual = student.size();
+        Integer expected = reference.size();
+        Integer actual = student.size();
         assertEquals(expected, actual);
 
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < numberOfOperations; i++) {
             double n = StdRandom.uniform();
             if (n < 0.5) {
                 actual = student.removeFirst();
