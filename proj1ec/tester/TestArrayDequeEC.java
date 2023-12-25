@@ -14,15 +14,18 @@ public class TestArrayDequeEC {
 
         StudentArrayDeque<Integer> student = new StudentArrayDeque<>();
         ArrayDequeSolution<Integer> reference = new ArrayDequeSolution<>();
+        String message = "";
 
         for (int i = 0; i < 1000; i++) {
             double n = StdRandom.uniform();
             if (n < 0.5) {
                 student.addFirst(i);
                 reference.addFirst(i);
+                message += "addFirst(" + i + ")" + "\n";
             } else {
                 student.addLast(i);
                 reference.addLast(i);
+                message += "addFirst(" + i + ")" + "\n";
             }
         }
         int expected = reference.size();
@@ -35,11 +38,17 @@ public class TestArrayDequeEC {
             if (n < 0.5) {
                 actual = student.removeFirst();
                 expected = reference.removeFirst();
-                assertEquals(expected, actual);
+                if (expected != actual) {
+                    message += "removeFirst()";
+                    assertEquals(message, expected, actual);
+                }
             } else {
                 actual = student.removeLast();
                 expected = reference.removeLast();
-                assertEquals(expected, actual);
+                if (expected != actual) {
+                    message += "removeLast()";
+                    assertEquals(message, expected, actual);
+                }
             }
         }
     }
