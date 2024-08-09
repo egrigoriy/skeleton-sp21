@@ -14,22 +14,19 @@ public class Main {
             System.exit(0);
         }
         String firstArg = args[0];
+        Repository repository;
         switch(firstArg) {
             case "init":
-                if (!Repository.GITLET_DIR.exists()) {
-                    Repository repository = new Repository();
-                    repository.init();
-                } else {
-                    System.out.println("A Gitlet version-control system already exists in the current directory.");
-                    System.exit(0);
-                }
+                repository = new Repository();
+                repository.init();
                 break;
+            case "status":
+                repository = new Repository();
+                repository.status();
             case "add":
-                if (!Repository.GITLET_DIR.exists()) {
-                    System.out.println("Not in an initialized Gitlet directory.");
-                    System.exit(0);
-                }
                 // TODO: handle the `add [filename]` command
+                repository = new Repository();
+                repository.add();
                 break;
             default:
                 System.out.println("No command with that name exists.");
