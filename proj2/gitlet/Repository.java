@@ -24,10 +24,15 @@ public class Repository {
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
+    public static final File BRANCHES_DIR = join(GITLET_DIR, "branches");
 
     public void init() {
         if (!GITLET_DIR.exists()) {
             GITLET_DIR.mkdir();
+            BRANCHES_DIR.mkdir();
+            File master = join(BRANCHES_DIR, "master");
+            Utils.writeContents(master, "hash of initial commit");
+
         } else {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             System.exit(0);
@@ -42,6 +47,20 @@ public class Repository {
     }
 
     public void status() {
+        StringBuilder result = new StringBuilder();
+        result.append("=== Branches ===" + "\n");
+        result.append("*master" + "\n");
+        result.append("\n");
+        result.append("=== Staged Files ===" + "\n");
+        result.append("\n");
+        result.append("=== Removed Files ===" + "\n");
+        result.append("\n");
+        result.append("=== Modifications Not Staged For Commit ===" + "\n");
+        result.append("\n");
+        result.append("=== Untracked Files ===" + "\n");
+        result.append("\n");
+
+        System.out.println(result);
 
     }
     /* TODO: fill in the rest of this class. */
