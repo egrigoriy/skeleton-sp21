@@ -25,8 +25,8 @@ public class Repository {
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
 
-    public boolean exists() {
-        return GITLET_DIR.exists();
+    public void init() {
+        GITLET_DIR.mkdir();
     }
 
     /* TODO: fill in the rest of this class. */

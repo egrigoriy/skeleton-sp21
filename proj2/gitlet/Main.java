@@ -16,7 +16,13 @@ public class Main {
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
-                // TODO: handle the `init` command
+                if (!Repository.GITLET_DIR.exists()) {
+                    Repository repository = new Repository();
+                    repository.init();
+                } else {
+                    System.out.println("A Gitlet version-control system already exists in the current directory.");
+                    System.exit(0);
+                }
                 break;
             case "add":
                 if (!Repository.GITLET_DIR.exists()) {
