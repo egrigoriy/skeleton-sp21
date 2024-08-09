@@ -1,0 +1,6 @@
+# Given: any state
+# When: invoke with command that doesn’t exist
+# Should: print corresponding message
+> foo
+No command with that name exists.
+<<<

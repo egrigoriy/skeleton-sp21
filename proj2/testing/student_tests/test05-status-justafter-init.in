@@ -1,0 +1,17 @@
+# Given: init setup in empty working directory
+# When: invoke status
+# Then: Master branch created and no files in any places
+I init_setup.inc
+> status
+=== Branches ===
+\*master
+
+=== Staged Files ===
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+
+=== Untracked Files ===
+
+<<<

@@ -1,0 +1,6 @@
+# Given: init setup not done
+# When: invoke not in initialized Gitlet working directory (i.e., one containing a .gitlet subdirectory)
+# Should: print corresponding message
+> add
+Not in an initialized Gitlet directory.
+<<<

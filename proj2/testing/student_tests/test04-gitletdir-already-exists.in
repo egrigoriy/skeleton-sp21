@@ -1,0 +1,7 @@
+# Given: init setup done
+# When: invoke init again
+# Should: print corresponding message
+I init_setup.inc
+> init
+A Gitlet version-control system already exists in the current directory.
+<<<

@@ -1,0 +1,6 @@
+# Given: any state
+# When: no args provided
+# Should: print corresponding message
+>
+Please enter a command.
+<<<
