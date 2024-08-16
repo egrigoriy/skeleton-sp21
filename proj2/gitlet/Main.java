@@ -26,7 +26,8 @@ public class Main {
             case "add":
                 // TODO: handle the `add [filename]` command
                 repository = new Repository();
-                repository.add();
+                String fileName = args[1];
+                repository.add(fileName);
                 break;
             case "log":
                 repository = new Repository();

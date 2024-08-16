@@ -30,6 +30,7 @@ public class Repository {
     public static final File REFS_DIR = join(GITLET_DIR, "refs");
     public static final File REF_HEADS_DIR = join(REFS_DIR, "heads");
     public static final File head_master = Utils.join(REF_HEADS_DIR, "master");
+    public static final File INDEX = Utils.join(GITLET_DIR, "index");
 
     public void init() {
         // System.out.println(GITLET_DIR.exists());
@@ -55,11 +56,25 @@ public class Repository {
         //System.out.println(com);
     }
 
-    public void add() {
+    public void add(String fileName) {
         if (!GITLET_DIR.exists()) {
             System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
         }
+
+        Index index;
+        if (INDEX.exists()) {
+            // read INDEX
+            index = Persistor.readIndex();
+        } else {
+
+            // create INDEX
+            index = new Index();
+        }
+        // update index
+        index.toAdd(fileName);
+        // save index
+        index.save();
     }
 
     public void status() {
