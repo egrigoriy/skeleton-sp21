@@ -28,6 +28,10 @@ public class Main {
                 repository = new Repository();
                 repository.add();
                 break;
+            case "log":
+                repository = new Repository();
+                repository.log();
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);
