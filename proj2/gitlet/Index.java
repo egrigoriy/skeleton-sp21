@@ -28,11 +28,15 @@ public class Index implements Serializable {
     public void status() {
         String result = "=== Branches ==="
                 + "*master" + "\n" + "\n"
-                + "=== Staged Files ===" + "\n" + "\n"
+                + "=== Staged Files ===" + "\n" + getFileNamesToAdd()
                 + "=== Removed Files ===" + "\n" + "\n"
                 + "=== Modifications Not Staged For Commit ===" + "\n" + "\n"
                 + "=== Untracked Files ===" + "\n" + "\n";
         System.out.println(result);
+    }
+
+    private String getFileNamesToAdd() {
+        return String.join("\n", filesToAdd.keySet()) + "\n";
     }
 
     public boolean hasFile(String fileName) {
