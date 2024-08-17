@@ -16,7 +16,7 @@ public class Repository {
      * variable is used. We've provided two examples for you.
      */
 
-    public void init() {
+    public static void init() {
         if (!Persistor.isRepositoryInitialized()) {
             Persistor.buildInfrastructure();
         } else {
@@ -30,7 +30,7 @@ public class Repository {
         Persistor.saveMaster(uid);
     }
 
-    public void add(String fileName) {
+    public static void add(String fileName) {
         if (!Persistor.isRepositoryInitialized()) {
             System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
@@ -46,12 +46,12 @@ public class Repository {
         index.save();
     }
 
-    public void status() {
+    public static void status() {
         Index index = Persistor.readIndex();
         index.status();
     }
 
-    public void log() {
+    public static void log() {
         Commit current = Persistor.readLastCommit();
         while (current != null) {
             System.out.println(current);
@@ -59,7 +59,7 @@ public class Repository {
         }
     }
 
-    public void commit(String message) {
+    public static void commit(String message) {
         if (message.isEmpty()) {
             System.out.println("Please enter a commit message.");
             System.exit(0);
@@ -85,12 +85,12 @@ public class Repository {
         Persistor.saveMaster(commit.getUid());
     }
 
-    public void checkoutFileFromLastCommit(String fileName) {
+    public static void checkoutFileFromLastCommit(String fileName) {
         Commit lastCommit = Persistor.readLastCommit();
         checkoutFileFromCommit(fileName, lastCommit.getUid());
     }
 
-    public void checkoutFileFromCommit(String fileName, String commitID) {
+    public static void checkoutFileFromCommit(String fileName, String commitID) {
         Commit commit = Persistor.readCommit(commitID);
         if (!commit.hasFile(fileName)) {
             System.out.println("File does not exist in that commit.");
@@ -105,11 +105,11 @@ public class Repository {
         Persistor.writeContentToCWDFile(fileName, content);
     }
 
-    public void checkoutFilesFromBranchHead(String branchName) {
+    public static void checkoutFilesFromBranchHead(String branchName) {
         // NOT IMPLEMENTED YET
     }
 
-    public void remove(String fileName) {
+    public static void remove(String fileName) {
         Index index = Persistor.readIndex();
         if (!index.hasFile(fileName)) {
             System.out.println("No reason to remove the file.");

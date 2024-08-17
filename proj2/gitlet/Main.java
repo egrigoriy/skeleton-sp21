@@ -17,52 +17,44 @@ public class Main {
         Repository repository;
         switch(firstArg) {
             case "init":
-                repository = new Repository();
-                repository.init();
+                Repository.init();
                 break;
             case "status":
-                repository = new Repository();
-                repository.status();
+                Repository.status();
                 break;
             case "add":
                 //`add [filename]`
-                repository = new Repository();
                 String fileName = args[1];
-                repository.add(fileName);
+                Repository.add(fileName);
                 break;
             case "rm":
-                repository = new Repository();
                 fileName = args[1];
-                repository.remove(fileName);
+                Repository.remove(fileName);
                 break;
             case "log":
-                repository = new Repository();
-                repository.log();
+                Repository.log();
                 break;
             case "commit":
-                repository = new Repository();
                 String message = args[1];
-                repository.commit(message);
+                Repository.commit(message);
                 break;
             case "checkout":
-                repository = new Repository();
                 // java gitlet.Main checkout -- [file name]
                 if (args.length == 3) {
                     fileName = args[2];
-                    repository.checkoutFileFromLastCommit(fileName);
+                    Repository.checkoutFileFromLastCommit(fileName);
                 }
                 // java gitlet.Main checkout [commit id] -- [file name]
                 if (args.length == 4) {
                     String commitID = args[1];
                     fileName = args[3];
-                    repository.checkoutFileFromCommit(fileName, commitID);
+                    Repository.checkoutFileFromCommit(fileName, commitID);
                 }
                 // java gitlet.Main checkout [branch name]
                 if (args.length == 2) {
                     String branchName = args[1];
-                    repository.checkoutFilesFromBranchHead(branchName);
+                    Repository.checkoutFilesFromBranchHead(branchName);
                 }
-
                 break;
             default:
                 System.out.println("No command with that name exists.");
