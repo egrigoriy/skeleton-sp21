@@ -30,6 +30,11 @@ public class Main {
                 String fileName = args[1];
                 repository.add(fileName);
                 break;
+            case "rm":
+                repository = new Repository();
+                fileName = args[1];
+                repository.remove(fileName);
+                break;
             case "log":
                 repository = new Repository();
                 repository.log();

@@ -108,4 +108,12 @@ public class Repository {
     public void checkoutFilesFromBranchHead(String branchName) {
         // NOT IMPLEMENTED YET
     }
+
+    public void remove(String fileName) {
+        Index index = Persistor.readIndex();
+        if (!index.hasFile(fileName)) {
+            System.out.println("No reason to remove the file.");
+            System.exit(0);
+        }
+    }
 }

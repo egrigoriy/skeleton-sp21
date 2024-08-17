@@ -59,9 +59,8 @@ public class Commit implements Serializable {
         String result = "===" + "\n";
         result += "commit " + uid + "\n";
         if (secondParent != null) {
-            result += "Merge: " +
-                    firstParent.substring(0, 7) + " " +
-                    secondParent.substring(0, 7) + "\n";
+            result += "Merge: "
+                    + firstParent.substring(0, 7) + " " + secondParent.substring(0, 7) + "\n";
         }
         result += "Date: " + formatTimestamp() + "\n";
         result += message + "\n";
