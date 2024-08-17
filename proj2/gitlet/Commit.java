@@ -4,7 +4,14 @@ package gitlet;
 
 import java.io.Serializable;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Date; // TODO: You'll likely use this in this class
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
 /** Represents a gitlet commit object.
@@ -28,34 +35,50 @@ public class Commit implements Serializable {
     private Date timestamp;
     private String firstParent = null;
     private String secondParent = null;
-    private TreeMap<String, String> fileBlobPairs = null;
+    private TreeMap<String, String> filesTable = null;
 
     /* TODO: fill in the rest of this class. */
     public Commit () {
         message = "initial commit";
         timestamp = new Date(0);
-        uid = getUID();
+        uid = calculateUID();
     }
 
-    private String getUID() {
+    public Commit(String message, TreeMap<String, String> filesToAdd, String firstParent) {
+        this.firstParent = firstParent;
+        this.message = message;
+        updateFilesTable(filesToAdd);
+        timestamp = new Date();
+        uid = calculateUID();
+    }
+
+    private void updateFilesTable(TreeMap<String, String> filesToAdd) {
+        if (filesToAdd != null) {
+            filesTable = new TreeMap<String, String>();
+            filesTable.putAll(filesToAdd);
+        }
+    }
+
+    private String calculateUID() {
         return Utils.sha1(timestamp.toString().getBytes(), message.getBytes());
-    }
-
-    public void save() {
-        Persistor.saveCommit(this);
     }
 
     @Override
     public String toString() {
         String result = "===" + "\n";
-        result += "commit: " + uid + "\n";
+        result += "commit " + uid + "\n";
         if (secondParent != null) {
             result += "Merge: " + firstParent.substring(0, 7) + " " + secondParent.substring(0, 7) + "\n";
         }
-        result += "Date: " + timestamp + "\n";
+        result += "Date: " + formatTimestamp() + "\n";
         result += message + "\n";
-        result += "\n";
         return  result;
+    }
+
+    private String formatTimestamp() {
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.ENGLISH);
+        formatter.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+        return formatter.format(timestamp);
     }
 
     public String getUid() {

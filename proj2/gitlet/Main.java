@@ -33,6 +33,11 @@ public class Main {
                 repository = new Repository();
                 repository.log();
                 break;
+            case "commit":
+                repository = new Repository();
+                String message = args[1];
+                repository.commit(message);
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);
