@@ -38,6 +38,16 @@ public class Main {
                 String message = args[1];
                 repository.commit(message);
                 break;
+            case "checkout":
+                // java gitlet.Main checkout -- [file name]
+                // java gitlet.Main checkout [commit id] -- [file name]
+                // java gitlet.Main checkout [branch name]
+                repository = new Repository();
+                if (args.length == 3) {
+                    fileName = args[2];
+                    repository.checkoutFileFromLastCommit(fileName);
+                }
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);

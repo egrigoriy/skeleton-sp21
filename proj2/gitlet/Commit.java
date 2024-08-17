@@ -3,12 +3,7 @@ package gitlet;
 // TODO: any imports you need here
 
 import java.io.Serializable;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.Date; // TODO: You'll likely use this in this class
 import java.util.Locale;
 import java.util.TimeZone;
@@ -87,5 +82,13 @@ public class Commit implements Serializable {
 
     public String getFirstParent() {
         return firstParent;
+    }
+
+    public boolean hasFile(String fileName) {
+        return filesTable.containsKey(fileName);
+    }
+
+    public String getBlobSHA1(String fileName) {
+        return filesTable.get(fileName);
     }
 }

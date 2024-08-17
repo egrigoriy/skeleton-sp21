@@ -14,6 +14,7 @@ public class Persistor {
     public static final File REF_HEADS_DIR = join(REFS_DIR, "heads");
     public static final File HEAD_MASTER = Utils.join(REF_HEADS_DIR, "master");
     public static final File INDEX = Utils.join(GITLET_DIR, "index");
+
     public static void saveCommit(Commit commit) {
         File subDirPath = Utils.join(OBJECTS_DIR, getDirNameFromUID(commit.getUid()));
         if (!subDirPath.exists()) {
@@ -81,5 +82,20 @@ public class Persistor {
     }
     public static void saveMaster(String uid) {
         Utils.writeContents(HEAD_MASTER, uid);
+    }
+
+    public static Commit readLastCommit() {
+        String head_commit_uid = Persistor.readMaster();
+        return readCommit(head_commit_uid);
+    }
+
+    public static String readTrackedFileContent(String blobSHA1) {
+        String subDirName = getDirNameFromUID(blobSHA1);
+        String fileName = getFileNameFromUID(blobSHA1);
+        return Utils.readContentsAsString(Utils.join(OBJECTS_DIR, subDirName , fileName));
+    }
+
+    public static void writeContentToCWDFile(String fileName, String content) {
+        Utils.writeContents(Utils.join(CWD, fileName), content);
     }
 }

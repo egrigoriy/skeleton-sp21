@@ -78,5 +78,22 @@ public class Repository {
         // update master head
         Persistor.saveMaster(commit.getUid());
     }
+
+    public void checkoutFileFromLastCommit(String fileName) {
+        // read last commit
+        Commit lastCommit = Persistor.readLastCommit();
+        // if not exist error + exit
+        if (!lastCommit.hasFile(fileName)) {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
+        // else
+        // get blob sha of file
+        String blobSHA1 = lastCommit.getBlobSHA1(fileName);
+        // read blob
+        String content = Persistor.readTrackedFileContent(blobSHA1);
+        // write blob content to filename
+        Persistor.writeContentToCWDFile(fileName, content);
+    }
     /* TODO: fill in the rest of this class. */
 }
