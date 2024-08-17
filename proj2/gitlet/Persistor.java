@@ -24,12 +24,12 @@ public class Persistor {
         Utils.writeObject(filePath, commit);
     }
 
-    public static Commit readCommit(String uid) {
-        if (uid == null ) {
+    public static Commit readCommit(String commitID) {
+        if (commitID == null ) {
             return null;
         }
-        String subDirName = getDirNameFromUID(uid);
-        String fileName = getFileNameFromUID(uid);
+        String subDirName = getDirNameFromUID(commitID);
+        String fileName = getFileNameFromUID(commitID);
         File file = Utils.join(OBJECTS_DIR, subDirName, fileName);
         return Utils.readObject(file, Commit.class);
     }

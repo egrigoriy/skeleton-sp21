@@ -1,9 +1,6 @@
 package gitlet;
 
-import java.io.File;
 import java.util.TreeMap;
-
-import static gitlet.Utils.*;
 
 // TODO: any imports you need here
 
@@ -80,20 +77,27 @@ public class Repository {
     }
 
     public void checkoutFileFromLastCommit(String fileName) {
-        // read last commit
         Commit lastCommit = Persistor.readLastCommit();
-        // if not exist error + exit
-        if (!lastCommit.hasFile(fileName)) {
+        checkoutFileFromCommit(fileName, lastCommit.getUid());
+    }
+
+    public void checkoutFileFromCommit(String fileName, String commitID) {
+        Commit commit = Persistor.readCommit(commitID);
+        if (!commit.hasFile(fileName)) {
             System.out.println("File does not exist in that commit.");
             System.exit(0);
         }
         // else
         // get blob sha of file
-        String blobSHA1 = lastCommit.getBlobSHA1(fileName);
+        String blobSHA1 = commit.getBlobSHA1(fileName);
         // read blob
         String content = Persistor.readTrackedFileContent(blobSHA1);
         // write blob content to filename
         Persistor.writeContentToCWDFile(fileName, content);
+    }
+
+    public void checkoutFilesFromBranchHead(String branchName) {
+        // NOT IMPLEMENTED YET
     }
     /* TODO: fill in the rest of this class. */
 }
