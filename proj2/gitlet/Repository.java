@@ -37,6 +37,10 @@ public class Repository {
             System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
         }
+        if (!Persistor.fileExists(fileName)) {
+            System.out.println("File does not exist.");
+            System.exit(0);
+        }
         Index index = Persistor.readIndex();
         // update index
         index.toAdd(fileName);
@@ -59,10 +63,18 @@ public class Repository {
     }
 
     public void commit(String message) {
+        if (message.isEmpty()) {
+            System.out.println("Please enter a commit message.");
+            System.exit(0);
+        }
         // read index
         Index index = Persistor.readIndex();
         // get files to add
         TreeMap<String, String> filesToAdd = index.getFilesToAdd();
+        if (filesToAdd.isEmpty()) {
+            System.out.println("No changes added to the commit.");
+            System.exit(0);
+        }
         String firstParent = Persistor.readMaster();
         // create commit with msg, files to add
         Commit commit = new Commit(message, filesToAdd, firstParent);

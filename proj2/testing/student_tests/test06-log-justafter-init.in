@@ -1,0 +1,11 @@
+# Given: init setup in empty working directory
+# When: invoke log
+# Then: Initial commit displayed
+I definitions.inc
+I init_setup.inc
+> log
+===
+${COMMIT_HEAD}
+initial commit
+
+<<<*

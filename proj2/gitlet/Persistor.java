@@ -98,4 +98,8 @@ public class Persistor {
     public static void writeContentToCWDFile(String fileName, String content) {
         Utils.writeContents(Utils.join(CWD, fileName), content);
     }
+
+    public static boolean fileExists(String fileName) {
+        return Utils.join(CWD, fileName).exists();
+    }
 }

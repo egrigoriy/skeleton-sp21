@@ -1,0 +1,20 @@
+# Given: init setup in empty working directory
+# When: invoke log
+# Then: Initial commit displayed
+I definitions.inc
+I init_setup.inc
++ wug.txt wug.txt
+> add wug.txt
+<<<
+> commit "added wug"
+<<<
+> log
+===
+${COMMIT_HEAD}
+added wug
+
+===
+${COMMIT_HEAD}
+initial commit
+
+<<<*

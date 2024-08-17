@@ -1,0 +1,5 @@
+# Check that adding nonexistent file gets correct error.
+I init_setup.inc
+> add f.txt
+File does not exist.
+<<<
