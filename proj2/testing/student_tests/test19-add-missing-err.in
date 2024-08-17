@@ -3,3 +3,4 @@ I init_setup.inc
 > add f.txt
 File does not exist.
 <<<
+I blank-status.inc

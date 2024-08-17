@@ -47,7 +47,8 @@ public class Repository {
     }
 
     public void status() {
-
+        Index index = Persistor.readIndex();
+        index.status();
     }
 
     public void log() {

@@ -23,6 +23,7 @@ public class Main {
             case "status":
                 repository = new Repository();
                 repository.status();
+                break;
             case "add":
                 //`add [filename]`
                 repository = new Repository();
