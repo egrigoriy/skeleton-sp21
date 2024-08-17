@@ -2,17 +2,14 @@ package gitlet;
 
 import java.util.TreeMap;
 
-// TODO: any imports you need here
-
 /** Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
+ *  TOD: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *
- *  @author TODO
+ *  @author Grigoriy Emiliyanov
  */
 public class Repository {
     /**
-     * TODO: add instance variables here.
      *
      * List all instance variables of the Repository class here with a useful
      * comment above them describing what that variable represents and how that
@@ -23,7 +20,8 @@ public class Repository {
         if (!Persistor.isRepositoryInitialized()) {
             Persistor.buildInfrastructure();
         } else {
-            System.out.println("A Gitlet version-control system already exists in the current directory.");
+            String m = "A Gitlet version-control system already exists in the current directory.";
+            System.out.println(m);
             System.exit(0);
         }
         Commit initialCommit = new Commit();
@@ -53,9 +51,7 @@ public class Repository {
     }
 
     public void log() {
-        String head_commit_uid = Persistor.readMaster();
-        Commit head_commit = Persistor.readCommit(head_commit_uid);
-        Commit current = head_commit;
+        Commit current = Persistor.readLastCommit();
         while (current != null) {
             System.out.println(current);
             current = Persistor.readCommit(current.getFirstParent());
@@ -111,5 +107,4 @@ public class Repository {
     public void checkoutFilesFromBranchHead(String branchName) {
         // NOT IMPLEMENTED YET
     }
-    /* TODO: fill in the rest of this class. */
 }

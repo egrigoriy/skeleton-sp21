@@ -1,23 +1,20 @@
 package gitlet;
 
-// TODO: any imports you need here
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.Date; // TODO: You'll likely use this in this class
+import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
 /** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
+ *  TOD: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *
- *  @author TODO
+ *  @author Grigoriy Emiliyanov
  */
 public class Commit implements Serializable {
     /**
-     * TODO: add instance variables here.
      *
      * List all instance variables of the Commit class here with a useful
      * comment above them describing what that variable represents and how that
@@ -32,8 +29,7 @@ public class Commit implements Serializable {
     private String secondParent = null;
     private TreeMap<String, String> filesTable = null;
 
-    /* TODO: fill in the rest of this class. */
-    public Commit () {
+    public Commit() {
         message = "initial commit";
         timestamp = new Date(0);
         uid = calculateUID();
@@ -63,7 +59,9 @@ public class Commit implements Serializable {
         String result = "===" + "\n";
         result += "commit " + uid + "\n";
         if (secondParent != null) {
-            result += "Merge: " + firstParent.substring(0, 7) + " " + secondParent.substring(0, 7) + "\n";
+            result += "Merge: " +
+                    firstParent.substring(0, 7) + " " +
+                    secondParent.substring(0, 7) + "\n";
         }
         result += "Date: " + formatTimestamp() + "\n";
         result += message + "\n";
@@ -71,7 +69,8 @@ public class Commit implements Serializable {
     }
 
     private String formatTimestamp() {
-        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.ENGLISH);
+        String pattern = "EEE MMM d HH:mm:ss yyyy Z";
+        SimpleDateFormat formatter = new SimpleDateFormat(pattern, Locale.ENGLISH);
         formatter.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
         return formatter.format(timestamp);
     }

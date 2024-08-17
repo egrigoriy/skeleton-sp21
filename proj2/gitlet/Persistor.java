@@ -25,7 +25,7 @@ public class Persistor {
     }
 
     public static Commit readCommit(String commitID) {
-        if (commitID == null ) {
+        if (commitID == null) {
             return null;
         }
         String subDirName = getDirNameFromUID(commitID);
@@ -85,14 +85,14 @@ public class Persistor {
     }
 
     public static Commit readLastCommit() {
-        String head_commit_uid = Persistor.readMaster();
-        return readCommit(head_commit_uid);
+        String lastCommitID = Persistor.readMaster();
+        return readCommit(lastCommitID);
     }
 
     public static String readTrackedFileContent(String blobSHA1) {
         String subDirName = getDirNameFromUID(blobSHA1);
         String fileName = getFileNameFromUID(blobSHA1);
-        return Utils.readContentsAsString(Utils.join(OBJECTS_DIR, subDirName , fileName));
+        return Utils.readContentsAsString(Utils.join(OBJECTS_DIR, subDirName, fileName));
     }
 
     public static void writeContentToCWDFile(String fileName, String content) {

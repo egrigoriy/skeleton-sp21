@@ -1,7 +1,7 @@
 package gitlet;
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
- *  @author TODO
+ *  @author Grigoriy Emiliyanov
  */
 public class Main {
 
@@ -24,7 +24,7 @@ public class Main {
                 repository = new Repository();
                 repository.status();
             case "add":
-                // TODO: handle the `add [filename]` command
+                //`add [filename]`
                 repository = new Repository();
                 String fileName = args[1];
                 repository.add(fileName);
