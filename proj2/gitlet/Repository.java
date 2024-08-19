@@ -1,7 +1,5 @@
 package gitlet;
 
-import java.util.TreeMap;
-
 /** Represents a gitlet repository.
  *  TOD: It's a good idea to give a description here of what else this Class
  *  does at a high level.
@@ -40,7 +38,7 @@ public class Repository {
             System.exit(0);
         }
         Index index = Persistor.readIndex();
-        index.toAdd(fileName);
+        index.add(fileName);
         Persistor.saveIndex(index);
     }
 
@@ -62,20 +60,15 @@ public class Repository {
             System.out.println("Please enter a commit message.");
             System.exit(0);
         }
-        // read index
         Index index = Persistor.readIndex();
-        // get files to add
-        TreeMap<String, String> filesToAdd = index.getFilesToAdd();
-        if (filesToAdd.isEmpty()) {
+        if (index.nothingToAdd()) {
             System.out.println("No changes added to the commit.");
             System.exit(0);
         }
         String firstParent = Persistor.readMaster();
-        // create commit with msg, files to add
-        Commit commit = new Commit(message, filesToAdd, firstParent);
+        Commit commit = new Commit(message, index, firstParent);
         // save commit
         Persistor.saveCommit(commit);
-        // clean index
         index.clear();
         // save index
         Persistor.saveIndex(index);
@@ -113,7 +106,7 @@ public class Repository {
             System.out.println("No reason to remove the file.");
             System.exit(0);
         }
-        index.toRemove(fileName);
+        index.remove(fileName);
         Persistor.saveIndex(index);
     }
 }

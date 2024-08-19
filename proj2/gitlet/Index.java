@@ -15,7 +15,7 @@ public class Index implements Serializable {
     public Index(Commit lastCommit) {
         repo.putAll(lastCommit.getFilesTable());
     }
-    public void toAdd(String fileName) {
+    public void add(String fileName) {
         String hash = Persistor.saveBlob(fileName);
         if (repo.containsKey(fileName) && repo.get(fileName).equals(hash)) {
             return;
@@ -23,10 +23,8 @@ public class Index implements Serializable {
         filesToAdd.put(fileName, hash);
     }
 
-    public void toRemove(String fileName) {
-        if (filesToAdd.containsKey(fileName)) {
-            filesToAdd.remove(fileName);
-        }
+    public void remove(String fileName) {
+        filesToAdd.remove(fileName);
         if (repo.containsKey(fileName)) {
             filesToRemove.put(fileName, repo.get(fileName));
         }
@@ -36,11 +34,6 @@ public class Index implements Serializable {
     public void clear() {
         filesToAdd.clear();
         filesToRemove.clear();
-    }
-
-
-    public TreeMap<String, String> getFilesToAdd() {
-        return filesToAdd;
     }
 
     public void status() {
@@ -74,5 +67,18 @@ public class Index implements Serializable {
 
     public boolean fileInStageOrRepo(String fileName) {
         return filesToAdd.containsKey(fileName) || repo.containsKey(fileName);
+    }
+
+    public TreeMap<String, String> getFilesToCommit() {
+        TreeMap<String, String> result = new TreeMap<>(repo);
+        result.putAll(filesToAdd);
+        for (String fileName : filesToRemove.keySet()) {
+            result.remove(fileName);
+        }
+        repo.putAll(result);
+        return result;
+    }
+    public boolean nothingToAdd() {
+        return filesToAdd.isEmpty();
     }
 }

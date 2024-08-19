@@ -34,20 +34,12 @@ public class Commit implements Serializable {
         timestamp = new Date(0);
     }
 
-    public Commit(String message, TreeMap<String, String> filesToAdd, String firstParent) {
+    public Commit(String message, Index index, String firstParent) {
         this.firstParent = firstParent;
         this.message = message;
-        updateFilesTable(filesToAdd);
+        this.filesTable = new TreeMap<>(index.getFilesToCommit());
         timestamp = new Date();
     }
-
-    private void updateFilesTable(TreeMap<String, String> filesToAdd) {
-        if (filesToAdd != null) {
-            filesTable = new TreeMap<String, String>();
-            filesTable.putAll(filesToAdd);
-        }
-    }
-
 
     @Override
     public String toString() {
