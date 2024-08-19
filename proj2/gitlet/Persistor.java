@@ -100,7 +100,7 @@ public class Persistor {
         return Utils.join(CWD, fileName).exists();
     }
 
-    public static void HeadToMaster() {
+    public static void headToMaster() {
         String refToMaster = "refs/heads/master";
         Utils.writeContents(HEAD, "path: " + refToMaster);
     }
