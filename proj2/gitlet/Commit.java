@@ -101,4 +101,8 @@ public class Commit implements Serializable {
     public void setUid(String uid) {
         this.uid = uid;
     }
+
+    public TreeMap<String, String> getFilesTable() {
+        return filesTable;
+    }
 }
