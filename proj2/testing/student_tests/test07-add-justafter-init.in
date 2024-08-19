@@ -1,0 +1,7 @@
+# Given: init setup in empty working directory
+# When: invoke log
+# Then: Initial commit displayed
+I init_setup.inc
++ wug.txt wug.txt
+> add wug.txt
+<<<

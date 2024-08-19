@@ -1,7 +1,7 @@
 package gitlet;
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
- *  @author TODO
+ *  @author Grigoriy Emiliyanov
  */
 public class Main {
 
@@ -17,16 +17,44 @@ public class Main {
         Repository repository;
         switch(firstArg) {
             case "init":
-                repository = new Repository();
-                repository.init();
+                Repository.init();
                 break;
             case "status":
-                repository = new Repository();
-                repository.status();
+                Repository.status();
+                break;
             case "add":
-                // TODO: handle the `add [filename]` command
-                repository = new Repository();
-                repository.add();
+                //`add [filename]`
+                String fileName = args[1];
+                Repository.add(fileName);
+                break;
+            case "rm":
+                fileName = args[1];
+                Repository.remove(fileName);
+                break;
+            case "log":
+                Repository.log();
+                break;
+            case "commit":
+                String message = args[1];
+                Repository.commit(message);
+                break;
+            case "checkout":
+                // java gitlet.Main checkout -- [file name]
+                if (args.length == 3) {
+                    fileName = args[2];
+                    Repository.checkoutFileFromLastCommit(fileName);
+                }
+                // java gitlet.Main checkout [commit id] -- [file name]
+                if (args.length == 4) {
+                    String commitID = args[1];
+                    fileName = args[3];
+                    Repository.checkoutFileFromCommit(fileName, commitID);
+                }
+                // java gitlet.Main checkout [branch name]
+                if (args.length == 2) {
+                    String branchName = args[1];
+                    Repository.checkoutFilesFromBranchHead(branchName);
+                }
                 break;
             default:
                 System.out.println("No command with that name exists.");

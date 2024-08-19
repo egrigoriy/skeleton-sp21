@@ -1,67 +1,119 @@
 package gitlet;
 
-import java.io.File;
-import static gitlet.Utils.*;
-
-// TODO: any imports you need here
+import java.util.TreeMap;
 
 /** Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
+ *  TOD: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *
- *  @author TODO
+ *  @author Grigoriy Emiliyanov
  */
 public class Repository {
     /**
-     * TODO: add instance variables here.
      *
      * List all instance variables of the Repository class here with a useful
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided two examples for you.
      */
 
-    /** The current working directory. */
-    public static final File CWD = new File(System.getProperty("user.dir"));
-    /** The .gitlet directory. */
-    public static final File GITLET_DIR = join(CWD, ".gitlet");
-    public static final File BRANCHES_DIR = join(GITLET_DIR, "branches");
-
-    public void init() {
-        if (!GITLET_DIR.exists()) {
-            GITLET_DIR.mkdir();
-            BRANCHES_DIR.mkdir();
-            File master = join(BRANCHES_DIR, "master");
-            Utils.writeContents(master, "hash of initial commit");
-
+    public static void init() {
+        if (!Persistor.isRepositoryInitialized()) {
+            Persistor.buildInfrastructure();
         } else {
-            System.out.println("A Gitlet version-control system already exists in the current directory.");
+            String m = "A Gitlet version-control system already exists in the current directory.";
+            System.out.println(m);
             System.exit(0);
         }
+        Commit initialCommit = new Commit();
+        String uid = initialCommit.getUid();
+        Persistor.saveCommit(initialCommit);
+        Persistor.saveMaster(uid);
     }
 
-    public void add() {
-        if (!GITLET_DIR.exists()) {
+    public static void add(String fileName) {
+        if (!Persistor.isRepositoryInitialized()) {
             System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
         }
+        if (!Persistor.fileExists(fileName)) {
+            System.out.println("File does not exist.");
+            System.exit(0);
+        }
+        Index index = Persistor.readIndex();
+        // update index
+        index.toAdd(fileName);
+        // save index
+        index.save();
     }
 
-    public void status() {
-        StringBuilder result = new StringBuilder();
-        result.append("=== Branches ===" + "\n");
-        result.append("*master" + "\n");
-        result.append("\n");
-        result.append("=== Staged Files ===" + "\n");
-        result.append("\n");
-        result.append("=== Removed Files ===" + "\n");
-        result.append("\n");
-        result.append("=== Modifications Not Staged For Commit ===" + "\n");
-        result.append("\n");
-        result.append("=== Untracked Files ===" + "\n");
-        result.append("\n");
-
-        System.out.println(result);
-
+    public static void status() {
+        Index index = Persistor.readIndex();
+        index.status();
     }
-    /* TODO: fill in the rest of this class. */
+
+    public static void log() {
+        Commit current = Persistor.readLastCommit();
+        while (current != null) {
+            System.out.println(current);
+            current = Persistor.readCommit(current.getFirstParent());
+        }
+    }
+
+    public static void commit(String message) {
+        if (message.isEmpty()) {
+            System.out.println("Please enter a commit message.");
+            System.exit(0);
+        }
+        // read index
+        Index index = Persistor.readIndex();
+        // get files to add
+        TreeMap<String, String> filesToAdd = index.getFilesToAdd();
+        if (filesToAdd.isEmpty()) {
+            System.out.println("No changes added to the commit.");
+            System.exit(0);
+        }
+        String firstParent = Persistor.readMaster();
+        // create commit with msg, files to add
+        Commit commit = new Commit(message, filesToAdd, firstParent);
+        // save commit
+        Persistor.saveCommit(commit);
+        // clean index
+        index.clear();
+        // save index
+        index.save();
+        // update master head
+        Persistor.saveMaster(commit.getUid());
+    }
+
+    public static void checkoutFileFromLastCommit(String fileName) {
+        Commit lastCommit = Persistor.readLastCommit();
+        checkoutFileFromCommit(fileName, lastCommit.getUid());
+    }
+
+    public static void checkoutFileFromCommit(String fileName, String commitID) {
+        Commit commit = Persistor.readCommit(commitID);
+        if (!commit.hasFile(fileName)) {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
+        // else
+        // get blob sha of file
+        String blobSHA1 = commit.getBlobSHA1(fileName);
+        // read blob
+        String content = Persistor.readTrackedFileContent(blobSHA1);
+        // write blob content to filename
+        Persistor.writeContentToCWDFile(fileName, content);
+    }
+
+    public static void checkoutFilesFromBranchHead(String branchName) {
+        // NOT IMPLEMENTED YET
+    }
+
+    public static void remove(String fileName) {
+        Index index = Persistor.readIndex();
+        if (!index.hasFile(fileName)) {
+            System.out.println("No reason to remove the file.");
+            System.exit(0);
+        }
+    }
 }
