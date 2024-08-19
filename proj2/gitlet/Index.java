@@ -7,11 +7,8 @@ public class Index implements Serializable {
     private TreeMap<String, String> filesToAdd = new TreeMap<String, String>();
 
     public void toAdd(String fileName) {
-        byte[] fileContent = Utils.readContents(Utils.join(Persistor.CWD, fileName));
-        String blobSHA1 = Utils.sha1(fileContent);
-        filesToAdd.put(fileName, blobSHA1);
-        // save blob
-        Persistor.saveBlob(blobSHA1, fileContent);
+        String hash = Persistor.saveBlob(fileName);
+        filesToAdd.put(fileName, hash);
     }
     public void clear() {
         filesToAdd.clear();

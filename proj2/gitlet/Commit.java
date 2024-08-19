@@ -89,4 +89,16 @@ public class Commit implements Serializable {
     public String getBlobSHA1(String fileName) {
         return filesTable.get(fileName);
     }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
 }

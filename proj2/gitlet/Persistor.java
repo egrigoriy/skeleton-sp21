@@ -15,9 +15,14 @@ public class Persistor {
     public static final File HEAD_MASTER = Utils.join(REF_HEADS_DIR, "master");
     public static final File INDEX = Utils.join(GITLET_DIR, "index");
 
-    public static void saveCommit(Commit commit) {
-        File objectPath = hashToObjectPath(commit.getUid());
+    public static String saveCommit(Commit commit) {
+        String sha = Utils.sha1(
+                commit.getTimestamp().toString().getBytes(),
+                commit.getMessage().getBytes());
+        commit.setUid(sha);
+        File objectPath = hashToObjectPath(sha);
         Utils.writeObject(objectPath, commit);
+        return sha;
     }
 
     public static Commit readCommit(String commitID) {
@@ -37,9 +42,12 @@ public class Persistor {
         return Utils.join(subDirPath, fileName);
     }
 
-    public static void saveBlob(String blobSHA1, byte[] fileContent) {
+    public static String saveBlob(String fileName) {
+        byte[] fileContent = Utils.readContents(Utils.join(Persistor.CWD, fileName));
+        String blobSHA1 = Utils.sha1(fileContent);
         File objectPath = hashToObjectPath(blobSHA1);
         Utils.writeContents(objectPath, fileContent);
+        return blobSHA1;
     }
 
     public static void saveIndex(Index index) {
