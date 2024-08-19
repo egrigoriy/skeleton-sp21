@@ -27,8 +27,8 @@ public class Index implements Serializable {
         filesToAdd.remove(fileName);
         if (repo.containsKey(fileName)) {
             filesToRemove.put(fileName, repo.get(fileName));
+            Persistor.removeCWDFile(fileName);
         }
-        Persistor.removeCWDFile(fileName);
     }
 
     public void clear() {
@@ -39,18 +39,24 @@ public class Index implements Serializable {
     public void status() {
         String result = "=== Branches ===" + "\n"
                 + "*master" + "\n" + "\n"
-                + "=== Staged Files ===" + "\n" + getFileNamesToAdd()
-                + "=== Removed Files ===" + "\n" + getFileNamesToDelete()
+                + "=== Staged Files ===" + "\n" + getFileNamesToAdd() + "\n"
+                + "=== Removed Files ===" + "\n" + getFileNamesToDelete() + "\n"
                 + "=== Modifications Not Staged For Commit ===" + "\n" + "\n"
                 + "=== Untracked Files ===" + "\n" + getUntrackedFileNames();
         System.out.println(result);
     }
 
     private String getFileNamesToAdd() {
+        if (filesToAdd.isEmpty()) {
+            return "";
+        }
         return String.join("\n", filesToAdd.keySet()) + "\n";
     }
 
     private String getFileNamesToDelete() {
+        if (filesToRemove.isEmpty()) {
+            return "";
+        }
         return String.join("\n", filesToRemove.keySet()) + "\n";
     }
 
@@ -61,6 +67,9 @@ public class Index implements Serializable {
             if (!filesToAdd.containsKey(file) && !repo.containsKey(file)) {
                 untrackedFiles.add(file);
             }
+        }
+        if (untrackedFiles.isEmpty()) {
+            return "";
         }
         return String.join("\n", untrackedFiles) + "\n";
     }
