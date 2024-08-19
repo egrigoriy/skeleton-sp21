@@ -32,7 +32,6 @@ public class Commit implements Serializable {
     public Commit() {
         message = "initial commit";
         timestamp = new Date(0);
-        uid = calculateUID();
     }
 
     public Commit(String message, TreeMap<String, String> filesToAdd, String firstParent) {
@@ -40,7 +39,6 @@ public class Commit implements Serializable {
         this.message = message;
         updateFilesTable(filesToAdd);
         timestamp = new Date();
-        uid = calculateUID();
     }
 
     private void updateFilesTable(TreeMap<String, String> filesToAdd) {
@@ -50,9 +48,6 @@ public class Commit implements Serializable {
         }
     }
 
-    private String calculateUID() {
-        return Utils.sha1(timestamp.toString().getBytes(), message.getBytes());
-    }
 
     @Override
     public String toString() {

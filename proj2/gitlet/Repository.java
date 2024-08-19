@@ -109,9 +109,11 @@ public class Repository {
 
     public static void remove(String fileName) {
         Index index = Persistor.readIndex();
-        if (!index.hasFile(fileName)) {
+        if (!index.fileInStageOrRepo(fileName)) {
             System.out.println("No reason to remove the file.");
             System.exit(0);
         }
+        index.toRemove(fileName);
+        Persistor.saveIndex(index);
     }
 }

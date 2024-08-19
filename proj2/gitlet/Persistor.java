@@ -104,4 +104,9 @@ public class Persistor {
         String refToMaster = "refs/heads/master";
         Utils.writeContents(HEAD, "path: " + refToMaster);
     }
+
+    public static void removeCWDFile(String fileName) {
+        File filePath = Utils.join(CWD, fileName);
+        Utils.restrictedDelete(filePath);
+    }
 }
