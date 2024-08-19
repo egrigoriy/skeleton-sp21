@@ -57,7 +57,7 @@ public class Index implements Serializable {
         List<String> untrackedFiles = new ArrayList<String>();
         List<String> files = Utils.plainFilenamesIn(Persistor.CWD);
         for (String file : files) {
-            if (!stage.containsKey(file) || !repo.containsKey(file)) {
+            if (!stage.containsKey(file) && !repo.containsKey(file)) {
                 untrackedFiles.add(file);
             }
         }
