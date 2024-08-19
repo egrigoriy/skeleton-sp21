@@ -27,6 +27,7 @@ public class Repository {
         Commit initialCommit = new Commit();
         String hash = Persistor.saveCommit(initialCommit);
         Persistor.saveMaster(hash);
+        Persistor.HeadToMaster();
     }
 
     public static void add(String fileName) {
@@ -39,10 +40,8 @@ public class Repository {
             System.exit(0);
         }
         Index index = Persistor.readIndex();
-        // update index
         index.toAdd(fileName);
-        // save index
-        index.save();
+        Persistor.saveIndex(index);
     }
 
     public static void status() {
@@ -79,7 +78,7 @@ public class Repository {
         // clean index
         index.clear();
         // save index
-        index.save();
+        Persistor.saveIndex(index);
         // update master head
         Persistor.saveMaster(commit.getUid());
     }

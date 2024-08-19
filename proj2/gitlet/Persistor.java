@@ -13,6 +13,8 @@ public class Persistor {
     public static final File REFS_DIR = join(GITLET_DIR, "refs");
     public static final File REF_HEADS_DIR = join(REFS_DIR, "heads");
     public static final File HEAD_MASTER = Utils.join(REF_HEADS_DIR, "master");
+    public static final File HEAD = Utils.join(GITLET_DIR, "HEAD");
+
     public static final File INDEX = Utils.join(GITLET_DIR, "index");
 
     public static String saveCommit(Commit commit) {
@@ -96,5 +98,10 @@ public class Persistor {
 
     public static boolean fileExists(String fileName) {
         return Utils.join(CWD, fileName).exists();
+    }
+
+    public static void HeadToMaster() {
+        String refToMaster = "refs/heads/master";
+        Utils.writeContents(HEAD, "path: " + refToMaster);
     }
 }

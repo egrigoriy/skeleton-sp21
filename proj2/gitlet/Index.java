@@ -18,10 +18,6 @@ public class Index implements Serializable {
         return filesToAdd;
     }
 
-    public void save() {
-        Persistor.saveIndex(this);
-    }
-
     public void status() {
         String result = "=== Branches ===" + "\n"
                 + "*master" + "\n" + "\n"
