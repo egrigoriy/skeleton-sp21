@@ -48,7 +48,9 @@ public class Persistor {
         byte[] fileContent = Utils.readContents(Utils.join(Persistor.CWD, fileName));
         String blobSHA1 = Utils.sha1(fileContent);
         File objectPath = hashToObjectPath(blobSHA1);
-        Utils.writeContents(objectPath, fileContent);
+        if (!objectPath.exists()) {
+            Utils.writeContents(objectPath, fileContent);
+        }
         return blobSHA1;
     }
 

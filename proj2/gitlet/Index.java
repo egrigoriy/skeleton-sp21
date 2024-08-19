@@ -17,6 +17,10 @@ public class Index implements Serializable {
     }
     public void add(String fileName) {
         String hash = Persistor.saveBlob(fileName);
+        if (filesToRemove.containsKey(fileName) && filesToRemove.get(fileName).equals(hash)) {
+            filesToRemove.remove(fileName);
+            return;
+        }
         if (repo.containsKey(fileName) && repo.get(fileName).equals(hash)) {
             return;
         }
