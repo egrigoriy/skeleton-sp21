@@ -91,7 +91,7 @@ public class Index implements Serializable {
         repo.putAll(result);
         return result;
     }
-    public boolean nothingToAdd() {
-        return filesToAdd.isEmpty();
+    public boolean nothingToAddOrRemove() {
+        return filesToAdd.isEmpty() && filesToRemove.isEmpty();
     }
 }

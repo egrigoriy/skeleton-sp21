@@ -61,7 +61,7 @@ public class Repository {
             System.exit(0);
         }
         Index index = Persistor.readIndex();
-        if (index.nothingToAdd()) {
+        if (index.nothingToAddOrRemove()) {
             System.out.println("No changes added to the commit.");
             System.exit(0);
         }
