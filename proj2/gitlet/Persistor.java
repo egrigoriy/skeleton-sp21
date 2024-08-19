@@ -16,42 +16,30 @@ public class Persistor {
     public static final File INDEX = Utils.join(GITLET_DIR, "index");
 
     public static void saveCommit(Commit commit) {
-        File subDirPath = Utils.join(OBJECTS_DIR, getDirNameFromUID(commit.getUid()));
-        if (!subDirPath.exists()) {
-            subDirPath.mkdir();
-        }
-        File filePath = Utils.join(subDirPath, getFileNameFromUID(commit.getUid()));
-        Utils.writeObject(filePath, commit);
+        File objectPath = hashToObjectPath(commit.getUid());
+        Utils.writeObject(objectPath, commit);
     }
 
     public static Commit readCommit(String commitID) {
         if (commitID == null) {
             return null;
         }
-        String subDirName = getDirNameFromUID(commitID);
-        String fileName = getFileNameFromUID(commitID);
-        File file = Utils.join(OBJECTS_DIR, subDirName, fileName);
-        return Utils.readObject(file, Commit.class);
+        File objectPath = hashToObjectPath(commitID);
+        return Utils.readObject(objectPath, Commit.class);
     }
 
-
-    private static String getDirNameFromUID(String uid) {
-        return uid.substring(0, 2);
-    }
-
-    private static String getFileNameFromUID(String uid) {
-        return uid.substring(2);
-    }
-
-    public static void saveBlob(String blobSHA1, byte[] fileContent) {
-        String subDirName = getDirNameFromUID(blobSHA1);
-        String fileName = getFileNameFromUID(blobSHA1);
-        File subDirPath =  Utils.join(OBJECTS_DIR, subDirName);
+    private static File hashToObjectPath(String hash) {
+        File subDirPath = Utils.join(OBJECTS_DIR, hash.substring(0, 2));
         if (!subDirPath.exists()) {
             subDirPath.mkdir();
         }
-        File file = Utils.join(OBJECTS_DIR, subDirName, fileName);
-        Utils.writeContents(file, fileContent);
+        String fileName = hash.substring(2);
+        return Utils.join(subDirPath, fileName);
+    }
+
+    public static void saveBlob(String blobSHA1, byte[] fileContent) {
+        File objectPath = hashToObjectPath(blobSHA1);
+        Utils.writeContents(objectPath, fileContent);
     }
 
     public static void saveIndex(Index index) {
@@ -90,9 +78,8 @@ public class Persistor {
     }
 
     public static String readTrackedFileContent(String blobSHA1) {
-        String subDirName = getDirNameFromUID(blobSHA1);
-        String fileName = getFileNameFromUID(blobSHA1);
-        return Utils.readContentsAsString(Utils.join(OBJECTS_DIR, subDirName, fileName));
+        File objectPath = hashToObjectPath(blobSHA1);
+        return Utils.readContentsAsString(objectPath);
     }
 
     public static void writeContentToCWDFile(String fileName, String content) {

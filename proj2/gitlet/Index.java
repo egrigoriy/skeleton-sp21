@@ -26,7 +26,7 @@ public class Index implements Serializable {
     }
 
     public void status() {
-        String result = "=== Branches ==="
+        String result = "=== Branches ===" + "\n"
                 + "*master" + "\n" + "\n"
                 + "=== Staged Files ===" + "\n" + getFileNamesToAdd()
                 + "=== Removed Files ===" + "\n" + "\n"
