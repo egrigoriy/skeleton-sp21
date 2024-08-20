@@ -89,9 +89,9 @@ public class Repository {
         }
         // else
         // get blob sha of file
-        String blobSHA1 = commit.getBlobSHA1(fileName);
+        String hash = commit.getFileHash(fileName);
         // read blob
-        String content = Persistor.readTrackedFileContent(blobSHA1);
+        String content = Persistor.readTrackedFileContent(hash);
         // write blob content to filename
         Persistor.writeContentToCWDFile(fileName, content);
     }

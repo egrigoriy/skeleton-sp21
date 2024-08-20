@@ -46,12 +46,12 @@ public class Persistor {
 
     public static String saveBlob(String fileName) {
         byte[] fileContent = Utils.readContents(Utils.join(Persistor.CWD, fileName));
-        String blobSHA1 = Utils.sha1(fileContent);
-        File objectPath = hashToObjectPath(blobSHA1);
+        String hash = Utils.sha1(fileContent);
+        File objectPath = hashToObjectPath(hash);
         if (!objectPath.exists()) {
             Utils.writeContents(objectPath, fileContent);
         }
-        return blobSHA1;
+        return hash;
     }
 
     public static void saveIndex(Index index) {

@@ -73,7 +73,7 @@ public class Commit implements Serializable {
         return filesTable.containsKey(fileName);
     }
 
-    public String getBlobSHA1(String fileName) {
+    public String getFileHash(String fileName) {
         return filesTable.get(fileName);
     }
 
