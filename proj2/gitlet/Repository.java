@@ -1,5 +1,6 @@
 package gitlet;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -128,32 +129,42 @@ public class Repository {
 
         // Takes all files in the commit at the head of the given branch,
         String hash = Persistor.readHashOfBranchHead(branchName);
-        Commit newBranchHeadCommit = Persistor.readCommit(hash);
-        if (newBranchHeadCommit.getFilesTable() != null) {
+        Commit checkedOutHeadCommit = Persistor.readCommit(hash);
+        Set<String> checkedOutBranchFiles;
+        if (checkedOutHeadCommit.getFilesTable() != null) {
+            checkedOutBranchFiles = checkedOutHeadCommit.getFilesTable().keySet();
+        } else {
+            checkedOutBranchFiles = new HashSet<>();
+        }
             // and puts them in the working directory, overwriting the versions of the files
             // that are already there if they exist.
-            Set<String> newBranchFiles = newBranchHeadCommit.getFilesTable().keySet();
-            for (String fileName : newBranchFiles) {
-                // get blob sha of file
-                String sha = newBranchHeadCommit.getFileHash(fileName);
-                // read blob
-                String content = Persistor.readTrackedFileContent(sha);
-                // write blob content to filename
-                Persistor.writeContentToCWDFile(fileName, content);
-            }
-            // Any files that are tracked in the current branch but are not
-            // present in the checked-out branch are deleted.
-            for (String fileName : currentlyTrackedFiles) {
-                if (!newBranchFiles.contains(fileName)) {
-                    Utils.restrictedDelete(Utils.join(Persistor.CWD, fileName));
-                }
-            }
-            // The staging area is cleared, unless the checked-out branch is the current branch
-            Index index = Persistor.readIndex();
-            index.clear();
-            Persistor.saveIndex(index);
-        }
 
+        for (String f : Utils.plainFilenamesIn(Persistor.CWD)) {
+            Utils.restrictedDelete(f);
+        }
+        if (!Utils.plainFilenamesIn(Persistor.CWD).isEmpty()) {
+            throw new GitletException("NOT EMPTY");
+        }
+        for (String fileName : checkedOutBranchFiles) {
+            // get blob sha of file
+            String sha = checkedOutHeadCommit.getFileHash(fileName);
+            // read blob
+            String content = Persistor.readTrackedFileContent(sha);
+            // write blob content to filename
+            Persistor.writeContentToCWDFile(fileName, content);
+        }
+        // Any files that are tracked in the current branch but are not
+        // present in the checked-out branch are deleted.
+//        for (String fileName : currentlyTrackedFiles) {
+//            if (!checkedOutBranchFiles.contains(fileName)) {
+//                Utils.restrictedDelete(Utils.join(Persistor.CWD, fileName));
+//            }
+//        }
+
+        // The staging area is cleared, unless the checked-out branch is the current branch
+        Index index = Persistor.readIndex();
+        index.clear();
+        Persistor.saveIndex(index);
 
         // Also, at the end of this command,
         // the given branch will now be considered the current branch (HEAD).
@@ -198,4 +209,12 @@ public class Repository {
         }
     }
 
+    public static void find(String message) {
+        List<String> foundCommits = new ArrayList<>();
+
+        if (foundCommits.isEmpty()) {
+            System.out.println("Found no commit with that message.");
+            System.exit(0);
+        }
+    }
 }

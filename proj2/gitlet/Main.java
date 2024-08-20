@@ -74,6 +74,10 @@ public class Main {
                 // Usage: java gitlet.Main global-log
                 Repository.globalLog();
                 break;
+            case "find":
+                // java gitlet.Main find [commit message]
+                message = args[1];
+                Repository.find(message);
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);
