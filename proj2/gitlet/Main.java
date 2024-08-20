@@ -56,6 +56,11 @@ public class Main {
                     Repository.checkoutFilesFromBranchHead(branchName);
                 }
                 break;
+            case "branch":
+                // Usage: java gitlet.Main branch [branch name]
+                String branchName = args[1];
+                Repository.branch(branchName);
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);

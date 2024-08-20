@@ -120,14 +120,37 @@ public class Persistor {
         writeHashOfBranchHead(branchName, hash);
     }
 
-    private static void writeHashOfBranchHead(String branchName, String hash) {
+    public static String readHashOfHead() {
+        String branchName = getBranchNameFromHead();
+        String hash = readHashOfBranchHead(branchName);
+        return hash;
+    }
+
+    public static String readHashOfBranchHead(String branchName) {
+        File branchHeadFile = Utils.join(REF_HEADS_DIR, branchName);
+        return Utils.readContentsAsString(branchHeadFile);
+    }
+
+    public static void writeHashOfBranchHead(String branchName, String hash) {
         File branchHeadFile = Utils.join(REF_HEADS_DIR, branchName);
         Utils.writeContents(branchHeadFile, hash);
     }
+
+
 
     private static String getBranchNameFromHead() {
         String headContent = Utils.readContentsAsString(HEAD);
         String branchName = headContent.substring(headContent.lastIndexOf("/") + 1);
         return branchName;
+    }
+
+
+    public static boolean branchExists(String branchName) {
+        return Utils.join(REF_HEADS_DIR, branchName).exists();
+    }
+
+    public static void createBranch(String branchName) {
+        String currentCommitHash = readHashOfHead();
+        writeHashOfBranchHead(branchName, currentCommitHash);
     }
 }

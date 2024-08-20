@@ -65,15 +65,12 @@ public class Repository {
             System.out.println("No changes added to the commit.");
             System.exit(0);
         }
-        String firstParent = Persistor.readMaster();
-        Commit commit = new Commit(message, index, firstParent);
-        // save commit
-        Persistor.saveCommit(commit);
+        String lastCommitHash = Persistor.readHashOfHead();
+        Commit commit = new Commit(message, index, lastCommitHash);
+        String hash = Persistor.saveCommit(commit);
         index.clear();
-        // save index
         Persistor.saveIndex(index);
-        // update master head
-        Persistor.saveMaster(commit.getUid());
+        Persistor.writeHashOfHead(hash);
     }
 
     public static void checkoutFileFromLastCommit(String fileName) {
@@ -109,4 +106,14 @@ public class Repository {
         index.remove(fileName);
         Persistor.saveIndex(index);
     }
+
+    public static void branch(String branchName) {
+        if (!Persistor.branchExists(branchName)) {
+            System.out.println("A branch with that name already exists.");
+            System.exit(0);
+
+        }
+        Persistor.createBranch(branchName);
+    }
+
 }
