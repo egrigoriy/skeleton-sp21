@@ -108,12 +108,22 @@ public class Repository {
     }
 
     public static void branch(String branchName) {
-        if (!Persistor.branchExists(branchName)) {
+        if (Persistor.branchExists(branchName)) {
             System.out.println("A branch with that name already exists.");
             System.exit(0);
-
         }
         Persistor.createBranch(branchName);
     }
 
+    public static void removeBranch(String branchName) {
+        if (!Persistor.branchExists(branchName)) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+        if (Persistor.getBranchNameFromHead().equals(branchName)) {
+            System.out.println("Cannot remove the current branch.");
+            System.exit(0);
+        }
+        Persistor.removeBranch(branchName);
+    }
 }

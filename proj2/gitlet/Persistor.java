@@ -138,7 +138,7 @@ public class Persistor {
 
 
 
-    private static String getBranchNameFromHead() {
+    public static String getBranchNameFromHead() {
         String headContent = Utils.readContentsAsString(HEAD);
         String branchName = headContent.substring(headContent.lastIndexOf("/") + 1);
         return branchName;
@@ -152,5 +152,9 @@ public class Persistor {
     public static void createBranch(String branchName) {
         String currentCommitHash = readHashOfHead();
         writeHashOfBranchHead(branchName, currentCommitHash);
+    }
+
+    public static void removeBranch(String branchName) {
+        Utils.restrictedDelete(Utils.join(REF_HEADS_DIR, branchName));
     }
 }
