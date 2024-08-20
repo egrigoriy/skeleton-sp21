@@ -1,5 +1,7 @@
 package gitlet;
 
+import java.util.List;
+
 /** Represents a gitlet repository.
  *  TOD: It's a good idea to give a description here of what else this Class
  *  does at a high level.
@@ -48,7 +50,12 @@ public class Repository {
     }
 
     public static void log() {
-        Commit current = Persistor.readLastCommit();
+        String hash = Persistor.readHashOfHead();
+        log(hash);
+    }
+
+    private static void log(String hash) {
+        Commit current = Persistor.readCommit(hash);
         while (current != null) {
             System.out.println(current);
             current = Persistor.readCommit(current.getFirstParent());
@@ -126,4 +133,13 @@ public class Repository {
         }
         Persistor.removeBranch(branchName);
     }
+
+    public static void globalLog() {
+        List<String> branchNames = Persistor.readAllBranchNames();
+        for (String branchName : branchNames) {
+            String hash = Persistor.readHashOfBranchHead(branchName);
+            log(hash);
+        }
+    }
+
 }

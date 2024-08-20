@@ -65,7 +65,11 @@ public class Main {
                 // Usage: java gitlet.Main rm-branch [branch name]
                 branchName = args[1];
                 Repository.removeBranch(branchName);
-
+                break;
+            case "global-log":
+                // Usage: java gitlet.Main global-log
+                Repository.globalLog();
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);

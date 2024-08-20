@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.util.List;
 
 import static gitlet.Utils.join;
 
@@ -156,5 +157,9 @@ public class Persistor {
 
     public static void removeBranch(String branchName) {
         Utils.restrictedDelete(Utils.join(REF_HEADS_DIR, branchName));
+    }
+
+    public static List<String> readAllBranchNames() {
+        return Utils.plainFilenamesIn(REF_HEADS_DIR);
     }
 }
