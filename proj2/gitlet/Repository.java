@@ -1,5 +1,6 @@
 package gitlet;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -118,7 +119,13 @@ public class Repository {
         // get currently tracked files
         String currentHash = Persistor.readHashOfHead();
         Commit currentCommit = Persistor.readCommit(currentHash);
-        Set<String> currentlyTrackedFiles = currentCommit.getFilesTable().keySet();
+        Set<String> currentlyTrackedFiles;
+        if (currentCommit.getFilesTable() != null) {
+            currentlyTrackedFiles = currentCommit.getFilesTable().keySet();
+        } else {
+            currentlyTrackedFiles = new HashSet<>();
+        }
+
         // Takes all files in the commit at the head of the given branch,
         String hash = Persistor.readHashOfBranchHead(branchName);
         Commit newBranchHeadCommit = Persistor.readCommit(hash);
@@ -134,7 +141,8 @@ public class Repository {
                 // write blob content to filename
                 Persistor.writeContentToCWDFile(fileName, content);
             }
-            // Any files that are tracked in the current branch but are not present in the checked-out branch are deleted.
+            // Any files that are tracked in the current branch but are not
+            // present in the checked-out branch are deleted.
             for (String fileName : currentlyTrackedFiles) {
                 if (!newBranchFiles.contains(fileName)) {
                     Utils.restrictedDelete(Utils.join(Persistor.CWD, fileName));

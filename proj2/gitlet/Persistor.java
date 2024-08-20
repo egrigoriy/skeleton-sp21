@@ -159,7 +159,7 @@ public class Persistor {
     }
 
     public static void removeBranch(String branchName) {
-        File f =Utils.join(REF_HEADS_DIR, branchName);
+        File f = Utils.join(REF_HEADS_DIR, branchName);
         //System.out.println(f);
         f.delete();
         //Utils.restrictedDelete(Utils.join(REF_HEADS_DIR, branchName));

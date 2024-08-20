@@ -47,6 +47,10 @@ public class Main {
                 // java gitlet.Main checkout [commit id] -- [file name]
                 if (args.length == 4) {
                     String commitID = args[1];
+                    if (!args[2].equals("--")) {
+                        System.out.println("Incorrect operands.");
+                        System.exit(0);
+                    }
                     fileName = args[3];
                     Repository.checkoutFileFromCommit(fileName, commitID);
                 }
