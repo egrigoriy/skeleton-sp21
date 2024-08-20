@@ -24,8 +24,8 @@ public class Repository {
         }
         Commit initialCommit = new Commit();
         String hash = Persistor.saveCommit(initialCommit);
-        Persistor.saveMaster(hash);
-        Persistor.headToMaster();
+        Persistor.writeToHead("master");
+        Persistor.writeHashOfHead(hash);
     }
 
     public static void add(String fileName) {

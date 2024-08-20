@@ -111,4 +111,23 @@ public class Persistor {
         File filePath = Utils.join(CWD, fileName);
         Utils.restrictedDelete(filePath);
     }
+
+    public static void writeToHead(String branchName) {
+        Utils.writeContents(HEAD, "ref: refs/heads/" + branchName);
+    }
+    public static void writeHashOfHead(String hash) {
+        String branchName = getBranchNameFromHead();
+        writeHashOfBranchHead(branchName, hash);
+    }
+
+    private static void writeHashOfBranchHead(String branchName, String hash) {
+        File branchHeadFile = Utils.join(REF_HEADS_DIR, branchName);
+        Utils.writeContents(branchHeadFile, hash);
+    }
+
+    private static String getBranchNameFromHead() {
+        String headContent = Utils.readContentsAsString(HEAD);
+        String branchName = headContent.substring(headContent.lastIndexOf("/") + 1);
+        return branchName;
+    }
 }
