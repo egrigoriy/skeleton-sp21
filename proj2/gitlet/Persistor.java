@@ -33,10 +33,25 @@ public class Persistor {
             return null;
         }
         File objectPath = hashToObjectPath(commitID);
+        if (commitID.length() < Utils.UID_LENGTH) {
+            objectPath = abbrHashObjectPath(commitID);
+        }
         if (!objectPath.exists()) {
             return null;
         }
         return Utils.readObject(objectPath, Commit.class);
+    }
+
+    private static File abbrHashObjectPath(String commitID) {
+        File subDirPath = Utils.join(OBJECTS_DIR, commitID.substring(0, 2));
+        String abbrFieName = commitID.substring(2);
+
+        for (String fileName : Utils.plainFilenamesIn(subDirPath)) {
+            if (fileName.contains(abbrFieName)) {
+                return Utils.join(subDirPath, fileName);
+            }
+        }
+        return null;
     }
 
     private static File hashToObjectPath(String hash) {
@@ -106,17 +121,14 @@ public class Persistor {
         return Utils.join(CWD, fileName).exists();
     }
 
-    public static void headToMaster() {
-        String refToMaster = "refs/heads/master";
-        Utils.writeContents(HEAD, "path: " + refToMaster);
-    }
+
 
     public static void removeCWDFile(String fileName) {
         File filePath = Utils.join(CWD, fileName);
         Utils.restrictedDelete(filePath);
     }
 
-    public static void writeToHead(String branchName) {
+    public static void pointHEADTo(String branchName) {
         Utils.writeContents(HEAD, "ref: refs/heads/" + branchName);
     }
     public static void writeHashOfHead(String hash) {

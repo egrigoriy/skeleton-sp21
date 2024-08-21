@@ -29,7 +29,7 @@ public class Repository {
         }
         Commit initialCommit = new Commit();
         String hash = Persistor.saveCommit(initialCommit);
-        Persistor.writeToHead("master");
+        Persistor.pointHEADTo("master");
         Persistor.writeHashOfHead(hash);
     }
 
@@ -187,7 +187,7 @@ public class Repository {
 
         // Also, at the end of this command,
         // the given branch will now be considered the current branch (HEAD).
-        Persistor.writeToHead(branchName);
+        Persistor.pointHEADTo(branchName);
     }
 
     public static void remove(String fileName) {
@@ -229,7 +229,7 @@ public class Repository {
             String hash = Persistor.readHashOfBranchHead(branchName);
             List<Commit> history = commitHistory(hash);
             for (Commit commit : history) {
-               if (commit.getMessage().equals(message)) {
+                if (commit.getMessage().equals(message)) {
                    foundCommits.add(commit.getUid());
                }
             }
