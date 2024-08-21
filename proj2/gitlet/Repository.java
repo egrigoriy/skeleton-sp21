@@ -53,18 +53,37 @@ public class Repository {
     }
 
     public static void log() {
-        String hash = Persistor.readHashOfHead();
-        log(hash);
+        List<Commit> history = commitHistoryHEAD();
+        log(history);
     }
 
-    private static void log(String hash) {
-        Commit current = Persistor.readCommit(hash);
-        while (current != null) {
-            System.out.println(current);
-            current = Persistor.readCommit(current.getFirstParent());
+    private static List<Commit> commitHistoryHEAD() {
+        String hash = Persistor.readHashOfHead();
+        return commitHistory(hash);
+    }
+    private static List<Commit> commitHistory(String hash) {
+        List<Commit> history = new ArrayList<>();
+        Commit p = Persistor.readCommit(hash);
+        while (p != null) {
+            history.add(p);
+            p = Persistor.readCommit(p.getFirstParent());
+        }
+        return history;
+    }
+    private static void log(List<Commit> history) {
+        for (Commit commit : history) {
+            System.out.println(commit);
         }
     }
 
+    public static void globalLog() {
+        List<String> branchNames = Persistor.readAllBranchNames();
+        for (String branchName : branchNames) {
+            String hash = Persistor.readHashOfBranchHead(branchName);
+            List<Commit> history = commitHistory(hash);
+            log(history);
+        }
+    }
     public static void commit(String message) {
         if (message.isEmpty()) {
             System.out.println("Please enter a commit message.");
@@ -201,20 +220,26 @@ public class Repository {
         Persistor.removeBranch(branchName);
     }
 
-    public static void globalLog() {
-        List<String> branchNames = Persistor.readAllBranchNames();
-        for (String branchName : branchNames) {
-            String hash = Persistor.readHashOfBranchHead(branchName);
-            log(hash);
-        }
-    }
 
     public static void find(String message) {
         List<String> foundCommits = new ArrayList<>();
+
+        List<String> branchNames = Persistor.readAllBranchNames();
+        for (String branchName : branchNames) {
+            String hash = Persistor.readHashOfBranchHead(branchName);
+            List<Commit> history = commitHistory(hash);
+            for (Commit commit : history) {
+               if (commit.getMessage().equals(message)) {
+                   foundCommits.add(commit.getUid());
+               }
+            }
+        }
 
         if (foundCommits.isEmpty()) {
             System.out.println("Found no commit with that message.");
             System.exit(0);
         }
+
+        System.out.println(String.join("\n", foundCommits));
     }
 }
