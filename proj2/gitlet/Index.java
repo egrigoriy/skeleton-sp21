@@ -64,6 +64,23 @@ public class Index implements Serializable {
         return String.join("\n", filesToRemove.keySet()) + "\n";
     }
 
+    public boolean untrackedFileInTheWay() {
+        List<String> files = Utils.plainFilenamesIn(Persistor.CWD);
+        for (String fileName : files) {
+            byte[] fileContent = Utils.readContents(Utils.join(Persistor.CWD, fileName));
+            String hash = Utils.sha1(fileContent);
+            if (!filesToAdd.containsKey(fileName) && !repo.containsKey(fileName)) {
+                return true;
+            }
+            if (filesToAdd.containsKey(fileName) && !filesToAdd.get(fileName).equals(hash)) {
+                return true;
+            }
+            if (repo.containsKey(fileName) && !repo.get(fileName).equals(hash)) {
+                return true;
+            }
+        }
+        return false;
+    }
     private String getUntrackedFileNames() {
         List<String> untrackedFiles = new ArrayList<String>();
         List<String> files = Utils.plainFilenamesIn(Persistor.CWD);

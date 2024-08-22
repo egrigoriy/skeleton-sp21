@@ -103,8 +103,8 @@ public class Repository {
     }
 
     public static void checkoutFileFromLastCommit(String fileName) {
-        Commit lastCommit = Persistor.readLastCommit();
-        checkoutFileFromCommit(fileName, lastCommit.getUid());
+        String hash = Persistor.readHashOfHead();
+        checkoutFileFromCommit(fileName, hash);
     }
 
     public static void checkoutFileFromCommit(String fileName, String commitID) {
@@ -121,7 +121,7 @@ public class Repository {
         // get blob sha of file
         String hash = commit.getFileHash(fileName);
         // read blob
-        String content = Persistor.readTrackedFileContent(hash);
+        String content = Persistor.readBlob(hash);
         // write blob content to filename
         Persistor.writeContentToCWDFile(fileName, content);
     }
@@ -136,6 +136,11 @@ public class Repository {
             System.exit(0);
         }
 
+        Index index = Persistor.readIndex();
+        if (index.untrackedFileInTheWay()) {
+            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+            System.exit(0);
+        }
         // get currently tracked files
         String currentHash = Persistor.readHashOfHead();
         Commit currentCommit = Persistor.readCommit(currentHash);
@@ -168,7 +173,7 @@ public class Repository {
             // get blob sha of file
             String sha = checkedOutHeadCommit.getFileHash(fileName);
             // read blob
-            String content = Persistor.readTrackedFileContent(sha);
+            String content = Persistor.readBlob(sha);
             // write blob content to filename
             Persistor.writeContentToCWDFile(fileName, content);
         }
@@ -181,7 +186,6 @@ public class Repository {
 //        }
 
         // The staging area is cleared, unless the checked-out branch is the current branch
-        Index index = Persistor.readIndex();
         index.clear();
         Persistor.saveIndex(index);
 
@@ -230,7 +234,7 @@ public class Repository {
             List<Commit> history = commitHistory(hash);
             for (Commit commit : history) {
                 if (commit.getMessage().equals(message)) {
-                   foundCommits.add(commit.getUid());
+                    foundCommits.add(commit.getUid());
                }
             }
         }

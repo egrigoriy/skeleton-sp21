@@ -3,6 +3,7 @@ package gitlet;
 import java.io.File;
 import java.util.List;
 
+import static gitlet.Utils.UID_LENGTH;
 import static gitlet.Utils.join;
 
 public class Persistor {
@@ -11,66 +12,68 @@ public class Persistor {
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
     public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
+    public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
+    public static final File BLOBS_DIR = join(GITLET_DIR, "blobs");
     public static final File REFS_DIR = join(GITLET_DIR, "refs");
     public static final File REF_HEADS_DIR = join(REFS_DIR, "heads");
-    public static final File HEAD_MASTER = Utils.join(REF_HEADS_DIR, "master");
     public static final File HEAD = Utils.join(GITLET_DIR, "HEAD");
 
     public static final File INDEX = Utils.join(GITLET_DIR, "index");
 
     public static String saveCommit(Commit commit) {
-        String sha = Utils.sha1(
+        String hash = Utils.sha1(
                 commit.getTimestamp().toString().getBytes(),
                 commit.getMessage().getBytes());
-        commit.setUid(sha);
-        File objectPath = hashToObjectPath(sha);
-        Utils.writeObject(objectPath, commit);
-        return sha;
+        commit.setUid(hash);
+        File savePath = Utils.join(COMMITS_DIR, hash);
+        Utils.writeObject(savePath, commit);
+        return hash;
     }
 
     public static Commit readCommit(String commitID) {
         if (commitID == null) {
             return null;
         }
-        File objectPath = hashToObjectPath(commitID);
-        if (commitID.length() < Utils.UID_LENGTH) {
-            objectPath = abbrHashObjectPath(commitID);
-        }
-        if (!objectPath.exists()) {
+        File readPath = getCommitPath(commitID);
+        if (!readPath.exists()) {
             return null;
         }
-        return Utils.readObject(objectPath, Commit.class);
+        return Utils.readObject(readPath, Commit.class);
     }
 
-    private static File abbrHashObjectPath(String commitID) {
-        File subDirPath = Utils.join(OBJECTS_DIR, commitID.substring(0, 2));
-        String abbrFieName = commitID.substring(2);
+    private static File getCommitPath(String commitID) {
+        return Utils.join(COMMITS_DIR, getCommitFileName(commitID));
+    }
 
-        for (String fileName : Utils.plainFilenamesIn(subDirPath)) {
-            if (fileName.contains(abbrFieName)) {
-                return Utils.join(subDirPath, fileName);
+    private static String getCommitFileName(String commitID) {
+        if (commitID.length() == UID_LENGTH) {
+            return commitID;
+        }
+        return fullCommitId(commitID);
+    }
+
+    private static String fullCommitId(String commitID) {
+        for (String fileName : Utils.plainFilenamesIn(COMMITS_DIR)) {
+            if (fileName.contains(commitID)) {
+                return fileName;
             }
         }
-        return null;
-    }
-
-    private static File hashToObjectPath(String hash) {
-        File subDirPath = Utils.join(OBJECTS_DIR, hash.substring(0, 2));
-        if (!subDirPath.exists()) {
-            subDirPath.mkdir();
-        }
-        String fileName = hash.substring(2);
-        return Utils.join(subDirPath, fileName);
+        return "";
     }
 
     public static String saveBlob(String fileName) {
         byte[] fileContent = Utils.readContents(Utils.join(Persistor.CWD, fileName));
         String hash = Utils.sha1(fileContent);
-        File objectPath = hashToObjectPath(hash);
-        if (!objectPath.exists()) {
-            Utils.writeContents(objectPath, fileContent);
+        File savePath = Utils.join(BLOBS_DIR, hash);
+        if (!savePath.exists()) {
+            Utils.writeContents(savePath, fileContent);
         }
         return hash;
+    }
+
+    public static String readBlob(String hash) {
+        File readPath = Utils.join(BLOBS_DIR, hash);
+        return Utils.readContentsAsString(readPath);
     }
 
     public static void saveIndex(Index index) {
@@ -85,33 +88,19 @@ public class Persistor {
         }
     }
 
-    public static String readMaster() {
-        return Utils.readContentsAsString(HEAD_MASTER);
-    }
-
     public static boolean isRepositoryInitialized() {
         return GITLET_DIR.exists();
     }
 
     public static void buildInfrastructure() {
         GITLET_DIR.mkdir();
-        OBJECTS_DIR.mkdir();
         REFS_DIR.mkdir();
         REF_HEADS_DIR.mkdir();
-    }
-    public static void saveMaster(String uid) {
-        Utils.writeContents(HEAD_MASTER, uid);
-    }
-
-    public static Commit readLastCommit() {
-        String lastCommitID = Persistor.readMaster();
-        return readCommit(lastCommitID);
+        COMMITS_DIR.mkdir();
+        BLOBS_DIR.mkdir();
     }
 
-    public static String readTrackedFileContent(String blobSHA1) {
-        File objectPath = hashToObjectPath(blobSHA1);
-        return Utils.readContentsAsString(objectPath);
-    }
+
 
     public static void writeContentToCWDFile(String fileName, String content) {
         Utils.writeContents(Utils.join(CWD, fileName), content);
