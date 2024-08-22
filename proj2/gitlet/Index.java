@@ -8,22 +8,31 @@ import java.util.TreeMap;
 public class Index implements Serializable {
     private TreeMap<String, String> filesToAdd = new TreeMap<String, String>();
     private TreeMap<String, String> filesToRemove = new TreeMap<String, String>();
-    private TreeMap<String, String> repo = new TreeMap<String, String>();
+    private TreeMap<String, String> repo = new TreeMap<>();
+    private TreeMap<String, String> stage = new TreeMap<>();
 
     public Index() {
     }
-    public Index(Commit lastCommit) {
-        repo.putAll(lastCommit.getFilesTable());
+
+    private boolean alreadyStagedForRemoval(String fileName) {
+        String hash = Persistor.saveBlob(fileName);
+        return  filesToRemove.containsKey(fileName) && filesToRemove.get(fileName).equals(hash);
+    }
+
+    private boolean alreadyInRepo(String fileName) {
+        String hash = Persistor.saveBlob(fileName);
+        return repo.containsKey(fileName) && repo.get(fileName).equals(hash);
     }
     public void add(String fileName) {
-        String hash = Persistor.saveBlob(fileName);
-        if (filesToRemove.containsKey(fileName) && filesToRemove.get(fileName).equals(hash)) {
+        if (alreadyStagedForRemoval(fileName)) {
             filesToRemove.remove(fileName);
             return;
         }
-        if (repo.containsKey(fileName) && repo.get(fileName).equals(hash)) {
+        if (alreadyInRepo(fileName)) {
             return;
         }
+        String hash = Persistor.saveBlob(fileName);
+        stage.put(fileName, hash);
         filesToAdd.put(fileName, hash);
     }
 
@@ -36,6 +45,7 @@ public class Index implements Serializable {
     }
 
     public void clear() {
+        stage = new TreeMap<>(repo);
         filesToAdd.clear();
         filesToRemove.clear();
     }
@@ -95,7 +105,7 @@ public class Index implements Serializable {
         return String.join("\n", untrackedFiles) + "\n";
     }
 
-    public boolean fileInStageOrRepo(String fileName) {
+    public boolean  fileInStageOrRepo(String fileName) {
         return filesToAdd.containsKey(fileName) || repo.containsKey(fileName);
     }
 

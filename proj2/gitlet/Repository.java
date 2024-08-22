@@ -57,6 +57,11 @@ public class Repository {
         log(history);
     }
 
+    private static void log(List<Commit> history) {
+        for (Commit commit : history) {
+            System.out.println(commit);
+        }
+    }
     private static List<Commit> commitHistoryHEAD() {
         String hash = Persistor.readHashOfHead();
         return commitHistory(hash);
@@ -69,11 +74,6 @@ public class Repository {
             p = Persistor.readCommit(p.getFirstParent());
         }
         return history;
-    }
-    private static void log(List<Commit> history) {
-        for (Commit commit : history) {
-            System.out.println(commit);
-        }
     }
 
     public static void globalLog() {
@@ -117,12 +117,8 @@ public class Repository {
             System.out.println("File does not exist in that commit.");
             System.exit(0);
         }
-        // else
-        // get blob sha of file
         String hash = commit.getFileHash(fileName);
-        // read blob
         String content = Persistor.readBlob(hash);
-        // write blob content to filename
         Persistor.writeContentToCWDFile(fileName, content);
     }
 
@@ -235,7 +231,7 @@ public class Repository {
             for (Commit commit : history) {
                 if (commit.getMessage().equals(message)) {
                     foundCommits.add(commit.getUid());
-               }
+                }
             }
         }
 
