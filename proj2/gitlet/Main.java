@@ -79,6 +79,11 @@ public class Main {
                 message = args[1];
                 Repository.find(message);
                 break;
+            case "reset":
+                // Usage: java gitlet.Main reset [commit id]
+                String commitID = args[1];
+                Repository.reset(commitID);
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);

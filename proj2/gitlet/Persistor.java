@@ -1,10 +1,10 @@
 package gitlet;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
-import static gitlet.Utils.UID_LENGTH;
-import static gitlet.Utils.join;
+import static gitlet.Utils.*;
 
 public class Persistor {
     /** The current working directory. */
@@ -100,7 +100,14 @@ public class Persistor {
         BLOBS_DIR.mkdir();
     }
 
-
+    public static List<Commit> getAllCommits() {
+        List<Commit> result = new ArrayList<>();
+        for (String fileName : plainFilenamesIn(COMMITS_DIR)) {
+            Commit commit = readCommit(fileName);
+            result.add(commit);
+        }
+        return result;
+    }
 
     public static void writeContentToCWDFile(String fileName, String content) {
         Utils.writeContents(Utils.join(CWD, fileName), content);

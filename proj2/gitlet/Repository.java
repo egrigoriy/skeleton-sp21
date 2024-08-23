@@ -53,35 +53,24 @@ public class Repository {
     }
 
     public static void log() {
-        List<Commit> history = commitHistoryHEAD();
-        log(history);
+        Commit lastCommit = Persistor.readCommit(Persistor.readHashOfHead());
+        log(lastCommit);
     }
 
-    private static void log(List<Commit> history) {
-        for (Commit commit : history) {
-            System.out.println(commit);
-        }
-    }
-    private static List<Commit> commitHistoryHEAD() {
-        String hash = Persistor.readHashOfHead();
-        return commitHistory(hash);
-    }
-    private static List<Commit> commitHistory(String hash) {
-        List<Commit> history = new ArrayList<>();
-        Commit p = Persistor.readCommit(hash);
+    private static void log(Commit commit) {
+        Commit p = commit;
         while (p != null) {
-            history.add(p);
+            System.out.println(p);
             p = Persistor.readCommit(p.getFirstParent());
         }
-        return history;
     }
 
     public static void globalLog() {
         List<String> branchNames = Persistor.readAllBranchNames();
         for (String branchName : branchNames) {
             String hash = Persistor.readHashOfBranchHead(branchName);
-            List<Commit> history = commitHistory(hash);
-            log(history);
+            Commit commit = Persistor.readCommit(hash);
+            log(commit);
         }
     }
     public static void commit(String message) {
@@ -134,7 +123,9 @@ public class Repository {
 
         Index index = Persistor.readIndex();
         if (index.untrackedFileInTheWay()) {
-            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+            String message ="There is an untracked file in the way; " +
+                    "delete it, or add and commit it first.";
+            System.out.println(message);
             System.exit(0);
         }
         // get currently tracked files
@@ -223,15 +214,10 @@ public class Repository {
 
     public static void find(String message) {
         List<String> foundCommits = new ArrayList<>();
-
-        List<String> branchNames = Persistor.readAllBranchNames();
-        for (String branchName : branchNames) {
-            String hash = Persistor.readHashOfBranchHead(branchName);
-            List<Commit> history = commitHistory(hash);
-            for (Commit commit : history) {
-                if (commit.getMessage().equals(message)) {
-                    foundCommits.add(commit.getUid());
-                }
+        List<Commit> allCommits = Persistor.getAllCommits();
+        for (Commit commit : allCommits) {
+            if (commit.getMessage().equals(message)) {
+                foundCommits.add(commit.getUid());
             }
         }
 
@@ -241,5 +227,13 @@ public class Repository {
         }
 
         System.out.println(String.join("\n", foundCommits));
+    }
+
+    public static void reset(String commitID) {
+        Commit commit = Persistor.readCommit(commitID);
+        if (commit == null) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
     }
 }
