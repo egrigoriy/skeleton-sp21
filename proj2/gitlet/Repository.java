@@ -48,11 +48,19 @@ public class Repository {
     }
 
     public static void status() {
+        if (!Persistor.isRepositoryInitialized()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
         Index index = Persistor.readIndex();
         index.status();
     }
 
     public static void log() {
+        if (!Persistor.isRepositoryInitialized()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
         Commit lastCommit = Persistor.readCommit(Persistor.readHashOfHead());
         log(lastCommit);
     }
@@ -66,6 +74,10 @@ public class Repository {
     }
 
     public static void globalLog() {
+        if (!Persistor.isRepositoryInitialized()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
         List<String> branchNames = Persistor.readAllBranchNames();
         for (String branchName : branchNames) {
             String hash = Persistor.readHashOfBranchHead(branchName);
@@ -74,6 +86,10 @@ public class Repository {
         }
     }
     public static void commit(String message) {
+        if (!Persistor.isRepositoryInitialized()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
         if (message.isEmpty()) {
             System.out.println("Please enter a commit message.");
             System.exit(0);
@@ -92,11 +108,19 @@ public class Repository {
     }
 
     public static void checkoutFileFromLastCommit(String fileName) {
+        if (!Persistor.isRepositoryInitialized()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
         String hash = Persistor.readHashOfHead();
         checkoutFileFromCommit(fileName, hash);
     }
 
     public static void checkoutFileFromCommit(String fileName, String commitID) {
+        if (!Persistor.isRepositoryInitialized()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
         Commit commit = Persistor.readCommit(commitID);
         if (commit == null) {
             System.out.println("No commit with that id exists.");
@@ -112,6 +136,10 @@ public class Repository {
     }
 
     public static void checkoutFilesFromBranchHead(String branchName) {
+        if (!Persistor.isRepositoryInitialized()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
         if (!Persistor.branchExists(branchName)) {
             System.out.println("No such branch exists.");
             System.exit(0);
@@ -182,6 +210,10 @@ public class Repository {
     }
 
     public static void remove(String fileName) {
+        if (!Persistor.isRepositoryInitialized()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
         Index index = Persistor.readIndex();
         if (!index.fileInStageOrRepo(fileName)) {
             System.out.println("No reason to remove the file.");
@@ -192,6 +224,10 @@ public class Repository {
     }
 
     public static void branch(String branchName) {
+        if (!Persistor.isRepositoryInitialized()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
         if (Persistor.branchExists(branchName)) {
             System.out.println("A branch with that name already exists.");
             System.exit(0);
@@ -200,6 +236,10 @@ public class Repository {
     }
 
     public static void removeBranch(String branchName) {
+        if (!Persistor.isRepositoryInitialized()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
         if (!Persistor.branchExists(branchName)) {
             System.out.println("A branch with that name does not exist.");
             System.exit(0);
@@ -213,6 +253,10 @@ public class Repository {
 
 
     public static void find(String message) {
+        if (!Persistor.isRepositoryInitialized()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
         List<String> foundCommits = new ArrayList<>();
         List<Commit> allCommits = Persistor.getAllCommits();
         for (Commit commit : allCommits) {
@@ -230,6 +274,10 @@ public class Repository {
     }
 
     public static void reset(String commitID) {
+        if (!Persistor.isRepositoryInitialized()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
         Commit commit = Persistor.readCommit(commitID);
         if (commit == null) {
             System.out.println("No commit with that id exists.");
