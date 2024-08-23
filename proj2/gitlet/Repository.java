@@ -1,9 +1,6 @@
 package gitlet;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /** Represents a gitlet repository.
  *  TOD: It's a good idea to give a description here of what else this Class
@@ -169,11 +166,11 @@ public class Repository {
         // Takes all files in the commit at the head of the given branch,
         String hash = Persistor.readHashOfBranchHead(branchName);
         Commit checkedOutHeadCommit = Persistor.readCommit(hash);
-        Set<String> checkedOutBranchFiles;
+        TreeMap<String, String> checkedOutBranchFiles;
         if (checkedOutHeadCommit.getFilesTable() != null) {
-            checkedOutBranchFiles = checkedOutHeadCommit.getFilesTable().keySet();
+            checkedOutBranchFiles = checkedOutHeadCommit.getFilesTable();
         } else {
-            checkedOutBranchFiles = new HashSet<>();
+            checkedOutBranchFiles = new TreeMap<>();
         }
             // and puts them in the working directory, overwriting the versions of the files
             // that are already there if they exist.
@@ -184,7 +181,7 @@ public class Repository {
         if (!Utils.plainFilenamesIn(Persistor.CWD).isEmpty()) {
             throw new GitletException("NOT EMPTY");
         }
-        for (String fileName : checkedOutBranchFiles) {
+        for (String fileName : checkedOutBranchFiles.keySet()) {
             // get blob sha of file
             String sha = checkedOutHeadCommit.getFileHash(fileName);
             // read blob
@@ -194,14 +191,16 @@ public class Repository {
         }
         // Any files that are tracked in the current branch but are not
         // present in the checked-out branch are deleted.
-//        for (String fileName : currentlyTrackedFiles) {
-//            if (!checkedOutBranchFiles.contains(fileName)) {
-//                Utils.restrictedDelete(Utils.join(Persistor.CWD, fileName));
-//            }
-//        }
+        for (String fileName : currentlyTrackedFiles) {
+            if (!checkedOutBranchFiles.keySet().contains(fileName)) {
+                //System.out.println("FOO: " + fileName);
+                Utils.restrictedDelete(Utils.join(Persistor.CWD, fileName));
+            }
+        }
 
         // The staging area is cleared, unless the checked-out branch is the current branch
         index.clear();
+        index.setRepo(checkedOutBranchFiles);
         Persistor.saveIndex(index);
 
         // Also, at the end of this command,
@@ -215,7 +214,7 @@ public class Repository {
             System.exit(0);
         }
         Index index = Persistor.readIndex();
-        if (!index.fileInStageOrRepo(fileName)) {
+        if (index.isUntracked(fileName)) {
             System.out.println("No reason to remove the file.");
             System.exit(0);
         }

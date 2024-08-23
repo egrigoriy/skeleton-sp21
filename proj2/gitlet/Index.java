@@ -74,6 +74,10 @@ public class Index implements Serializable {
         return String.join("\n", filesToRemove.keySet()) + "\n";
     }
 
+    public void setRepo(TreeMap<String, String> newRepo) {
+        repo = newRepo;
+    }
+
     public boolean untrackedFileInTheWay() {
         List<String> files = Utils.plainFilenamesIn(Persistor.CWD);
         for (String fileName : files) {
@@ -91,12 +95,16 @@ public class Index implements Serializable {
         }
         return false;
     }
+
+    public boolean isUntracked(String fileName) {
+        return!filesToAdd.containsKey(fileName) && !repo.containsKey(fileName);
+    }
     private String getUntrackedFileNames() {
         List<String> untrackedFiles = new ArrayList<String>();
-        List<String> files = Utils.plainFilenamesIn(Persistor.CWD);
-        for (String file : files) {
-            if (!filesToAdd.containsKey(file) && !repo.containsKey(file)) {
-                untrackedFiles.add(file);
+        List<String> fileNames = Utils.plainFilenamesIn(Persistor.CWD);
+        for (String fileName : fileNames) {
+            if (isUntracked(fileName)) {
+                untrackedFiles.add(fileName);
             }
         }
         if (untrackedFiles.isEmpty()) {
@@ -105,18 +113,12 @@ public class Index implements Serializable {
         return String.join("\n", untrackedFiles) + "\n";
     }
 
-    public boolean  fileInStageOrRepo(String fileName) {
-        return filesToAdd.containsKey(fileName) || repo.containsKey(fileName);
-    }
-
     public TreeMap<String, String> getFilesToCommit() {
-        TreeMap<String, String> result = new TreeMap<>(repo);
-        result.putAll(filesToAdd);
-        for (String fileName : filesToRemove.keySet()) {
-            result.remove(fileName);
-        }
-        repo.putAll(result);
-        return result;
+        TreeMap<String, String> filesToCommit = new TreeMap<>(repo);
+        filesToCommit.putAll(filesToAdd);
+        filesToCommit.keySet().removeAll(filesToRemove.keySet());
+        repo = filesToCommit;
+        return filesToCommit;
     }
     public boolean nothingToAddOrRemove() {
         return filesToAdd.isEmpty() && filesToRemove.isEmpty();
