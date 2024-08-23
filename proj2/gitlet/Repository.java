@@ -123,8 +123,8 @@ public class Repository {
 
         Index index = Persistor.readIndex();
         if (index.untrackedFileInTheWay()) {
-            String message ="There is an untracked file in the way; " +
-                    "delete it, or add and commit it first.";
+            String message = "There is an untracked file in the way; "
+                    + "delete it, or add and commit it first.";
             System.out.println(message);
             System.exit(0);
         }
