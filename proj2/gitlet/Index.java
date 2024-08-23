@@ -97,7 +97,7 @@ public class Index implements Serializable {
     }
 
     public boolean isUntracked(String fileName) {
-        return!filesToAdd.containsKey(fileName) && !repo.containsKey(fileName);
+        return !filesToAdd.containsKey(fileName) && !repo.containsKey(fileName);
     }
     private String getUntrackedFileNames() {
         List<String> untrackedFiles = new ArrayList<String>();
