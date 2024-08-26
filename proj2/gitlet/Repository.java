@@ -75,10 +75,8 @@ public class Repository {
             System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
         }
-        List<String> branchNames = Persistor.readAllBranchNames();
-        for (String branchName : branchNames) {
-            String hash = Persistor.readHashOfBranchHead(branchName);
-            Commit commit = Persistor.readCommit(hash);
+        List<Commit> allCommits = Persistor.getAllCommits();
+        for (Commit commit : allCommits) {
             log(commit);
         }
     }

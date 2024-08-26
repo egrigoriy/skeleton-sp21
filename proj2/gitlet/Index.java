@@ -59,9 +59,39 @@ public class Index implements Serializable {
                 + getBranches() + "\n"
                 + "=== Staged Files ===" + "\n" + getFileNamesToAdd() + "\n"
                 + "=== Removed Files ===" + "\n" + getFileNamesToDelete() + "\n"
-                + "=== Modifications Not Staged For Commit ===" + "\n" + "\n"
+                + "=== Modifications Not Staged For Commit ===" + "\n" + getModifiedNotStaged() + "\n"
                 + "=== Untracked Files ===" + "\n" + getUntrackedFileNames();
         System.out.println(result);
+    }
+
+    private String getModifiedNotStaged() {
+        List<String> result = new ArrayList<String>();
+
+        // Staged for addition, but with different contents than in the working directory; or
+        // Staged for addition, but deleted in the working directory; or
+
+        List<String> fileNames = Utils.plainFilenamesIn(Persistor.CWD);
+        for (String fileName : fileNames) {
+            byte[] fileContent = Utils.readContents(Utils.join(Persistor.CWD, fileName));
+            String hash = Utils.sha1(fileContent);
+            // Tracked in the current commit, changed in the working directory, but not staged; or
+            if (repo.containsKey(fileName)
+                    && !repo.get(fileName).equals(hash)
+                    && !filesToAdd.containsKey(fileName)) {
+                result.add(fileName + " (modified)");
+            }
+        }
+        // Not staged for removal, but tracked in the current commit and deleted from the working directory.
+        for (String fileName : repo.keySet()) {
+            File filePath = Utils.join(Persistor.CWD, fileName);
+            if (!filesToRemove.containsKey(fileName) && !filePath.exists()) {
+                result.add(fileName + " (deleted)");
+            }
+        }
+        if (result.isEmpty()) {
+            return "";
+        }
+        return String.join("\n", result) + "\n";
     }
 
     private String getBranches() {
@@ -128,6 +158,7 @@ public class Index implements Serializable {
         if (untrackedFiles.isEmpty()) {
             return "";
         }
+        //System.out.println("FOO" + untrackedFiles);
         return String.join("\n", untrackedFiles) + "\n";
     }
 
