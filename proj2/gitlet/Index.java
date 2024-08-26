@@ -8,44 +8,43 @@ import java.util.TreeMap;
 public class Index implements Serializable {
     private TreeMap<String, String> filesToAdd = new TreeMap<String, String>();
     private TreeMap<String, String> filesToRemove = new TreeMap<String, String>();
-    private TreeMap<String, String> repo = new TreeMap<>();
-    private TreeMap<String, String> stage = new TreeMap<>();
+    private TreeMap<String, String> repo = new TreeMap<String, String>();
 
     public Index() {
     }
 
-    private boolean alreadyStagedForRemoval(String fileName) {
-        String hash = Persistor.saveBlob(fileName);
+    private boolean isStagedForRemoval(String fileName) {
+        byte[] fileContent = Utils.readContents(Utils.join(Persistor.CWD, fileName));
+        String hash = Utils.sha1(fileContent);
         return  filesToRemove.containsKey(fileName) && filesToRemove.get(fileName).equals(hash);
     }
 
-    private boolean alreadyInRepo(String fileName) {
-        String hash = Persistor.saveBlob(fileName);
+    private boolean inRepo(String fileName) {
+        byte[] fileContent = Utils.readContents(Utils.join(Persistor.CWD, fileName));
+        String hash = Utils.sha1(fileContent);
         return repo.containsKey(fileName) && repo.get(fileName).equals(hash);
     }
     public void add(String fileName) {
-        if (alreadyStagedForRemoval(fileName)) {
+        if (isStagedForRemoval(fileName)) {
             filesToRemove.remove(fileName);
             return;
         }
-        if (alreadyInRepo(fileName)) {
+        if (inRepo(fileName)) {
             return;
         }
         String hash = Persistor.saveBlob(fileName);
-        stage.put(fileName, hash);
         filesToAdd.put(fileName, hash);
     }
 
     public void remove(String fileName) {
         filesToAdd.remove(fileName);
-        if (repo.containsKey(fileName)) {
+        if (inRepo(fileName)) {
             filesToRemove.put(fileName, repo.get(fileName));
             Persistor.removeCWDFile(fileName);
         }
     }
 
     public void clear() {
-        stage = new TreeMap<>(repo);
         filesToAdd.clear();
         filesToRemove.clear();
     }
@@ -114,7 +113,7 @@ public class Index implements Serializable {
     }
 
     public TreeMap<String, String> getFilesToCommit() {
-        TreeMap<String, String> filesToCommit = new TreeMap<>(repo);
+        TreeMap<String, String> filesToCommit = new TreeMap<String, String>(repo);
         filesToCommit.putAll(filesToAdd);
         filesToCommit.keySet().removeAll(filesToRemove.keySet());
         repo = filesToCommit;
