@@ -1,5 +1,6 @@
 package gitlet;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,11 @@ public class Index implements Serializable {
     }
 
     private boolean inRepo(String fileName) {
-        byte[] fileContent = Utils.readContents(Utils.join(Persistor.CWD, fileName));
+        File filePath = Utils.join(Persistor.CWD, fileName);
+        if (!filePath.exists()) {
+            return false;
+        }
+        byte[] fileContent = Utils.readContents(filePath);
         String hash = Utils.sha1(fileContent);
         return repo.containsKey(fileName) && repo.get(fileName).equals(hash);
     }
@@ -38,7 +43,7 @@ public class Index implements Serializable {
 
     public void remove(String fileName) {
         filesToAdd.remove(fileName);
-        if (inRepo(fileName)) {
+        if (repo.containsKey(fileName)) {
             filesToRemove.put(fileName, repo.get(fileName));
             Persistor.removeCWDFile(fileName);
         }
