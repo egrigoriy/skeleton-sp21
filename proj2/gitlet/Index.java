@@ -57,10 +57,14 @@ public class Index implements Serializable {
     public void status() {
         String result = "=== Branches ===" + "\n"
                 + getBranches() + "\n"
-                + "=== Staged Files ===" + "\n" + getFileNamesToAdd() + "\n"
-                + "=== Removed Files ===" + "\n" + getFileNamesToDelete() + "\n"
-                + "=== Modifications Not Staged For Commit ===" + "\n" + getModifiedNotStaged() + "\n"
-                + "=== Untracked Files ===" + "\n" + getUntrackedFileNames();
+                + "=== Staged Files ===" + "\n"
+                + getFileNamesToAdd() + "\n"
+                + "=== Removed Files ===" + "\n"
+                + getFileNamesToDelete() + "\n"
+                + "=== Modifications Not Staged For Commit ===" + "\n"
+                + getModifiedNotStaged() + "\n"
+                + "=== Untracked Files ===" + "\n"
+                + getUntrackedFileNames();
         System.out.println(result);
     }
 
@@ -81,7 +85,8 @@ public class Index implements Serializable {
                 result.add(fileName + " (modified)");
             }
         }
-        // Not staged for removal, but tracked in the current commit and deleted from the working directory.
+        // Not staged for removal, but tracked in the current commit and
+        // deleted from the working directory.
         for (String fileName : repo.keySet()) {
             File filePath = Utils.join(Persistor.CWD, fileName);
             if (!filesToRemove.containsKey(fileName) && !filePath.exists()) {
