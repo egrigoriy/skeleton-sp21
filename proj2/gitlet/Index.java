@@ -56,12 +56,26 @@ public class Index implements Serializable {
 
     public void status() {
         String result = "=== Branches ===" + "\n"
-                + "*master" + "\n" + "\n"
+                + getBranches() + "\n"
                 + "=== Staged Files ===" + "\n" + getFileNamesToAdd() + "\n"
                 + "=== Removed Files ===" + "\n" + getFileNamesToDelete() + "\n"
                 + "=== Modifications Not Staged For Commit ===" + "\n" + "\n"
                 + "=== Untracked Files ===" + "\n" + getUntrackedFileNames();
         System.out.println(result);
+    }
+
+    private String getBranches() {
+        List<String> branchNames = Persistor.readAllBranchNames();
+        String currentBranch = Persistor.getBranchNameFromHead();
+        String result = "";
+        for (String branchName : branchNames) {
+            if (branchName.equals(currentBranch)) {
+                result += "*" + branchName + "\n";
+            } else {
+                result += branchName + "\n";
+            }
+        }
+        return result;
     }
 
     private String getFileNamesToAdd() {
