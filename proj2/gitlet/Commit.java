@@ -27,7 +27,7 @@ public class Commit implements Serializable {
     private Date timestamp;
     private String firstParent = null;
     private String secondParent = null;
-    private TreeMap<String, String> filesTable = null;
+    private TreeMap<String, String> filesTable = new TreeMap<>();
 
     public Commit() {
         message = "initial commit";

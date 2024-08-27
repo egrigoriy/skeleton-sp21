@@ -150,40 +150,16 @@ public class Repository {
             System.exit(0);
         }
         // get currently tracked files
-        Commit currentCommit = Persistor.getActiveCommit();
-        Set<String> currentlyTrackedFiles;
-        if (currentCommit.getFilesTable() != null) {
-            currentlyTrackedFiles = currentCommit.getFilesTable().keySet();
-        } else {
-            currentlyTrackedFiles = new HashSet<>();
-        }
+        Set<String> activeCommitFiles = Persistor.getActiveCommit().getFilesTable().keySet();
 
         // Takes all files in the commit at the head of the given branch,
-        String hash = Persistor.readHashOfBranchHead(branchName);
-        Commit checkedOutHeadCommit = Persistor.readCommit(hash);
-        TreeMap<String, String> checkedOutBranchFiles;
-        if (checkedOutHeadCommit.getFilesTable() != null) {
-            checkedOutBranchFiles = checkedOutHeadCommit.getFilesTable();
-        } else {
-            checkedOutBranchFiles = new TreeMap<>();
-        }
-            // and puts them in the working directory, overwriting the versions of the files
-            // that are already there if they exist.
-
-        for (String f : Utils.plainFilenamesIn(Persistor.CWD)) {
-            Utils.restrictedDelete(f);
-        }
-        for (String fileName : checkedOutBranchFiles.keySet()) {
-            // get blob sha of file
-            String sha = checkedOutHeadCommit.getFileHash(fileName);
-            // read blob
-            String content = Persistor.readBlob(sha);
-            // write blob content to filename
-            Persistor.writeContentToCWDFile(fileName, content);
-        }
+        TreeMap<String, String> checkedOutBranchFiles = Persistor.getBranchHeadCommit(branchName).getFilesTable();
+        // and puts them in the working directory, overwriting the versions of the files
+        // that are already there if they exist.
+        Persistor.writeCWDFiles(checkedOutBranchFiles);
         // Any files that are tracked in the current branch but are not
         // present in the checked-out branch are deleted.
-        for (String fileName : currentlyTrackedFiles) {
+        for (String fileName : activeCommitFiles) {
             if (!checkedOutBranchFiles.keySet().contains(fileName)) {
                 Utils.restrictedDelete(Utils.join(Persistor.CWD, fileName));
             }
@@ -195,6 +171,53 @@ public class Repository {
         Persistor.pointHEADTo(branchName);
     }
 
+    public static void reset(String commitID) {
+        if (!Persistor.isRepositoryInitialized()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
+        Commit commit = Persistor.readCommit(commitID);
+        if (commit == null) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+
+        Index index = Persistor.readIndex();
+        if (index.untrackedFileInTheWay()) {
+            String message = "There is an untracked file in the way; "
+                    + "delete it, or add and commit it first.";
+            System.out.println(message);
+            System.exit(0);
+        }
+        // get currently tracked files
+        Set<String> currentlyTrackedFiles = Persistor.getActiveCommit().getFilesTable().keySet();
+
+        Commit checkedOutCommit = Persistor.readCommit(commitID);
+        TreeMap<String, String> checkedOutBranchFiles = checkedOutCommit.getFilesTable();
+        // and puts them in the working directory, overwriting the versions of the files
+        // that are already there if they exist.
+
+        for (String f : Utils.plainFilenamesIn(Persistor.CWD)) {
+            Utils.restrictedDelete(f);
+        }
+        Persistor.writeCWDFiles(checkedOutBranchFiles);
+
+        // Any files that are tracked in the current branch but are not
+        // present in the checked-out branch are deleted.
+        for (String fileName : currentlyTrackedFiles) {
+            if (!checkedOutBranchFiles.keySet().contains(fileName)) {
+                Utils.restrictedDelete(Utils.join(Persistor.CWD, fileName));
+            }
+        }
+
+        // The staging area is cleared, unless the checked-out branch is the current branch
+        index.clear();
+        index.setRepo(checkedOutBranchFiles);
+        Persistor.saveIndex(index);
+
+        // Also moves the current branch’s head to that commit node.
+        Persistor.writeHashOfHead(commitID);
+    }
     public static void remove(String fileName) {
         if (!Persistor.isRepositoryInitialized()) {
             System.out.println("Not in an initialized Gitlet directory.");
@@ -250,82 +273,10 @@ public class Repository {
                 foundCommits.add(commit.getUid());
             }
         }
-
         if (foundCommits.isEmpty()) {
             System.out.println("Found no commit with that message.");
             System.exit(0);
         }
-
         System.out.println(String.join("\n", foundCommits));
-    }
-
-    public static void reset(String commitID) {
-        if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
-        }
-        Commit commit = Persistor.readCommit(commitID);
-        if (commit == null) {
-            System.out.println("No commit with that id exists.");
-            System.exit(0);
-        }
-
-        Index index = Persistor.readIndex();
-        if (index.untrackedFileInTheWay()) {
-            String message = "There is an untracked file in the way; "
-                    + "delete it, or add and commit it first.";
-            System.out.println(message);
-            System.exit(0);
-        }
-        // get currently tracked files
-        Commit currentCommit = Persistor.getActiveCommit();
-        Set<String> currentlyTrackedFiles;
-        if (currentCommit.getFilesTable() != null) {
-            currentlyTrackedFiles = currentCommit.getFilesTable().keySet();
-        } else {
-            currentlyTrackedFiles = new HashSet<>();
-        }
-
-        Commit checkedOutCommit = Persistor.readCommit(commitID);
-        TreeMap<String, String> checkedOutBranchFiles;
-        if (checkedOutCommit.getFilesTable() != null) {
-            checkedOutBranchFiles = checkedOutCommit.getFilesTable();
-        } else {
-            checkedOutBranchFiles = new TreeMap<>();
-        }
-        // and puts them in the working directory, overwriting the versions of the files
-        // that are already there if they exist.
-
-        for (String f : Utils.plainFilenamesIn(Persistor.CWD)) {
-            Utils.restrictedDelete(f);
-        }
-        if (!Utils.plainFilenamesIn(Persistor.CWD).isEmpty()) {
-            throw new GitletException("NOT EMPTY");
-        }
-        for (String fileName : checkedOutBranchFiles.keySet()) {
-            // get blob sha of file
-            String sha = checkedOutCommit.getFileHash(fileName);
-            // read blob
-            String content = Persistor.readBlob(sha);
-            // write blob content to filename
-            Persistor.writeContentToCWDFile(fileName, content);
-        }
-        // Any files that are tracked in the current branch but are not
-        // present in the checked-out branch are deleted.
-        for (String fileName : currentlyTrackedFiles) {
-            if (!checkedOutBranchFiles.keySet().contains(fileName)) {
-                //System.out.println("FOO: " + fileName);
-                Utils.restrictedDelete(Utils.join(Persistor.CWD, fileName));
-            }
-        }
-
-        // The staging area is cleared, unless the checked-out branch is the current branch
-        index.clear();
-        index.setRepo(checkedOutBranchFiles);
-        Persistor.saveIndex(index);
-
-        // Also, at the end of this command,
-        // the given branch will now be considered the current branch (HEAD).
-        Persistor.writeHashOfHead(commitID);
     }
 }

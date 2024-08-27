@@ -99,7 +99,7 @@ public class Index implements Serializable {
         return false;
     }
 
-    private boolean isModified(String fileName) {
+    public boolean isModified(String fileName) {
         String hash = Persistor.getFileHash(fileName);
         return  (filesToAdd.containsKey(fileName) && !filesToAdd.get(fileName).equals(hash))
                 || (repo.containsKey(fileName) && !repo.get(fileName).equals(hash));

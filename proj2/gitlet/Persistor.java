@@ -3,6 +3,8 @@ package gitlet;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeMap;
 
 import static gitlet.Utils.*;
 
@@ -182,6 +184,39 @@ public class Persistor {
     }
 
     public static Commit getActiveCommit() {
-        return Persistor.readCommit(Persistor.readHashOfHead());
+        return getBranchHeadCommit(getActiveBranchName());
     }
+
+    public static Commit getBranchHeadCommit(String branchName) {
+        String hash = readHashOfBranchHead(branchName);
+        return readCommit(hash);
+    }
+
+    public static void writeCWDFiles(TreeMap<String, String> files) {
+        for (String fileName : files.keySet()) {
+            String sha = files.get(fileName);
+            String content = Persistor.readBlob(sha);
+            Persistor.writeContentToCWDFile(fileName, content);
+        }
+    }
+
+    public static void foo(String branchName) {
+        // get currently tracked files
+        Set<String> activeCommitFiles = Persistor.getActiveCommit().getFilesTable().keySet();
+
+        // Takes all files in the commit at the head of the given branch,
+        TreeMap<String, String> checkedOutBranchFiles = Persistor.getBranchHeadCommit(branchName).getFilesTable();
+        // and puts them in the working directory, overwriting the versions of the files
+        // that are already there if they exist.
+        Persistor.writeCWDFiles(checkedOutBranchFiles);
+        // Any files that are tracked in the current branch but are not
+        // present in the checked-out branch are deleted.
+        for (String fileName : activeCommitFiles) {
+            if (!checkedOutBranchFiles.keySet().contains(fileName)) {
+                Utils.restrictedDelete(Utils.join(Persistor.CWD, fileName));
+            }
+        }
+    }
+
+
 }
