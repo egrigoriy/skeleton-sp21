@@ -17,12 +17,12 @@ public class Repository {
      */
 
     public static void init() {
-        if (!Persistor.isRepositoryInitialized()) {
-            Persistor.buildInfrastructure();
-        } else {
+        if (Persistor.isRepositoryInitialized()) {
             String m = "A Gitlet version-control system already exists in the current directory.";
             System.out.println(m);
             System.exit(0);
+        } else {
+            Persistor.buildInfrastructure();
         }
         Commit initialCommit = new Commit();
         String hash = Persistor.saveCommit(initialCommit);
@@ -58,8 +58,7 @@ public class Repository {
             System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
         }
-        Commit lastCommit = Persistor.readCommit(Persistor.readHashOfHead());
-        log(lastCommit);
+        log(Persistor.getActiveCommit());
     }
 
     private static void log(Commit commit) {
@@ -94,9 +93,8 @@ public class Repository {
             System.out.println("No changes added to the commit.");
             System.exit(0);
         }
-        String lastCommitHash = Persistor.readHashOfHead();
-        Commit commit = new Commit(message, index, lastCommitHash);
-        String hash = Persistor.saveCommit(commit);
+        Commit newCommit = new Commit(message, index);
+        String hash = Persistor.saveCommit(newCommit);
         index.clear();
         Persistor.saveIndex(index);
         Persistor.writeHashOfHead(hash);
@@ -152,8 +150,7 @@ public class Repository {
             System.exit(0);
         }
         // get currently tracked files
-        String currentHash = Persistor.readHashOfHead();
-        Commit currentCommit = Persistor.readCommit(currentHash);
+        Commit currentCommit = Persistor.getActiveCommit();
         Set<String> currentlyTrackedFiles;
         if (currentCommit.getFilesTable() != null) {
             currentlyTrackedFiles = currentCommit.getFilesTable().keySet();
@@ -176,9 +173,6 @@ public class Repository {
         for (String f : Utils.plainFilenamesIn(Persistor.CWD)) {
             Utils.restrictedDelete(f);
         }
-        if (!Utils.plainFilenamesIn(Persistor.CWD).isEmpty()) {
-            throw new GitletException("NOT EMPTY");
-        }
         for (String fileName : checkedOutBranchFiles.keySet()) {
             // get blob sha of file
             String sha = checkedOutHeadCommit.getFileHash(fileName);
@@ -191,18 +185,13 @@ public class Repository {
         // present in the checked-out branch are deleted.
         for (String fileName : currentlyTrackedFiles) {
             if (!checkedOutBranchFiles.keySet().contains(fileName)) {
-                //System.out.println("FOO: " + fileName);
                 Utils.restrictedDelete(Utils.join(Persistor.CWD, fileName));
             }
         }
 
-        // The staging area is cleared, unless the checked-out branch is the current branch
         index.clear();
         index.setRepo(checkedOutBranchFiles);
         Persistor.saveIndex(index);
-
-        // Also, at the end of this command,
-        // the given branch will now be considered the current branch (HEAD).
         Persistor.pointHEADTo(branchName);
     }
 
@@ -289,8 +278,7 @@ public class Repository {
             System.exit(0);
         }
         // get currently tracked files
-        String currentHash = Persistor.readHashOfHead();
-        Commit currentCommit = Persistor.readCommit(currentHash);
+        Commit currentCommit = Persistor.getActiveCommit();
         Set<String> currentlyTrackedFiles;
         if (currentCommit.getFilesTable() != null) {
             currentlyTrackedFiles = currentCommit.getFilesTable().keySet();

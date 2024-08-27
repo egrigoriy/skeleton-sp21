@@ -34,8 +34,8 @@ public class Commit implements Serializable {
         timestamp = new Date(0);
     }
 
-    public Commit(String message, Index index, String firstParent) {
-        this.firstParent = firstParent;
+    public Commit(String message, Index index) {
+        this.firstParent = Persistor.getActiveCommit().getUid();
         this.message = message;
         this.filesTable = new TreeMap<>(index.getFilesToCommit());
         timestamp = new Date();

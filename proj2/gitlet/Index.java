@@ -9,26 +9,8 @@ public class Index implements Serializable {
     private TreeMap<String, String> filesToRemove = new TreeMap<String, String>();
     private TreeMap<String, String> repo = new TreeMap<String, String>();
 
-    public Index() {
-    }
-
-    private boolean isStagedForRemoval(String fileName) {
-        byte[] fileContent = Utils.readContents(Utils.join(Persistor.CWD, fileName));
-        String hash = Utils.sha1(fileContent);
-        return  filesToRemove.containsKey(fileName) && filesToRemove.get(fileName).equals(hash);
-    }
-
-    private boolean inRepo(String fileName) {
-        File filePath = Utils.join(Persistor.CWD, fileName);
-        if (!filePath.exists()) {
-            return false;
-        }
-        byte[] fileContent = Utils.readContents(filePath);
-        String hash = Utils.sha1(fileContent);
-        return repo.containsKey(fileName) && repo.get(fileName).equals(hash);
-    }
     public void add(String fileName) {
-        if (isStagedForRemoval(fileName)) {
+        if (filesToRemove.containsKey(fileName)) {
             filesToRemove.remove(fileName);
             return;
         }
@@ -54,7 +36,7 @@ public class Index implements Serializable {
 
     public void status() {
         String result = "=== Branches ===" + "\n"
-                + getBranches() + "\n"
+                + formatSetToString(getBranchesAsSet()) + "\n"
                 + "=== Staged Files ===" + "\n"
                 + formatSetToString(filesToAdd.keySet()) + "\n"
                 + "=== Removed Files ===" + "\n"
@@ -66,6 +48,20 @@ public class Index implements Serializable {
         System.out.println(result);
     }
 
+    private Set<String> getBranchesAsSet() {
+        List<String> branchNames = Persistor.readAllBranchNames();
+        String activeBranch = Persistor.getActiveBranchName();
+        TreeSet<String> result = new TreeSet<>();
+        for (String branchName : branchNames) {
+            if (branchName.equals(activeBranch)) {
+                result.add("*" + branchName);
+            } else {
+                result.add(branchName);
+            }
+        }
+        return result;
+    }
+
     private Set<String> getModifiedNotStaged() {
         Set<String> result = new HashSet<>();
 
@@ -74,12 +70,7 @@ public class Index implements Serializable {
 
         List<String> fileNames = Utils.plainFilenamesIn(Persistor.CWD);
         for (String fileName : fileNames) {
-            byte[] fileContent = Utils.readContents(Utils.join(Persistor.CWD, fileName));
-            String hash = Utils.sha1(fileContent);
-            // Tracked in the current commit, changed in the working directory, but not staged; or
-            if (repo.containsKey(fileName)
-                    && !repo.get(fileName).equals(hash)
-                    && !filesToAdd.containsKey(fileName)) {
+            if (isModified(fileName)) {
                 result.add(fileName + " (modified)");
             }
         }
@@ -94,20 +85,6 @@ public class Index implements Serializable {
         return result;
     }
 
-    private String getBranches() {
-        List<String> branchNames = Persistor.readAllBranchNames();
-        String activeBranch = Persistor.getActiveBranchName();
-        String result = "";
-        for (String branchName : branchNames) {
-            if (branchName.equals(activeBranch)) {
-                result += "*" + branchName + "\n";
-            } else {
-                result += branchName + "\n";
-            }
-        }
-        return result;
-    }
-
     public void setRepo(TreeMap<String, String> newRepo) {
         repo = newRepo;
     }
@@ -115,24 +92,32 @@ public class Index implements Serializable {
     public boolean untrackedFileInTheWay() {
         List<String> files = Utils.plainFilenamesIn(Persistor.CWD);
         for (String fileName : files) {
-            byte[] fileContent = Utils.readContents(Utils.join(Persistor.CWD, fileName));
-            String hash = Utils.sha1(fileContent);
-            if (!filesToAdd.containsKey(fileName) && !repo.containsKey(fileName)) {
-                return true;
-            }
-            if (filesToAdd.containsKey(fileName) && !filesToAdd.get(fileName).equals(hash)) {
-                return true;
-            }
-            if (repo.containsKey(fileName) && !repo.get(fileName).equals(hash)) {
+            if (isUntracked(fileName) || isModified(fileName)) {
                 return true;
             }
         }
         return false;
     }
 
+    private boolean isModified(String fileName) {
+        String hash = Persistor.getFileHash(fileName);
+        return  (filesToAdd.containsKey(fileName) && !filesToAdd.get(fileName).equals(hash))
+                || (repo.containsKey(fileName) && !repo.get(fileName).equals(hash));
+    }
+
     public boolean isUntracked(String fileName) {
         return !filesToAdd.containsKey(fileName) && !repo.containsKey(fileName);
     }
+
+    private boolean inRepo(String fileName) {
+        if (!Persistor.fileExists(fileName)) {
+            return false;
+        }
+
+        String hash = Persistor.getFileHash(fileName);
+        return repo.containsKey(fileName) && repo.get(fileName).equals(hash);
+    }
+
     private Set<String> getUntrackedFileNames() {
         Set<String> untrackedFiles = new HashSet<>();
         List<String> fileNames = Utils.plainFilenamesIn(Persistor.CWD);

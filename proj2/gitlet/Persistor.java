@@ -167,13 +167,21 @@ public class Persistor {
     }
 
     public static void removeBranch(String branchName) {
-        File f = Utils.join(REF_HEADS_DIR, branchName);
-        //System.out.println(f);
-        f.delete();
-        //Utils.restrictedDelete(Utils.join(REF_HEADS_DIR, branchName));
+        File filePath = Utils.join(REF_HEADS_DIR, branchName);
+        filePath.delete();
     }
 
     public static List<String> readAllBranchNames() {
         return Utils.plainFilenamesIn(REF_HEADS_DIR);
+    }
+
+    public static String getFileHash(String fileName) {
+        byte[] fileContent = Utils.readContents(Utils.join(Persistor.CWD, fileName));
+        String hash = Utils.sha1(fileContent);
+        return hash;
+    }
+
+    public static Commit getActiveCommit() {
+        return Persistor.readCommit(Persistor.readHashOfHead());
     }
 }
