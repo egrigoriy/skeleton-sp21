@@ -128,12 +128,12 @@ public class Persistor {
         Utils.writeContents(HEAD, "ref: refs/heads/" + branchName);
     }
     public static void writeHashOfHead(String hash) {
-        String branchName = getBranchNameFromHead();
+        String branchName = getActiveBranchName();
         writeHashOfBranchHead(branchName, hash);
     }
 
     public static String readHashOfHead() {
-        String branchName = getBranchNameFromHead();
+        String branchName = getActiveBranchName();
         String hash = readHashOfBranchHead(branchName);
         return hash;
     }
@@ -150,7 +150,7 @@ public class Persistor {
 
 
 
-    public static String getBranchNameFromHead() {
+    public static String getActiveBranchName() {
         String headContent = Utils.readContentsAsString(HEAD);
         String branchName = headContent.substring(headContent.lastIndexOf("/") + 1);
         return branchName;

@@ -139,7 +139,7 @@ public class Repository {
             System.out.println("No such branch exists.");
             System.exit(0);
         }
-        if (Persistor.getBranchNameFromHead().equals(branchName)) {
+        if (Persistor.getActiveBranchName().equals(branchName)) {
             System.out.println("No need to checkout the current branch.");
             System.exit(0);
         }
@@ -241,7 +241,7 @@ public class Repository {
             System.out.println("A branch with that name does not exist.");
             System.exit(0);
         }
-        if (Persistor.getBranchNameFromHead().equals(branchName)) {
+        if (Persistor.getActiveBranchName().equals(branchName)) {
             System.out.println("Cannot remove the current branch.");
             System.exit(0);
         }
