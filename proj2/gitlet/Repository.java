@@ -153,7 +153,8 @@ public class Repository {
         Set<String> activeCommitFiles = Persistor.getActiveCommit().getFilesTable().keySet();
 
         // Takes all files in the commit at the head of the given branch,
-        TreeMap<String, String> checkedOutBranchFiles = Persistor.getBranchHeadCommit(branchName).getFilesTable();
+        TreeMap<String, String> checkedOutBranchFiles = Persistor.getBranchHeadCommit(branchName)
+                .getFilesTable();
         // and puts them in the working directory, overwriting the versions of the files
         // that are already there if they exist.
         Persistor.writeCWDFiles(checkedOutBranchFiles);
