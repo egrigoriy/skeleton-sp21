@@ -1,6 +1,9 @@
 package gitlet;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeMap;
 
 /** Represents a gitlet repository.
  *  TOD: It's a good idea to give a description here of what else this Class
@@ -25,9 +28,9 @@ public class Repository {
             Persistor.buildInfrastructure();
         }
         Commit initialCommit = new Commit();
-        String hash = Persistor.saveCommit(initialCommit);
-        Persistor.pointHEADTo("master");
-        Persistor.writeHashOfHead(hash);
+        String commitId = Persistor.saveCommit(initialCommit);
+        Persistor.setActiveBranchTo("master");
+        Persistor.setActiveCommitTo(commitId);
     }
 
     public static void add(String fileName) {
@@ -35,7 +38,7 @@ public class Repository {
             System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
         }
-        if (!Persistor.fileExists(fileName)) {
+        if (!WorkingDir.fileExists(fileName)) {
             System.out.println("File does not exist.");
             System.exit(0);
         }
@@ -58,11 +61,7 @@ public class Repository {
             System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
         }
-        log(Persistor.getActiveCommit());
-    }
-
-    private static void log(Commit commit) {
-        Commit p = commit;
+        Commit p = Persistor.getActiveCommit();
         while (p != null) {
             System.out.println(p);
             p = Persistor.readCommit(p.getFirstParent());
@@ -76,7 +75,7 @@ public class Repository {
         }
         List<Commit> allCommits = Persistor.getAllCommits();
         for (Commit commit : allCommits) {
-            log(commit);
+            System.out.println(commit);
         }
     }
     public static void commit(String message) {
@@ -94,10 +93,10 @@ public class Repository {
             System.exit(0);
         }
         Commit newCommit = new Commit(message, index);
-        String hash = Persistor.saveCommit(newCommit);
+        String commitId = Persistor.saveCommit(newCommit);
+        Persistor.setActiveCommitTo(commitId);
         index.clear();
         Persistor.saveIndex(index);
-        Persistor.writeHashOfHead(hash);
     }
 
     public static void checkoutFileFromLastCommit(String fileName) {
@@ -105,8 +104,8 @@ public class Repository {
             System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
         }
-        String hash = Persistor.readHashOfHead();
-        checkoutFileFromCommit(fileName, hash);
+        String commitId = Persistor.getActiveCommitId();
+        checkoutFileFromCommit(fileName, commitId);
     }
 
     public static void checkoutFileFromCommit(String fileName, String commitID) {
@@ -125,7 +124,7 @@ public class Repository {
         }
         String hash = commit.getFileHash(fileName);
         String content = Persistor.readBlob(hash);
-        Persistor.writeContentToCWDFile(fileName, content);
+        WorkingDir.writeContentToCWDFile(fileName, content);
     }
 
     public static void checkoutFilesFromBranchHead(String branchName) {
@@ -157,19 +156,19 @@ public class Repository {
                 .getFilesTable();
         // and puts them in the working directory, overwriting the versions of the files
         // that are already there if they exist.
-        Persistor.writeCWDFiles(checkedOutBranchFiles);
+        WorkingDir.writeCWDFiles(checkedOutBranchFiles);
         // Any files that are tracked in the current branch but are not
         // present in the checked-out branch are deleted.
         for (String fileName : activeCommitFiles) {
             if (!checkedOutBranchFiles.keySet().contains(fileName)) {
-                Utils.restrictedDelete(Utils.join(Persistor.CWD, fileName));
+                Utils.restrictedDelete(Utils.join(WorkingDir.CWD, fileName));
             }
         }
 
         index.clear();
         index.setRepo(checkedOutBranchFiles);
         Persistor.saveIndex(index);
-        Persistor.pointHEADTo(branchName);
+        Persistor.setActiveBranchTo(branchName);
     }
 
     public static void reset(String commitID) {
@@ -198,16 +197,16 @@ public class Repository {
         // and puts them in the working directory, overwriting the versions of the files
         // that are already there if they exist.
 
-        for (String f : Utils.plainFilenamesIn(Persistor.CWD)) {
+        for (String f : Utils.plainFilenamesIn(WorkingDir.CWD)) {
             Utils.restrictedDelete(f);
         }
-        Persistor.writeCWDFiles(checkedOutBranchFiles);
+        WorkingDir.writeCWDFiles(checkedOutBranchFiles);
 
         // Any files that are tracked in the current branch but are not
         // present in the checked-out branch are deleted.
         for (String fileName : currentlyTrackedFiles) {
             if (!checkedOutBranchFiles.keySet().contains(fileName)) {
-                Utils.restrictedDelete(Utils.join(Persistor.CWD, fileName));
+                Utils.restrictedDelete(Utils.join(WorkingDir.CWD, fileName));
             }
         }
 
@@ -217,7 +216,7 @@ public class Repository {
         Persistor.saveIndex(index);
 
         // Also moves the current branch’s head to that commit node.
-        Persistor.writeHashOfHead(commitID);
+        Persistor.setActiveCommitTo(commitID);
     }
     public static void remove(String fileName) {
         if (!Persistor.isRepositoryInitialized()) {

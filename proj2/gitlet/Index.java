@@ -25,7 +25,7 @@ public class Index implements Serializable {
         filesToAdd.remove(fileName);
         if (repo.containsKey(fileName)) {
             filesToRemove.put(fileName, repo.get(fileName));
-            Persistor.removeCWDFile(fileName);
+            WorkingDir.removeCWDFile(fileName);
         }
     }
 
@@ -36,7 +36,7 @@ public class Index implements Serializable {
 
     public void status() {
         String result = "=== Branches ===" + "\n"
-                + formatSetToString(getBranchesAsSet()) + "\n"
+                + formatSetToString(Persistor.getBranchesStatus()) + "\n"
                 + "=== Staged Files ===" + "\n"
                 + formatSetToString(filesToAdd.keySet()) + "\n"
                 + "=== Removed Files ===" + "\n"
@@ -48,19 +48,7 @@ public class Index implements Serializable {
         System.out.println(result);
     }
 
-    private Set<String> getBranchesAsSet() {
-        List<String> branchNames = Persistor.readAllBranchNames();
-        String activeBranch = Persistor.getActiveBranchName();
-        TreeSet<String> result = new TreeSet<>();
-        for (String branchName : branchNames) {
-            if (branchName.equals(activeBranch)) {
-                result.add("*" + branchName);
-            } else {
-                result.add(branchName);
-            }
-        }
-        return result;
-    }
+
 
     private Set<String> getModifiedNotStaged() {
         Set<String> result = new HashSet<>();
@@ -68,7 +56,7 @@ public class Index implements Serializable {
         // Staged for addition, but with different contents than in the working directory; or
         // Staged for addition, but deleted in the working directory; or
 
-        List<String> fileNames = Utils.plainFilenamesIn(Persistor.CWD);
+        List<String> fileNames = WorkingDir.getFileNames();
         for (String fileName : fileNames) {
             if (isModified(fileName)) {
                 result.add(fileName + " (modified)");
@@ -77,7 +65,7 @@ public class Index implements Serializable {
         // Not staged for removal, but tracked in the current commit and
         // deleted from the working directory.
         for (String fileName : repo.keySet()) {
-            File filePath = Utils.join(Persistor.CWD, fileName);
+            File filePath = Utils.join(WorkingDir.CWD, fileName);
             if (!filesToRemove.containsKey(fileName) && !filePath.exists()) {
                 result.add(fileName + " (deleted)");
             }
@@ -90,7 +78,7 @@ public class Index implements Serializable {
     }
 
     public boolean untrackedFileInTheWay() {
-        List<String> files = Utils.plainFilenamesIn(Persistor.CWD);
+        List<String> files = WorkingDir.getFileNames();
         for (String fileName : files) {
             if (isUntracked(fileName) || isModified(fileName)) {
                 return true;
@@ -100,7 +88,7 @@ public class Index implements Serializable {
     }
 
     public boolean isModified(String fileName) {
-        String hash = Persistor.getFileHash(fileName);
+        String hash = WorkingDir.getFileHash(fileName);
         return  (filesToAdd.containsKey(fileName) && !filesToAdd.get(fileName).equals(hash))
                 || (repo.containsKey(fileName) && !repo.get(fileName).equals(hash));
     }
@@ -110,17 +98,17 @@ public class Index implements Serializable {
     }
 
     private boolean inRepo(String fileName) {
-        if (!Persistor.fileExists(fileName)) {
+        if (!WorkingDir.fileExists(fileName)) {
             return false;
         }
 
-        String hash = Persistor.getFileHash(fileName);
+        String hash = WorkingDir.getFileHash(fileName);
         return repo.containsKey(fileName) && repo.get(fileName).equals(hash);
     }
 
     private Set<String> getUntrackedFileNames() {
         Set<String> untrackedFiles = new HashSet<>();
-        List<String> fileNames = Utils.plainFilenamesIn(Persistor.CWD);
+        List<String> fileNames = WorkingDir.getFileNames();
         for (String fileName : fileNames) {
             if (isUntracked(fileName)) {
                 untrackedFiles.add(fileName);
