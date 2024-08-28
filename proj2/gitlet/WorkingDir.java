@@ -2,7 +2,6 @@ package gitlet;
 
 import java.io.File;
 import java.util.List;
-import java.util.TreeMap;
 
 public class WorkingDir {
     public static final File CWD = new File(System.getProperty("user.dir"));
@@ -23,19 +22,16 @@ public class WorkingDir {
         Utils.restrictedDelete(filePath);
     }
     public static String getFileHash(String fileName) {
-        byte[] fileContent = Utils.readContents(Utils.join(CWD, fileName));
+        byte[] fileContent = readFileContent(fileName);
         String hash = Utils.sha1(fileContent);
         return hash;
     }
 
-    public static void writeFiles(TreeMap<String, String> files) {
-        for (String fileName : files.keySet()) {
-            String sha = files.get(fileName);
-            String content = Persistor.readBlob(sha);
-            writeContentToFile(fileName, content);
+    public static void clean() {
+        for (String f : Utils.plainFilenamesIn(WorkingDir.CWD)) {
+            Utils.restrictedDelete(f);
         }
     }
-
     public static List<String> getFileNames() {
         return Utils.plainFilenamesIn(WorkingDir.CWD);
     }

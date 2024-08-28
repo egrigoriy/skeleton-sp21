@@ -2,8 +2,6 @@ package gitlet;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
 
 /** Represents a gitlet repository.
  *  TOD: It's a good idea to give a description here of what else this Class
@@ -168,32 +166,10 @@ public class Repository {
             System.out.println(message);
             System.exit(0);
         }
-        // get currently tracked files
-        Set<String> currentlyTrackedFiles = Persistor.getActiveCommit().getFilesTable().keySet();
-
-        Commit checkedOutCommit = Persistor.readCommit(commitID);
-        TreeMap<String, String> checkedOutBranchFiles = checkedOutCommit.getFilesTable();
-        // and puts them in the working directory, overwriting the versions of the files
-        // that are already there if they exist.
-
-        for (String f : Utils.plainFilenamesIn(WorkingDir.CWD)) {
-            Utils.restrictedDelete(f);
-        }
-        WorkingDir.writeFiles(checkedOutBranchFiles);
-
-        // Any files that are tracked in the current branch but are not
-        // present in the checked-out branch are deleted.
-        for (String fileName : currentlyTrackedFiles) {
-            if (!checkedOutBranchFiles.keySet().contains(fileName)) {
-                Utils.restrictedDelete(Utils.join(WorkingDir.CWD, fileName));
-            }
-        }
-
-        // The staging area is cleared, unless the checked-out branch is the current branch
+        Persistor.checkoutFilesFromCommit(commit);
         index.clear();
-        index.setRepo(checkedOutBranchFiles);
+        index.setRepo(commit.getFilesTable());
         Persistor.saveIndex(index);
-
         // Also moves the current branch’s head to that commit node.
         Persistor.setActiveCommitTo(commitID);
     }

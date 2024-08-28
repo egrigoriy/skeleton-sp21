@@ -8,7 +8,6 @@ import static gitlet.Utils.*;
 public class Persistor {
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(WorkingDir.CWD, ".gitlet");
-    public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
     public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
     public static final File BLOBS_DIR = join(GITLET_DIR, "blobs");
     public static final File REFS_DIR = join(GITLET_DIR, "refs");
@@ -178,22 +177,10 @@ public class Persistor {
     }
 
     public static void checkoutFilesFromCommit(Commit commit) {
-        // Takes all files in the commit at the head of the given branch,
-        // and puts them in the working directory, overwriting the versions of the files
-        // that are already there if they exist.
+        WorkingDir.clean();
         TreeMap<String, String> checkedOutFiles = commit.getFilesTable();
         for (String fileName : checkedOutFiles.keySet()) {
             checkoutFileFromCommit(fileName, commit);
-        }
-        // Any files that are tracked in the current branch but are not
-        // present in the checked-out branch are deleted.
-        Commit activeCommit = Persistor.getActiveCommit();
-        Set<String> activeCommitFiles = activeCommit.getFilesTable().keySet();
-
-        for (String fileName : activeCommitFiles) {
-            if (!checkedOutFiles.keySet().contains(fileName)) {
-                Utils.restrictedDelete(Utils.join(WorkingDir.CWD, fileName));
-            }
         }
     }
 }
