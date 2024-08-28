@@ -1,10 +1,7 @@
 package gitlet;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static gitlet.Utils.*;
 
@@ -178,5 +175,25 @@ public class Persistor {
         String hash = commit.getFileHash(fileName);
         String content = readBlob(hash);
         WorkingDir.writeContentToFile(fileName, content);
+    }
+
+    public static void checkoutFilesFromCommit(Commit commit) {
+        // Takes all files in the commit at the head of the given branch,
+        // and puts them in the working directory, overwriting the versions of the files
+        // that are already there if they exist.
+        TreeMap<String, String> checkedOutFiles = commit.getFilesTable();
+        for (String fileName : checkedOutFiles.keySet()) {
+            checkoutFileFromCommit(fileName, commit);
+        }
+        // Any files that are tracked in the current branch but are not
+        // present in the checked-out branch are deleted.
+        Commit activeCommit = Persistor.getActiveCommit();
+        Set<String> activeCommitFiles = activeCommit.getFilesTable().keySet();
+
+        for (String fileName : activeCommitFiles) {
+            if (!checkedOutFiles.keySet().contains(fileName)) {
+                Utils.restrictedDelete(Utils.join(WorkingDir.CWD, fileName));
+            }
+        }
     }
 }

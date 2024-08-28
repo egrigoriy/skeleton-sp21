@@ -142,25 +142,10 @@ public class Repository {
             System.out.println(message);
             System.exit(0);
         }
-        // get currently tracked files
-        Set<String> activeCommitFiles = Persistor.getActiveCommit().getFilesTable().keySet();
-
-        // Takes all files in the commit at the head of the given branch,
-        TreeMap<String, String> checkedOutBranchFiles = Persistor.getBranchHeadCommit(branchName)
-                .getFilesTable();
-        // and puts them in the working directory, overwriting the versions of the files
-        // that are already there if they exist.
-        WorkingDir.writeFiles(checkedOutBranchFiles);
-        // Any files that are tracked in the current branch but are not
-        // present in the checked-out branch are deleted.
-        for (String fileName : activeCommitFiles) {
-            if (!checkedOutBranchFiles.keySet().contains(fileName)) {
-                Utils.restrictedDelete(Utils.join(WorkingDir.CWD, fileName));
-            }
-        }
-
+        Commit branchHeadCommit = Persistor.getBranchHeadCommit(branchName);
+        Persistor.checkoutFilesFromCommit(branchHeadCommit);
         index.clear();
-        index.setRepo(checkedOutBranchFiles);
+        index.setRepo(branchHeadCommit.getFilesTable());
         Persistor.saveIndex(index);
         Persistor.setActiveBranchTo(branchName);
     }
