@@ -84,6 +84,11 @@ public class Main {
                 String commitID = args[1];
                 Repository.reset(commitID);
                 break;
+            case "merge":
+                // Usage: java gitlet.Main merge [branch name]
+                branchName = args[1];
+                Repository.merge(branchName);
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);

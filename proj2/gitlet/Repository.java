@@ -234,4 +234,30 @@ public class Repository {
         }
         System.out.println(String.join("\n", foundCommits));
     }
+
+    public static void merge(String branchName) {
+        if (!Persistor.isRepositoryInitialized()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
+        if (!Persistor.branchExists(branchName)) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+        if (Persistor.getActiveBranchName().equals(branchName)) {
+            System.out.println("Cannot merge a branch with itself.");
+            System.exit(0);
+        }
+        Index index = Persistor.readIndex();
+        if (index.untrackedFileInTheWay()) {
+            String message = "There is an untracked file in the way; "
+                    + "delete it, or add and commit it first.";
+            System.out.println(message);
+            System.exit(0);
+        }
+        if (!index.nothingToAddOrRemove()) {
+            System.out.println("You have uncommitted changes.");
+            System.exit(0);
+        }
+    }
 }
