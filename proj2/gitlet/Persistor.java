@@ -74,7 +74,7 @@ public class Persistor {
     }
 
     public static String saveBlob(String fileName) {
-        byte[] fileContent = WorkingDir.readContent(fileName);
+        byte[] fileContent = WorkingDir.readFileContent(fileName);
         String hash = Utils.sha1(fileContent);
         File savePath = Utils.join(BLOBS_DIR, hash);
         if (!savePath.exists()) {
@@ -172,5 +172,11 @@ public class Persistor {
             }
         }
         return result;
+    }
+
+    public static void checkoutFileFromCommit(String fileName, Commit commit) {
+        String hash = commit.getFileHash(fileName);
+        String content = readBlob(hash);
+        WorkingDir.writeContentToFile(fileName, content);
     }
 }

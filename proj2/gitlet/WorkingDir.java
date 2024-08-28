@@ -7,18 +7,18 @@ import java.util.TreeMap;
 public class WorkingDir {
     public static final File CWD = new File(System.getProperty("user.dir"));
 
-    public static byte[] readContent(String fileName) {
+    public static byte[] readFileContent(String fileName) {
         return Utils.readContents(Utils.join(CWD, fileName));
     }
 
-    public static void writeContentToCWDFile(String fileName, String content) {
+    public static void writeContentToFile(String fileName, String content) {
         Utils.writeContents(Utils.join(CWD, fileName), content);
     }
 
     public static boolean fileExists(String fileName) {
         return Utils.join(CWD, fileName).exists();
     }
-    public static void removeCWDFile(String fileName) {
+    public static void removeFile(String fileName) {
         File filePath = Utils.join(CWD, fileName);
         Utils.restrictedDelete(filePath);
     }
@@ -28,11 +28,11 @@ public class WorkingDir {
         return hash;
     }
 
-    public static void writeCWDFiles(TreeMap<String, String> files) {
+    public static void writeFiles(TreeMap<String, String> files) {
         for (String fileName : files.keySet()) {
             String sha = files.get(fileName);
             String content = Persistor.readBlob(sha);
-            writeContentToCWDFile(fileName, content);
+            writeContentToFile(fileName, content);
         }
     }
 

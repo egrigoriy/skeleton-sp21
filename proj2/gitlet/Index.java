@@ -25,7 +25,7 @@ public class Index implements Serializable {
         filesToAdd.remove(fileName);
         if (repo.containsKey(fileName)) {
             filesToRemove.put(fileName, repo.get(fileName));
-            WorkingDir.removeCWDFile(fileName);
+            WorkingDir.removeFile(fileName);
         }
     }
 
@@ -98,10 +98,6 @@ public class Index implements Serializable {
     }
 
     private boolean inRepo(String fileName) {
-        if (!WorkingDir.fileExists(fileName)) {
-            return false;
-        }
-
         String hash = WorkingDir.getFileHash(fileName);
         return repo.containsKey(fileName) && repo.get(fileName).equals(hash);
     }

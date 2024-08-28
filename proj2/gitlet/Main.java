@@ -42,7 +42,7 @@ public class Main {
                 // java gitlet.Main checkout -- [file name]
                 if (args.length == 3) {
                     fileName = args[2];
-                    Repository.checkoutFileFromLastCommit(fileName);
+                    Repository.checkoutFileFromActiveCommit(fileName);
                 }
                 // java gitlet.Main checkout [commit id] -- [file name]
                 if (args.length == 4) {

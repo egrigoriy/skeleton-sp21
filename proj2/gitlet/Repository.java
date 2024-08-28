@@ -99,11 +99,7 @@ public class Repository {
         Persistor.saveIndex(index);
     }
 
-    public static void checkoutFileFromLastCommit(String fileName) {
-        if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
-        }
+    public static void checkoutFileFromActiveCommit(String fileName) {
         String commitId = Persistor.getActiveCommitId();
         checkoutFileFromCommit(fileName, commitId);
     }
@@ -122,9 +118,7 @@ public class Repository {
             System.out.println("File does not exist in that commit.");
             System.exit(0);
         }
-        String hash = commit.getFileHash(fileName);
-        String content = Persistor.readBlob(hash);
-        WorkingDir.writeContentToCWDFile(fileName, content);
+        Persistor.checkoutFileFromCommit(fileName, commit);
     }
 
     public static void checkoutFilesFromBranchHead(String branchName) {
@@ -156,7 +150,7 @@ public class Repository {
                 .getFilesTable();
         // and puts them in the working directory, overwriting the versions of the files
         // that are already there if they exist.
-        WorkingDir.writeCWDFiles(checkedOutBranchFiles);
+        WorkingDir.writeFiles(checkedOutBranchFiles);
         // Any files that are tracked in the current branch but are not
         // present in the checked-out branch are deleted.
         for (String fileName : activeCommitFiles) {
@@ -200,7 +194,7 @@ public class Repository {
         for (String f : Utils.plainFilenamesIn(WorkingDir.CWD)) {
             Utils.restrictedDelete(f);
         }
-        WorkingDir.writeCWDFiles(checkedOutBranchFiles);
+        WorkingDir.writeFiles(checkedOutBranchFiles);
 
         // Any files that are tracked in the current branch but are not
         // present in the checked-out branch are deleted.
