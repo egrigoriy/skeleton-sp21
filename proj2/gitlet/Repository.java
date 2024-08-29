@@ -261,9 +261,13 @@ public class Repository {
         Commit activeCommit = Persistor.getActiveCommit();
         Commit otherBranchHeadCommit = Persistor.getBranchHeadCommit(branchName);
         Commit splitCommit = findSplitCommit(activeCommit, otherBranchHeadCommit);
-        Set<String> allFileNames = getFileNamesInMerge(splitCommit, activeCommit, otherBranchHeadCommit);
+        Set<String> allFileNames = getFileNamesInMerge(splitCommit,
+                activeCommit,
+                otherBranchHeadCommit
+        );
         for (String fileName : allFileNames) {
-            if (same(fileName, activeCommit, splitCommit) && !otherBranchHeadCommit.hasFile(fileName)) {
+            if (same(fileName, activeCommit, splitCommit)
+                    && !otherBranchHeadCommit.hasFile(fileName)) {
                 remove(fileName);
             }
             if (!splitCommit.hasFile(fileName)
@@ -277,9 +281,26 @@ public class Repository {
                 checkoutFileFromCommit(fileName, otherBranchHeadCommit.getUid());
                 add(fileName);
             }
+            if (splitCommit.hasFile(fileName)
+            && modif(fileName, activeCommit, splitCommit)
+            && modif(fileName, otherBranchHeadCommit, splitCommit)) {
+                System.out.println("Encountered a merge conflict.");
+                String fixedContent = fixConflict(fileName, activeCommit, otherBranchHeadCommit);
+                WorkingDir.writeContentToFile(fileName, fixedContent);
+                add(fileName);
+            }
         }
 //        status();
         commit("Merged " + branchName + " into " + Persistor.getActiveBranchName() + ".");
+    }
+
+    private static String fixConflict(String fileName, Commit activeCommit, Commit otherBranchHeadCommit) {
+        String result = "<<<<<<< HEAD" + "\n";
+        result += Persistor.readBlob(activeCommit.getFileHash(fileName));
+        result += "=======" + "\n";;
+        result += Persistor.readBlob(otherBranchHeadCommit.getFileHash(fileName));
+        result += ">>>>>>>" + "\n";
+        return result;
     }
 
 
