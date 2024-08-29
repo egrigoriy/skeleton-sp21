@@ -307,7 +307,8 @@ public class Repository {
             }
         }
 //        status();
-        String commitMessage = "Merged " + branchName + " into " + Persistor.getActiveBranchName() + ".";
+        String commitMessage = "Merged " + branchName + " into "
+                + Persistor.getActiveBranchName() + ".";
         commit(commitMessage, otherBranchHeadCommit.getUid());
     }
 
