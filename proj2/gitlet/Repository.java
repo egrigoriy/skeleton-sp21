@@ -282,23 +282,23 @@ public class Repository {
                 add(fileName);
             }
             if (splitCommit.hasFile(fileName)
-            && modif(fileName, activeCommit, splitCommit)
-            && modif(fileName, otherBranchHeadCommit, splitCommit)) {
-                System.out.println("Encountered a merge conflict.");
-                String fixedContent = fixConflict(fileName, activeCommit, otherBranchHeadCommit);
-                WorkingDir.writeContentToFile(fileName, fixedContent);
-                add(fileName);
+                && modif(fileName, activeCommit, splitCommit)
+                && modif(fileName, otherBranchHeadCommit, splitCommit)) {
+                    System.out.println("Encountered a merge conflict.");
+                    String fixedContent = fixConflict(fileName, activeCommit, otherBranchHeadCommit);
+                    WorkingDir.writeContentToFile(fileName, fixedContent);
+                    add(fileName);
             }
         }
 //        status();
         commit("Merged " + branchName + " into " + Persistor.getActiveBranchName() + ".");
     }
 
-    private static String fixConflict(String fileName, Commit activeCommit, Commit otherBranchHeadCommit) {
+    private static String fixConflict(String fileName, Commit activeCommit, Commit otherCommit) {
         String result = "<<<<<<< HEAD" + "\n";
         result += Persistor.readBlob(activeCommit.getFileHash(fileName));
-        result += "=======" + "\n";;
-        result += Persistor.readBlob(otherBranchHeadCommit.getFileHash(fileName));
+        result += "=======" + "\n";
+        result += Persistor.readBlob(otherCommit.getFileHash(fileName));
         result += ">>>>>>>" + "\n";
         return result;
     }
