@@ -296,8 +296,8 @@ public class Repository {
         commit("Merged " + branchName + " into " + Persistor.getActiveBranchName() + ".");
     }
 
-    private static boolean created(String fileName, Commit otherBranchHeadCommit, Commit splitCommit) {
-        return !splitCommit.hasFile(fileName) && otherBranchHeadCommit.hasFile(fileName);
+    private static boolean created(String fileName, Commit otherCommit, Commit splitCommit) {
+        return !splitCommit.hasFile(fileName) && otherCommit.hasFile(fileName);
     }
 
 
