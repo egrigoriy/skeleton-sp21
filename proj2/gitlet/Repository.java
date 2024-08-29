@@ -1,7 +1,6 @@
 package gitlet;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /** Represents a gitlet repository.
  *  TOD: It's a good idea to give a description here of what else this Class
@@ -259,5 +258,74 @@ public class Repository {
             System.out.println("You have uncommitted changes.");
             System.exit(0);
         }
+        Commit activeCommit = Persistor.getActiveCommit();
+        Commit otherBranchHeadCommit = Persistor.getBranchHeadCommit(branchName);
+        Commit splitCommit = findSplitCommit(activeCommit, otherBranchHeadCommit);
+        Set<String> allFileNames = getFileNamesInMerge(splitCommit, activeCommit, otherBranchHeadCommit);
+        for (String fileName : allFileNames) {
+            if (same(fileName, activeCommit, splitCommit) && !otherBranchHeadCommit.hasFile(fileName)) {
+                remove(fileName);
+            }
+            if (!splitCommit.hasFile(fileName)
+                && !activeCommit.hasFile(fileName)
+                && otherBranchHeadCommit.hasFile(fileName)) {
+                checkoutFileFromCommit(fileName, otherBranchHeadCommit.getUid());
+                add(fileName);
+            }
+            if (!activeCommit.hasFile(fileName)
+                && modif(fileName, otherBranchHeadCommit, splitCommit)) {
+                checkoutFileFromCommit(fileName, otherBranchHeadCommit.getUid());
+                add(fileName);
+            }
+        }
+//        status();
+        commit("Merged " + branchName + " into " + Persistor.getActiveBranchName() + ".");
     }
+
+
+    private static boolean same(String fileName, Commit c1, Commit c2) {
+        return c1.getFilesTable().containsKey(fileName) && c2.getFilesTable().containsKey(fileName)
+                && c1.getFilesTable().get(fileName).equals(c2.getFilesTable().get(fileName));
+    }
+
+    private static boolean modif(String fileName, Commit c1, Commit c2) {
+        return c1.getFilesTable().containsKey(fileName) && c2.getFilesTable().containsKey(fileName)
+                && !c1.getFilesTable().get(fileName).equals(c2.getFilesTable().get(fileName));
+    }
+
+    private static Set<String> getFileNamesInMerge(Commit c1, Commit c2, Commit c3) {
+        Set<String> result = new HashSet<>();
+        result.addAll(c1.getFilesTable().keySet());
+        result.addAll(c2.getFilesTable().keySet());
+        result.addAll(c3.getFilesTable().keySet());
+        return result;
+    }
+
+
+    private static Commit findSplitCommit(Commit c1, Commit c2) {
+        Stack<Commit> c1History = getCommitHistory(c1);
+        Stack<Commit> c2History = getCommitHistory(c2);
+        Commit splitCommit = c1History.peek();
+        while (!c1History.isEmpty() && !c2History.isEmpty()) {
+            Commit c11 = c1History.pop();
+            Commit c22 = c2History.pop();
+            if (c11.getUid().equals(c22.getUid())) {
+                splitCommit = c11;
+            } else {
+                return splitCommit;
+            }
+        }
+        return splitCommit;
+    }
+
+    private static Stack<Commit> getCommitHistory(Commit c1) {
+        Stack<Commit> history = new Stack<>();
+        Commit p = c1;
+        while (p != null) {
+            history.push(p);
+            p = Persistor.readCommit(p.getFirstParent());
+        }
+        return history;
+    }
+
 }
