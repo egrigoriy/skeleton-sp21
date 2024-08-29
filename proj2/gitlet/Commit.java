@@ -89,6 +89,10 @@ public class Commit implements Serializable {
         this.uid = uid;
     }
 
+    public void setSecondParent(String commitId) {
+        this.secondParent = commitId;
+    }
+
     public TreeMap<String, String> getFilesTable() {
         return filesTable;
     }

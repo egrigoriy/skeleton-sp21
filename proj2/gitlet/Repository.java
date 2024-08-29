@@ -75,6 +75,11 @@ public class Repository {
             System.out.println(commit);
         }
     }
+
+    public static void commit(String  message, String secondParent) {
+        commit(message);
+        Persistor.getActiveCommit().setSecondParent(secondParent);
+    }
     public static void commit(String message) {
         if (!Persistor.isRepositoryInitialized()) {
             System.out.println("Not in an initialized Gitlet directory.");
@@ -261,6 +266,15 @@ public class Repository {
         Commit activeCommit = Persistor.getActiveCommit();
         Commit otherBranchHeadCommit = Persistor.getBranchHeadCommit(branchName);
         Commit splitCommit = findSplitCommit(activeCommit, otherBranchHeadCommit);
+        if (splitCommit.getUid().equals(otherBranchHeadCommit.getUid())) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            System.exit(0);
+        }
+        if (splitCommit.getUid().equals(activeCommit.getUid())) {
+            System.out.println("Current branch fast-forwarded.");
+            checkoutFilesFromBranchHead(branchName);
+            System.exit(0);
+        }
         Set<String> allFileNames = getFileNamesInMerge(splitCommit,
                 activeCommit,
                 otherBranchHeadCommit
@@ -293,7 +307,8 @@ public class Repository {
             }
         }
 //        status();
-        commit("Merged " + branchName + " into " + Persistor.getActiveBranchName() + ".");
+        String commitMessage = "Merged " + branchName + " into " + Persistor.getActiveBranchName() + ".";
+        commit(commitMessage, otherBranchHeadCommit.getUid());
     }
 
     private static boolean created(String fileName, Commit otherCommit, Commit splitCommit) {
