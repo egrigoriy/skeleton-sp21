@@ -270,35 +270,46 @@ public class Repository {
                     && !otherBranchHeadCommit.hasFile(fileName)) {
                 remove(fileName);
             }
-            if (!splitCommit.hasFile(fileName)
-                && !activeCommit.hasFile(fileName)
-                && otherBranchHeadCommit.hasFile(fileName)) {
-                checkoutFileFromCommit(fileName, otherBranchHeadCommit.getUid());
-                add(fileName);
-            }
-            if (!activeCommit.hasFile(fileName)
-                && modif(fileName, otherBranchHeadCommit, splitCommit)) {
+            if (created(fileName, otherBranchHeadCommit, splitCommit)
+                || modif(fileName, otherBranchHeadCommit, splitCommit)) {
                 checkoutFileFromCommit(fileName, otherBranchHeadCommit.getUid());
                 add(fileName);
             }
             if (splitCommit.hasFile(fileName)
-                && modif(fileName, activeCommit, splitCommit)
+                && !same(fileName, activeCommit, splitCommit)
                 && modif(fileName, otherBranchHeadCommit, splitCommit)) {
-                    System.out.println("Encountered a merge conflict.");
-                    String fixedContent = fixConflict(fileName, activeCommit, otherBranchHeadCommit);
-                    WorkingDir.writeContentToFile(fileName, fixedContent);
-                    add(fileName);
+                System.out.println("Encountered a merge conflict.");
+                String fixedContent = fixConflict(fileName, activeCommit, otherBranchHeadCommit);
+                WorkingDir.writeContentToFile(fileName, fixedContent);
+                add(fileName);
+            }
+            if (splitCommit.hasFile(fileName)
+                    && modif(fileName, activeCommit, splitCommit)
+                    && !otherBranchHeadCommit.hasFile(fileName)) {
+                System.out.println("Encountered a merge conflict.");
+                String fixedContent = fixConflict(fileName, activeCommit, otherBranchHeadCommit);
+                WorkingDir.writeContentToFile(fileName, fixedContent);
+                add(fileName);
             }
         }
 //        status();
         commit("Merged " + branchName + " into " + Persistor.getActiveBranchName() + ".");
     }
 
+    private static boolean created(String fileName, Commit otherBranchHeadCommit, Commit splitCommit) {
+        return !splitCommit.hasFile(fileName) && otherBranchHeadCommit.hasFile(fileName);
+    }
+
+
     private static String fixConflict(String fileName, Commit activeCommit, Commit otherCommit) {
         String result = "<<<<<<< HEAD" + "\n";
-        result += Persistor.readBlob(activeCommit.getFileHash(fileName));
+        if (activeCommit.hasFile(fileName)) {
+            result += Persistor.readBlob(activeCommit.getFileHash(fileName));
+        }
         result += "=======" + "\n";
-        result += Persistor.readBlob(otherCommit.getFileHash(fileName));
+        if (otherCommit.hasFile(fileName)) {
+            result += Persistor.readBlob(otherCommit.getFileHash(fileName));
+        }
         result += ">>>>>>>" + "\n";
         return result;
     }
