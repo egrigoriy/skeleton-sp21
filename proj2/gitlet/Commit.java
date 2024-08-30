@@ -2,10 +2,7 @@ package gitlet;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.util.TreeMap;
+import java.util.*;
 
 /** Represents a gitlet commit object.
  *  TOD: It's a good idea to give a description here of what else this Class
@@ -93,7 +90,19 @@ public class Commit implements Serializable {
         this.secondParent = commitId;
     }
 
+    public String getSecondParent() {
+        return secondParent;
+    }
+
     public TreeMap<String, String> getFilesTable() {
         return filesTable;
+    }
+
+    public Set<String> getFileNames() {
+        return filesTable.keySet();
+    }
+
+    public String getHash(String fileName) {
+        return filesTable.get(fileName);
     }
 }

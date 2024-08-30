@@ -178,8 +178,8 @@ public class Persistor {
 
     public static void checkoutFilesFromCommit(Commit commit) {
         WorkingDir.clean();
-        TreeMap<String, String> checkedOutFiles = commit.getFilesTable();
-        for (String fileName : checkedOutFiles.keySet()) {
+        Set<String> checkedOutFileNames = commit.getFileNames();
+        for (String fileName : checkedOutFileNames) {
             checkoutFileFromCommit(fileName, commit);
         }
     }

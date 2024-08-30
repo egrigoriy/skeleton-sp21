@@ -77,8 +77,25 @@ public class Repository {
     }
 
     public static void commit(String  message, String secondParent) {
-        commit(message);
-        Persistor.getActiveCommit().setSecondParent(secondParent);
+        if (!Persistor.isRepositoryInitialized()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
+        if (message.isEmpty()) {
+            System.out.println("Please enter a commit message.");
+            System.exit(0);
+        }
+        Index index = Persistor.readIndex();
+        if (index.nothingToAddOrRemove()) {
+            System.out.println("No changes added to the commit.");
+            System.exit(0);
+        }
+        Commit newCommit = new Commit(message, index);
+        newCommit.setSecondParent(secondParent);
+        String commitId = Persistor.saveCommit(newCommit);
+        Persistor.setActiveCommitTo(commitId);
+        index.clear();
+        Persistor.saveIndex(index);
     }
     public static void commit(String message) {
         if (!Persistor.isRepositoryInitialized()) {
@@ -264,9 +281,9 @@ public class Repository {
             System.exit(0);
         }
         Commit activeCommit = Persistor.getActiveCommit();
-        Commit otherBranchHeadCommit = Persistor.getBranchHeadCommit(branchName);
-        Commit splitCommit = findSplitCommit(activeCommit, otherBranchHeadCommit);
-        if (splitCommit.getUid().equals(otherBranchHeadCommit.getUid())) {
+        Commit otherCommit = Persistor.getBranchHeadCommit(branchName);
+        Commit splitCommit = findSplitCommit(activeCommit, otherCommit);
+        if (splitCommit.getUid().equals(otherCommit.getUid())) {
             System.out.println("Given branch is an ancestor of the current branch.");
             System.exit(0);
         }
@@ -275,48 +292,50 @@ public class Repository {
             checkoutFilesFromBranchHead(branchName);
             System.exit(0);
         }
-        Set<String> allFileNames = getFileNamesInMerge(splitCommit,
-                activeCommit,
-                otherBranchHeadCommit
-        );
+        Set<String> allFileNames = getFileNamesInMerge(splitCommit, activeCommit, otherCommit);
         for (String fileName : allFileNames) {
-            if (same(fileName, activeCommit, splitCommit)
-                    && !otherBranchHeadCommit.hasFile(fileName)) {
+            if (same(fileName, activeCommit, splitCommit) && !otherCommit.hasFile(fileName)) {
                 remove(fileName);
             }
-            if (created(fileName, otherBranchHeadCommit, splitCommit)
-                || modif(fileName, otherBranchHeadCommit, splitCommit)) {
-                checkoutFileFromCommit(fileName, otherBranchHeadCommit.getUid());
+            if (created(fileName, otherCommit, splitCommit) || modif(fileName, otherCommit, splitCommit)) {
+                checkoutFileFromCommit(fileName, otherCommit.getUid());
                 add(fileName);
             }
-            if (splitCommit.hasFile(fileName)
-                && !same(fileName, activeCommit, splitCommit)
-                && modif(fileName, otherBranchHeadCommit, splitCommit)) {
+            if (modifiedInDifferentWays(fileName, activeCommit, otherCommit, splitCommit)) {
                 System.out.println("Encountered a merge conflict.");
-                String fixedContent = fixConflict(fileName, activeCommit, otherBranchHeadCommit);
-                WorkingDir.writeContentToFile(fileName, fixedContent);
-                add(fileName);
-            }
-            if (splitCommit.hasFile(fileName)
-                    && modif(fileName, activeCommit, splitCommit)
-                    && !otherBranchHeadCommit.hasFile(fileName)) {
-                System.out.println("Encountered a merge conflict.");
-                String fixedContent = fixConflict(fileName, activeCommit, otherBranchHeadCommit);
+                String fixedContent = fixConflict(fileName, activeCommit, otherCommit);
                 WorkingDir.writeContentToFile(fileName, fixedContent);
                 add(fileName);
             }
         }
-//        status();
-        String commitMessage = "Merged " + branchName + " into "
-                + Persistor.getActiveBranchName() + ".";
-        commit(commitMessage, otherBranchHeadCommit.getUid());
+        String message = "Merged " + branchName + " into " + Persistor.getActiveBranchName() + ".";
+        if (Objects.equals(branchName, "B2")) {
+//            System.out.println("FOO" + getFullCommitHistory(activeCommit));
+        }
+        commit(message, otherCommit.getUid());
     }
 
     private static boolean created(String fileName, Commit otherCommit, Commit splitCommit) {
         return !splitCommit.hasFile(fileName) && otherCommit.hasFile(fileName);
     }
 
+    private static boolean same(String fileName, Commit c1, Commit c2) {
+        return c1.hasFile(fileName) && c2.hasFile(fileName)
+                && c1.getHash(fileName).equals(c2.getHash(fileName));
+    }
 
+    private static boolean modif(String fileName, Commit c1, Commit c2) {
+        return c1.hasFile(fileName) && c2.hasFile(fileName)
+                && !c1.getHash(fileName).equals(c2.getHash(fileName));
+    }
+    private static boolean modifiedInDifferentWays(String fileName, Commit activeCommit, Commit otherCommit, Commit splitCommit) {
+        return splitCommit.hasFile(fileName)
+                && !same(fileName, activeCommit, splitCommit)
+                && modif(fileName, otherCommit, splitCommit)
+                || splitCommit.hasFile(fileName)
+                && modif(fileName, activeCommit, splitCommit)
+                && !otherCommit.hasFile(fileName);
+    }
     private static String fixConflict(String fileName, Commit activeCommit, Commit otherCommit) {
         String result = "<<<<<<< HEAD" + "\n";
         if (activeCommit.hasFile(fileName)) {
@@ -330,25 +349,13 @@ public class Repository {
         return result;
     }
 
-
-    private static boolean same(String fileName, Commit c1, Commit c2) {
-        return c1.getFilesTable().containsKey(fileName) && c2.getFilesTable().containsKey(fileName)
-                && c1.getFilesTable().get(fileName).equals(c2.getFilesTable().get(fileName));
-    }
-
-    private static boolean modif(String fileName, Commit c1, Commit c2) {
-        return c1.getFilesTable().containsKey(fileName) && c2.getFilesTable().containsKey(fileName)
-                && !c1.getFilesTable().get(fileName).equals(c2.getFilesTable().get(fileName));
-    }
-
     private static Set<String> getFileNamesInMerge(Commit c1, Commit c2, Commit c3) {
         Set<String> result = new HashSet<>();
-        result.addAll(c1.getFilesTable().keySet());
-        result.addAll(c2.getFilesTable().keySet());
-        result.addAll(c3.getFilesTable().keySet());
+        result.addAll(c1.getFileNames());
+        result.addAll(c2.getFileNames());
+        result.addAll(c3.getFileNames());
         return result;
     }
-
 
     private static Commit findSplitCommit(Commit c1, Commit c2) {
         Stack<Commit> c1History = getCommitHistory(c1);
@@ -376,4 +383,44 @@ public class Repository {
         return history;
     }
 
+    private static List<Stack<Commit>> getFullCommitHistory(Commit c) {
+//        System.out.println("BAZ" + c.getFirstParent());
+//        System.out.println("BAZ" + c.getSecondParent());
+        List<Stack<Commit>> history = new ArrayList<>();
+        Stack<Commit> f = new Stack<>();
+        f.push(c);
+        history.add(f);
+        Queue<Commit> queue = new LinkedList<>(getCommitParents(c));
+        System.out.println("First history: " + history);
+        while (!queue.isEmpty()) {
+            Commit current = queue.poll();
+            List<Commit> children = getCommitParents(current);
+            // add children to queque
+            if (!children.isEmpty()) {
+                queue.addAll(children);
+            }
+//            System.out.println("BAR: " + queue);
+            // push current to each stack in result
+            for (Commit child : children) {
+                for (Stack<Commit> stack : history) {
+                    stack.push(child);
+                }
+            }
+            //System.out.println("BOO " + history);
+        }
+        return history;
+    }
+
+    private static List<Commit> getCommitParents(Commit c) {
+        List<Commit> result = new LinkedList<>();
+        String firstParent = c.getFirstParent();
+        String secondParent = c.getSecondParent();
+        if (firstParent != null) {
+            result.add(Persistor.readCommit(firstParent));
+        }
+        if (secondParent != null) {
+            result.add(Persistor.readCommit(secondParent));
+        }
+        return result;
+    }
 }
