@@ -105,4 +105,19 @@ public class Commit implements Serializable {
     public String getHash(String fileName) {
         return filesTable.get(fileName);
     }
+
+    public boolean hasSameEntryFor(String fileName, Commit other) {
+        return this.hasFile(fileName) && other.hasFile(fileName)
+                && this.getHash(fileName).equals(other.getHash(fileName));
+    }
+
+    public boolean hasModified(String fileName, Commit other) {
+        return this.hasFile(fileName) && other.hasFile(fileName)
+                && !this.getHash(fileName).equals(other.getHash(fileName));
+    }
+    public boolean hasCreated(String fileName, Commit other) {
+        return this.hasFile(fileName) && !other.hasFile(fileName);
+    }
+
+
 }

@@ -294,11 +294,11 @@ public class Repository {
         }
         Set<String> allFileNames = getFileNamesInMerge(splitCommit, activeCommit, otherCommit);
         for (String fileName : allFileNames) {
-            if (same(fileName, activeCommit, splitCommit) && !otherCommit.hasFile(fileName)) {
+            if (activeCommit.hasSameEntryFor(fileName, splitCommit) && !otherCommit.hasFile(fileName)) {
                 remove(fileName);
             }
-            if (created(fileName, otherCommit, splitCommit)
-                    || modif(fileName, otherCommit, splitCommit)) {
+            if (otherCommit.hasCreated(fileName, splitCommit)
+                    || otherCommit.hasModified(fileName, splitCommit)) {
                 checkoutFileFromCommit(fileName, otherCommit.getUid());
                 add(fileName);
             }
@@ -316,28 +316,15 @@ public class Repository {
         commit(message, otherCommit.getUid());
     }
 
-    private static boolean created(String fileName, Commit otherCommit, Commit splitCommit) {
-        return !splitCommit.hasFile(fileName) && otherCommit.hasFile(fileName);
-    }
-
-    private static boolean same(String fileName, Commit c1, Commit c2) {
-        return c1.hasFile(fileName) && c2.hasFile(fileName)
-                && c1.getHash(fileName).equals(c2.getHash(fileName));
-    }
-
-    private static boolean modif(String fileName, Commit c1, Commit c2) {
-        return c1.hasFile(fileName) && c2.hasFile(fileName)
-                && !c1.getHash(fileName).equals(c2.getHash(fileName));
-    }
     private static boolean modifiedInDifferentWays(String fileName,
                                                    Commit activeCommit,
                                                    Commit otherCommit,
                                                    Commit splitCommit) {
         return splitCommit.hasFile(fileName)
-                && !same(fileName, activeCommit, splitCommit)
-                && modif(fileName, otherCommit, splitCommit)
+                && !activeCommit.hasSameEntryFor(fileName, splitCommit)
+                && otherCommit.hasModified(fileName, splitCommit)
                 || splitCommit.hasFile(fileName)
-                && modif(fileName, activeCommit, splitCommit)
+                && activeCommit.hasModified(fileName, splitCommit)
                 && !otherCommit.hasFile(fileName);
     }
     private static String fixConflict(String fileName, Commit activeCommit, Commit otherCommit) {
