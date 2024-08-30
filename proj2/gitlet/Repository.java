@@ -297,7 +297,8 @@ public class Repository {
             if (same(fileName, activeCommit, splitCommit) && !otherCommit.hasFile(fileName)) {
                 remove(fileName);
             }
-            if (created(fileName, otherCommit, splitCommit) || modif(fileName, otherCommit, splitCommit)) {
+            if (created(fileName, otherCommit, splitCommit)
+                    || modif(fileName, otherCommit, splitCommit)) {
                 checkoutFileFromCommit(fileName, otherCommit.getUid());
                 add(fileName);
             }
@@ -309,9 +310,9 @@ public class Repository {
             }
         }
         String message = "Merged " + branchName + " into " + Persistor.getActiveBranchName() + ".";
-        if (Objects.equals(branchName, "B2")) {
+//        if (Objects.equals(branchName, "B2")) {
 //            System.out.println("FOO" + getFullCommitHistory(activeCommit));
-        }
+//        }
         commit(message, otherCommit.getUid());
     }
 
@@ -328,7 +329,10 @@ public class Repository {
         return c1.hasFile(fileName) && c2.hasFile(fileName)
                 && !c1.getHash(fileName).equals(c2.getHash(fileName));
     }
-    private static boolean modifiedInDifferentWays(String fileName, Commit activeCommit, Commit otherCommit, Commit splitCommit) {
+    private static boolean modifiedInDifferentWays(String fileName,
+                                                   Commit activeCommit,
+                                                   Commit otherCommit,
+                                                   Commit splitCommit) {
         return splitCommit.hasFile(fileName)
                 && !same(fileName, activeCommit, splitCommit)
                 && modif(fileName, otherCommit, splitCommit)
