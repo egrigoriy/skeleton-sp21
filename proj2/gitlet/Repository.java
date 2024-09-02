@@ -282,7 +282,7 @@ public class Repository {
         }
         Commit activeCommit = Persistor.getActiveCommit();
         Commit otherCommit = Persistor.getBranchHeadCommit(branchName);
-        Commit splitCommit = findSplitCommit(activeCommit, otherCommit);
+        Commit splitCommit = findSplitCommit2(activeCommit, otherCommit);
         if (splitCommit.getUid().equals(otherCommit.getUid())) {
             System.out.println("Given branch is an ancestor of the current branch.");
             System.exit(0);
@@ -310,9 +310,9 @@ public class Repository {
             }
         }
         String message = "Merged " + branchName + " into " + Persistor.getActiveBranchName() + ".";
-//        if (Objects.equals(branchName, "B2")) {
-//            System.out.println("FOO" + getFullCommitHistory(activeCommit));
-//        }
+        if (Objects.equals(branchName, "B2")) {
+            findSplitCommit2(activeCommit, otherCommit);
+        }
         commit(message, otherCommit.getUid());
     }
 
@@ -363,7 +363,16 @@ public class Repository {
         }
         return splitCommit;
     }
-
+    private static Commit findSplitCommit2(Commit c1, Commit c2) {
+        DAG dag = new DAG();
+        dag.addSourceNode(c1);
+        dag.addSourceNode(c2);
+//        System.out.println("DAG: " + dag);
+//        System.out.println("DIST1: " + dag.getDistances(c1));
+//        System.out.println("DIST2: " + dag.getDistances(c2));
+//        System.out.println("COMM PAR:" + dag.getLatestCommonAncestor(c1, c2));
+        return dag.getLatestCommonAncestor(c1, c2);
+    }
     private static Stack<Commit> getCommitHistory(Commit c1) {
         Stack<Commit> history = new Stack<>();
         Commit p = c1;
@@ -373,6 +382,7 @@ public class Repository {
         }
         return history;
     }
+
 
     private static List<Stack<Commit>> getFullCommitHistory(Commit c) {
 //        System.out.println("BAZ" + c.getFirstParent());
