@@ -5,9 +5,9 @@ import java.util.*;
 public class DAG {
     private final Map<String, List<String>> adjMap = new HashMap<>();
 
-    public class Distance {
-        public String hash;
-        public Integer distance;
+    private class Distance {
+        private String hash;
+        private Integer distance;
         public Distance(String hash, Integer distance) {
             this.hash = hash;
             this.distance = distance;

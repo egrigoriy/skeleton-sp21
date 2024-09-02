@@ -294,7 +294,8 @@ public class Repository {
         }
         Set<String> allFileNames = getFileNamesInMerge(splitCommit, activeCommit, otherCommit);
         for (String fileName : allFileNames) {
-            if (activeCommit.hasSameEntryFor(fileName, splitCommit) && !otherCommit.hasFile(fileName)) {
+            if (activeCommit.hasSameEntryFor(fileName, splitCommit)
+                    && !otherCommit.hasFile(fileName)) {
                 remove(fileName);
             }
             if (otherCommit.hasCreated(fileName, splitCommit)
