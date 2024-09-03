@@ -282,7 +282,7 @@ public class Repository {
         }
         Commit activeCommit = Persistor.getActiveCommit();
         Commit otherCommit = Persistor.getBranchHeadCommit(branchName);
-        Commit splitCommit = findSplitCommit2(activeCommit, otherCommit);
+        Commit splitCommit = findSplitCommit(activeCommit, otherCommit);
         if (splitCommit.getUid().equals(otherCommit.getUid())) {
             System.out.println("Given branch is an ancestor of the current branch.");
             System.exit(0);
@@ -312,7 +312,7 @@ public class Repository {
         }
         String message = "Merged " + branchName + " into " + Persistor.getActiveBranchName() + ".";
         if (Objects.equals(branchName, "B2")) {
-            findSplitCommit2(activeCommit, otherCommit);
+            findSplitCommit(activeCommit, otherCommit);
         }
         commit(message, otherCommit.getUid());
     }
@@ -350,79 +350,9 @@ public class Repository {
     }
 
     private static Commit findSplitCommit(Commit c1, Commit c2) {
-        Stack<Commit> c1History = getCommitHistory(c1);
-        Stack<Commit> c2History = getCommitHistory(c2);
-        Commit splitCommit = c1History.peek();
-        while (!c1History.isEmpty() && !c2History.isEmpty()) {
-            Commit c11 = c1History.pop();
-            Commit c22 = c2History.pop();
-            if (c11.getUid().equals(c22.getUid())) {
-                splitCommit = c11;
-            } else {
-                return splitCommit;
-            }
-        }
-        return splitCommit;
-    }
-    private static Commit findSplitCommit2(Commit c1, Commit c2) {
         DAG dag = new DAG();
         dag.addSourceNode(c1);
         dag.addSourceNode(c2);
-//        System.out.println("DAG: " + dag);
-//        System.out.println("DIST1: " + dag.getDistances(c1));
-//        System.out.println("DIST2: " + dag.getDistances(c2));
-//        System.out.println("COMM PAR:" + dag.getLatestCommonAncestor(c1, c2));
         return dag.getLatestCommonAncestor(c1, c2);
-    }
-    private static Stack<Commit> getCommitHistory(Commit c1) {
-        Stack<Commit> history = new Stack<>();
-        Commit p = c1;
-        while (p != null) {
-            history.push(p);
-            p = Persistor.readCommit(p.getFirstParent());
-        }
-        return history;
-    }
-
-
-    private static List<Stack<Commit>> getFullCommitHistory(Commit c) {
-//        System.out.println("BAZ" + c.getFirstParent());
-//        System.out.println("BAZ" + c.getSecondParent());
-        List<Stack<Commit>> history = new ArrayList<>();
-        Stack<Commit> f = new Stack<>();
-        f.push(c);
-        history.add(f);
-        Queue<Commit> queue = new LinkedList<>(getCommitParents(c));
-        System.out.println("First history: " + history);
-        while (!queue.isEmpty()) {
-            Commit current = queue.poll();
-            List<Commit> children = getCommitParents(current);
-            // add children to queque
-            if (!children.isEmpty()) {
-                queue.addAll(children);
-            }
-//            System.out.println("BAR: " + queue);
-            // push current to each stack in result
-            for (Commit child : children) {
-                for (Stack<Commit> stack : history) {
-                    stack.push(child);
-                }
-            }
-            //System.out.println("BOO " + history);
-        }
-        return history;
-    }
-
-    private static List<Commit> getCommitParents(Commit c) {
-        List<Commit> result = new LinkedList<>();
-        String firstParent = c.getFirstParent();
-        String secondParent = c.getSecondParent();
-        if (firstParent != null) {
-            result.add(Persistor.readCommit(firstParent));
-        }
-        if (secondParent != null) {
-            result.add(Persistor.readCommit(secondParent));
-        }
-        return result;
     }
 }

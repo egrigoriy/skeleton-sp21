@@ -69,6 +69,18 @@ public class Persistor {
         return "";
     }
 
+    public static List<Commit> getCommitParents(Commit c) {
+        List<Commit> result = new LinkedList<>();
+        String firstParent = c.getFirstParent();
+        String secondParent = c.getSecondParent();
+        if (firstParent != null) {
+            result.add(Persistor.readCommit(firstParent));
+        }
+        if (secondParent != null) {
+            result.add(Persistor.readCommit(secondParent));
+        }
+        return result;
+    }
     public static String saveBlob(String fileName) {
         byte[] fileContent = WorkingDir.readFileContent(fileName);
         String hash = Utils.sha1(fileContent);
