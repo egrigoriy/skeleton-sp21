@@ -6,9 +6,9 @@ public class DAG {
     private final Map<String, List<String>> adjMap = new HashMap<>();
 
     private static class Distance {
-        public String hash;
-        public Integer distance;
-        public Distance(String hash, Integer distance) {
+        private String hash;
+        private Integer distance;
+        Distance(String hash, Integer distance) {
             this.hash = hash;
             this.distance = distance;
         }

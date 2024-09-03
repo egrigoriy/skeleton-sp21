@@ -58,11 +58,13 @@ public class Repository {
             System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
         }
-        Commit p = Persistor.getActiveCommit();
-        while (p != null) {
-            System.out.println(p);
-            p = Persistor.readCommit(p.getFirstParent());
+        Commit current = Persistor.getActiveCommit();
+        List<String> result = new ArrayList<>();
+        while (current != null) {
+            result.add(current.toString());
+            current = Persistor.readCommit(current.getFirstParent());
         }
+        System.out.println(String.join("\n", result));
     }
 
     public static void globalLog() {
