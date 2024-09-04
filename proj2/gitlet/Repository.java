@@ -1,5 +1,7 @@
 package gitlet;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 /** Represents a gitlet repository.
@@ -22,7 +24,7 @@ public class Repository {
             System.out.println(m);
             System.exit(0);
         } else {
-            Persistor.buildInfrastructure(WorkingDir.CWD);
+            Persistor.buildInfrastructure();
         }
         Commit initialCommit = new Commit();
         String commitId = Persistor.saveCommit(initialCommit);
@@ -359,26 +361,49 @@ public class Repository {
     }
 
     public static void addRemote(String remoteName, String remoteDirName) {
+//                System.out.println("ARG1 " + remoteName);
+//                System.out.println("ARG2 " + remoteDirName);
         if (Persistor.remoteExists(remoteName)) {
             System.out.println("A remote with that name already exists.");
             System.exit(0);
         }
         Persistor.addRemote(remoteName, remoteDirName);
+        Path path = Paths.get(remoteDirName).toAbsolutePath().normalize();
+        //buildInfrastructure(Utils.join(path.normalize().toFile()));
     }
 
     public static void removeRemote(String remoteName) {
-        System.out.println("File does not exist.");
-        System.exit(0);
+        if (!Persistor.remoteExists(remoteName)) {
+            System.out.println("A remote with that name does not exist.");
+            System.exit(0);
+        }
+        Persistor.removeRemote(remoteName);
+
     }
 
     public static void push(String remoteName, String remoteBranchName) {
-        System.out.println("File does not exist.");
+        if (!Persistor.remoteDirExists(remoteName)) {
+            System.out.println("Remote directory not found.");
+            System.exit(0);
+        }
+        if (!Persistor.remoteBranchExists(remoteName, remoteBranchName)) {
+            System.out.println("That remote does not have that branch.");
+            System.exit(0);
+        }
+        System.out.println("Please pull down remote changes before pushing.");
         System.exit(0);
+
     }
 
     public static void fetch(String remoteName, String remoteBranchName) {
-        System.out.println("File does not exist.");
-        System.exit(0);
+        if (!Persistor.remoteDirExists(remoteName)) {
+            System.out.println("Remote directory not found.");
+            System.exit(0);
+        }
+        if (!Persistor.remoteBranchExists(remoteName, remoteBranchName)) {
+            System.out.println("That remote does not have that branch.");
+            System.exit(0);
+        }
     }
 
     public static void pull(String remoteName, String remoteBranchName) {
