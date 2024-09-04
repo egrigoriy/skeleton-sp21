@@ -22,7 +22,7 @@ public class Repository {
             System.out.println(m);
             System.exit(0);
         } else {
-            Persistor.buildInfrastructure();
+            Persistor.buildInfrastructure(WorkingDir.CWD);
         }
         Commit initialCommit = new Commit();
         String commitId = Persistor.saveCommit(initialCommit);
@@ -356,5 +356,33 @@ public class Repository {
         dag.addSourceNode(c1);
         dag.addSourceNode(c2);
         return dag.getLatestCommonAncestor(c1, c2);
+    }
+
+    public static void addRemote(String remoteName, String remoteDirName) {
+        if (Persistor.remoteExists(remoteName)) {
+            System.out.println("A remote with that name already exists.");
+            System.exit(0);
+        }
+        Persistor.addRemote(remoteName, remoteDirName);
+    }
+
+    public static void removeRemote(String remoteName) {
+        System.out.println("File does not exist.");
+        System.exit(0);
+    }
+
+    public static void push(String remoteName, String remoteBranchName) {
+        System.out.println("File does not exist.");
+        System.exit(0);
+    }
+
+    public static void fetch(String remoteName, String remoteBranchName) {
+        System.out.println("File does not exist.");
+        System.exit(0);
+    }
+
+    public static void pull(String remoteName, String remoteBranchName) {
+        System.out.println("File does not exist.");
+        System.exit(0);
     }
 }

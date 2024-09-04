@@ -89,6 +89,35 @@ public class Main {
                 branchName = args[1];
                 Repository.merge(branchName);
                 break;
+            case "add-remote":
+                String remoteName = args[1];
+                String remoteDirName = args[2];
+                // Usage: java gitlet.Main add-remote [remote name] [name of remote directory]/.gitlet
+                Repository.addRemote(remoteName, remoteDirName);
+                break;
+            case "rm-remote":
+                // Usage: java gitlet.Main rm-remote [remote name]
+                remoteName = args[1];
+                Repository.removeRemote(remoteName);
+                break;
+            case "push":
+                // Usage: java gitlet.Main push [remote name] [remote branch name]
+                remoteName = args[1];
+                String remoteBranchName = args[2];
+                Repository.push(remoteName, remoteBranchName);
+                break;
+            case "fetch":
+                // Usage: java gitlet.Main fetch [remote name] [remote branch name]
+                remoteName = args[1];
+                remoteBranchName = args[2];
+                Repository.fetch(remoteName, remoteBranchName);
+                break;
+            case "pull":
+                // Usage: java gitlet.Main pull [remote name] [remote branch name]
+                remoteName = args[1];
+                remoteBranchName = args[2];
+                Repository.pull(remoteName, remoteBranchName);
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);

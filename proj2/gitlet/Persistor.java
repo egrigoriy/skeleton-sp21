@@ -7,11 +7,14 @@ import static gitlet.Utils.*;
 
 public class Persistor {
     /** The .gitlet directory. */
-    public static final File GITLET_DIR = join(WorkingDir.CWD, ".gitlet");
+    public static File GITLET_DIR = join(WorkingDir.CWD, ".gitlet");
     public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
     public static final File BLOBS_DIR = join(GITLET_DIR, "blobs");
     public static final File REFS_DIR = join(GITLET_DIR, "refs");
     public static final File REF_HEADS_DIR = join(REFS_DIR, "heads");
+
+    public static final File REF_REMOTES_DIR = join(REFS_DIR, "remotes");
+
     public static final File HEAD = Utils.join(GITLET_DIR, "HEAD");
 
     public static final File INDEX = Utils.join(GITLET_DIR, "index");
@@ -20,7 +23,8 @@ public class Persistor {
         return GITLET_DIR.exists();
     }
 
-    public static void buildInfrastructure() {
+    public static void buildInfrastructure(File dir) {
+        GITLET_DIR = Utils.join(dir, ".gitlet");
         GITLET_DIR.mkdir();
         REFS_DIR.mkdir();
         REF_HEADS_DIR.mkdir();
@@ -194,5 +198,15 @@ public class Persistor {
         for (String fileName : checkedOutFileNames) {
             checkoutFileFromCommit(fileName, commit);
         }
+    }
+
+    public static boolean remoteExists(String remoteName) {
+        return Utils.join(REF_REMOTES_DIR, remoteName).exists();
+    }
+
+    public static void addRemote(String remoteName, String remoteDirName) {
+        // add to config
+        // build infrastructure for remote
+       buildInfrastructure(Utils.join(remoteDirName));
     }
 }
