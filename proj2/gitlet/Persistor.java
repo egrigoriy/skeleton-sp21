@@ -9,7 +9,7 @@ import static gitlet.Utils.*;
 
 public class Persistor {
     /** The .gitlet directory. */
-    public static File GITLET_DIR = join(WorkingDir.CWD, ".gitlet");
+    public static final File GITLET_DIR = join(WorkingDir.CWD, ".gitlet");
     public static final File CONFIG = join(GITLET_DIR, "config");
     public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
     public static final File BLOBS_DIR = join(GITLET_DIR, "blobs");
@@ -231,7 +231,7 @@ public class Persistor {
         String remoteDirName = config.split("=")[1];
         File remoteDir = Utils.join(remoteDirName);
         File remoteRefsHeadsDir = Utils.join(remoteDir, "refs/heads");
-        List<String> remoteBranchNames =Utils.plainFilenamesIn(remoteRefsHeadsDir);
+        List<String> remoteBranchNames = Utils.plainFilenamesIn(remoteRefsHeadsDir);
 //        System.out.println("FII: " + remoteBranchNames + "-" + remoteBranchName);
         return remoteBranchNames.contains(remoteBranchName);
     }
