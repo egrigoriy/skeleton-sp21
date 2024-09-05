@@ -127,7 +127,7 @@ public class Main {
                 status = Status.ERR_NO_SUCH_COMMAND;
         }
         if (status != Status.SUCCESS) {
-            System.out.printf(status.text);
+            System.out.println(status.getText());
             System.exit(0);
         }
     }
