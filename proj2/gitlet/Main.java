@@ -9,40 +9,45 @@ public class Main {
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
     public static void main(String[] args) {
+        Status status = Status.SUCCESS;
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             System.exit(0);
         }
         String firstArg = args[0];
-        Repository repository;
         switch(firstArg) {
             case "init":
-                Repository.init();
-                break;
-            case "status":
-                Repository.status();
+                // Usage: java gitlet.Main init
+                status = Repository.init();
                 break;
             case "add":
-                //`add [filename]`
+                // Usage: java gitlet.Main add [file name]
                 String fileName = args[1];
-                Repository.add(fileName);
-                break;
-            case "rm":
-                fileName = args[1];
-                Repository.remove(fileName);
-                break;
-            case "log":
-                Repository.log();
+                status = Repository.add(fileName);
                 break;
             case "commit":
+                // Usage: java gitlet.Main commit [message]
                 String message = args[1];
-                Repository.commit(message);
+                status = Repository.commit(message);
+                break;
+            case "rm":
+                // Usage: java gitlet.Main rm [file name]
+                fileName = args[1];
+                status = Repository.remove(fileName);
+                break;
+            case "log":
+                // Usage: java gitlet.Main log
+                status = Repository.log();
+                break;
+            case "status":
+                // Usage: java gitlet.Main status
+                status = Repository.status();
                 break;
             case "checkout":
                 // java gitlet.Main checkout -- [file name]
                 if (args.length == 3) {
                     fileName = args[2];
-                    Repository.checkoutFileFromActiveCommit(fileName);
+                    status = Repository.checkoutFileFromActiveCommit(fileName);
                 }
                 // java gitlet.Main checkout [commit id] -- [file name]
                 if (args.length == 4) {
@@ -52,75 +57,78 @@ public class Main {
                         System.exit(0);
                     }
                     fileName = args[3];
-                    Repository.checkoutFileFromCommit(fileName, commitID);
+                    status = Repository.checkoutFileFromCommit(fileName, commitID);
                 }
                 // java gitlet.Main checkout [branch name]
                 if (args.length == 2) {
                     String branchName = args[1];
-                    Repository.checkoutFilesFromBranchHead(branchName);
+                    status = Repository.checkoutFilesFromBranchHead(branchName);
                 }
                 break;
             case "branch":
                 // Usage: java gitlet.Main branch [branch name]
                 String branchName = args[1];
-                Repository.branch(branchName);
+                status = Repository.branch(branchName);
                 break;
             case "rm-branch":
                 // Usage: java gitlet.Main rm-branch [branch name]
                 branchName = args[1];
-                Repository.removeBranch(branchName);
+                status = Repository.removeBranch(branchName);
                 break;
             case "global-log":
                 // Usage: java gitlet.Main global-log
-                Repository.globalLog();
+                status = Repository.globalLog();
                 break;
             case "find":
                 // java gitlet.Main find [commit message]
                 message = args[1];
-                Repository.find(message);
+                status = Repository.find(message);
                 break;
             case "reset":
                 // Usage: java gitlet.Main reset [commit id]
                 String commitID = args[1];
-                Repository.reset(commitID);
+                status = Repository.reset(commitID);
                 break;
             case "merge":
                 // Usage: java gitlet.Main merge [branch name]
                 branchName = args[1];
-                Repository.merge(branchName);
+                status = Repository.merge(branchName);
                 break;
             case "add-remote":
+                // Usage: java gitlet.Main add-remote [remote name] [name of remote directory]/.gitlet
                 String remoteName = args[1];
                 String remoteDirName = args[2];
-                // Usage: java gitlet.Main add-remote [remote name] [name of remote directory]/.gitlet
-                Repository.addRemote(remoteName, remoteDirName);
+                status = Repository.addRemote(remoteName, remoteDirName);
                 break;
             case "rm-remote":
                 // Usage: java gitlet.Main rm-remote [remote name]
                 remoteName = args[1];
-                Repository.removeRemote(remoteName);
+                status = Repository.removeRemote(remoteName);
                 break;
             case "push":
                 // Usage: java gitlet.Main push [remote name] [remote branch name]
                 remoteName = args[1];
                 String remoteBranchName = args[2];
-                Repository.push(remoteName, remoteBranchName);
+                status = Repository.push(remoteName, remoteBranchName);
                 break;
             case "fetch":
                 // Usage: java gitlet.Main fetch [remote name] [remote branch name]
                 remoteName = args[1];
                 remoteBranchName = args[2];
-                Repository.fetch(remoteName, remoteBranchName);
+                status = Repository.fetch(remoteName, remoteBranchName);
                 break;
             case "pull":
                 // Usage: java gitlet.Main pull [remote name] [remote branch name]
                 remoteName = args[1];
                 remoteBranchName = args[2];
-                Repository.pull(remoteName, remoteBranchName);
+                status = Repository.pull(remoteName, remoteBranchName);
                 break;
             default:
-                System.out.println("No command with that name exists.");
-                System.exit(0);
+                status = Status.ERR_NO_SUCH_COMMAND;
+        }
+        if (status != Status.SUCCESS) {
+            System.out.printf(status.text);
+            System.exit(0);
         }
     }
 }

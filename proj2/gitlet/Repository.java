@@ -1,7 +1,5 @@
 package gitlet;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 /** Represents a gitlet repository.
@@ -18,47 +16,43 @@ public class Repository {
      * variable is used. We've provided two examples for you.
      */
 
-    public static void init() {
+    public static Status init() {
         if (Persistor.isRepositoryInitialized()) {
-            String m = "A Gitlet version-control system already exists in the current directory.";
-            System.out.println(m);
-            System.exit(0);
-        } else {
-            Persistor.buildInfrastructure();
+            return Status.ERR_REPO_ALREADY_INIT;
         }
+        Persistor.buildInfrastructure();
         Commit initialCommit = new Commit();
         String commitId = Persistor.saveCommit(initialCommit);
         Persistor.setActiveBranchTo("master");
         Persistor.setActiveCommitTo(commitId);
+        return Status.SUCCESS;
     }
 
-    public static void add(String fileName) {
+    public static Status add(String fileName) {
         if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
+            return Status.ERR_REPO_NOT_INIT;
         }
         if (!WorkingDir.fileExists(fileName)) {
-            System.out.println("File does not exist.");
-            System.exit(0);
+            return Status.ERR_FILE_NOT_EXIST;
         }
         Index index = Persistor.readIndex();
         index.add(fileName);
         Persistor.saveIndex(index);
+        return Status.SUCCESS;
     }
 
-    public static void status() {
+    public static Status status() {
         if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
+            return Status.ERR_REPO_NOT_INIT;
         }
         Index index = Persistor.readIndex();
         index.status();
+        return Status.SUCCESS;
     }
 
-    public static void log() {
+    public static Status log() {
         if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
+            return Status.ERR_REPO_NOT_INIT;
         }
         Commit current = Persistor.getActiveCommit();
         List<String> result = new ArrayList<>();
@@ -67,32 +61,30 @@ public class Repository {
             current = Persistor.readCommit(current.getFirstParent());
         }
         System.out.println(String.join("\n", result));
+        return Status.SUCCESS;
     }
 
-    public static void globalLog() {
+    public static Status globalLog() {
         if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
+            return Status.ERR_REPO_NOT_INIT;
         }
         List<Commit> allCommits = Persistor.getAllCommits();
         for (Commit commit : allCommits) {
             System.out.println(commit);
         }
+        return Status.SUCCESS;
     }
 
-    public static void commit(String  message, String secondParent) {
+    public static Status commit(String  message, String secondParent) {
         if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
+            return Status.ERR_REPO_NOT_INIT;
         }
         if (message.isEmpty()) {
-            System.out.println("Please enter a commit message.");
-            System.exit(0);
+            return Status.ERR_EMPTY_COMMIT_MESSAGE;
         }
         Index index = Persistor.readIndex();
         if (index.nothingToAddOrRemove()) {
-            System.out.println("No changes added to the commit.");
-            System.exit(0);
+            return Status.ERR_NO_CHANGES_TO_COMMIT;
         }
         Commit newCommit = new Commit(message, index);
         newCommit.setSecondParent(secondParent);
@@ -100,70 +92,62 @@ public class Repository {
         Persistor.setActiveCommitTo(commitId);
         index.clear();
         Persistor.saveIndex(index);
+        return Status.SUCCESS;
     }
-    public static void commit(String message) {
+    public static Status commit(String message) {
         if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
+            return Status.ERR_REPO_NOT_INIT;
         }
         if (message.isEmpty()) {
-            System.out.println("Please enter a commit message.");
-            System.exit(0);
+            return Status.ERR_EMPTY_COMMIT_MESSAGE;
         }
         Index index = Persistor.readIndex();
         if (index.nothingToAddOrRemove()) {
-            System.out.println("No changes added to the commit.");
-            System.exit(0);
+            return Status.ERR_NO_CHANGES_TO_COMMIT;
         }
         Commit newCommit = new Commit(message, index);
         String commitId = Persistor.saveCommit(newCommit);
         Persistor.setActiveCommitTo(commitId);
         index.clear();
         Persistor.saveIndex(index);
+        return Status.SUCCESS;
     }
 
-    public static void checkoutFileFromActiveCommit(String fileName) {
+    public static Status checkoutFileFromActiveCommit(String fileName) {
         String commitId = Persistor.getActiveCommitId();
         checkoutFileFromCommit(fileName, commitId);
+        return Status.SUCCESS;
     }
 
-    public static void checkoutFileFromCommit(String fileName, String commitID) {
+    public static Status checkoutFileFromCommit(String fileName, String commitID) {
         if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
+            return Status.ERR_REPO_NOT_INIT;
         }
         Commit commit = Persistor.readCommit(commitID);
         if (commit == null) {
-            System.out.println("No commit with that id exists.");
-            System.exit(0);
+            return Status.ERR_NOT_EXIST_SUCH_COMMIT;
         }
         if (!commit.hasFile(fileName)) {
-            System.out.println("File does not exist in that commit.");
-            System.exit(0);
+            return Status.ERR_FILE_NOT_EXIST_IN_COMMIT;
         }
         Persistor.checkoutFileFromCommit(fileName, commit);
+        return Status.SUCCESS;
     }
 
-    public static void checkoutFilesFromBranchHead(String branchName) {
+    public static Status checkoutFilesFromBranchHead(String branchName) {
         if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
+            return Status.ERR_REPO_NOT_INIT;
         }
         if (!Persistor.branchExists(branchName)) {
-            System.out.println("No such branch exists.");
-            System.exit(0);
+            return Status.ERR_BRANCH_NOT_EXIST;
         }
         if (Persistor.getActiveBranchName().equals(branchName)) {
-            System.out.println("No need to checkout the current branch.");
-            System.exit(0);
+            return Status.ERR_BRANCH_NOT_NEED_CHECKOUT;
         }
 
         Index index = Persistor.readIndex();
         if (index.untrackedFileInTheWay()) {
-            String message = "There is an untracked file in the way; "
-                    + "delete it, or add and commit it first.";
-            System.out.println(message);
-            System.exit(0);
+            return Status.ERR_UNTRACKED_FILES;
         }
         Commit branchHeadCommit = Persistor.getBranchHeadCommit(branchName);
         Persistor.checkoutFilesFromCommit(branchHeadCommit);
@@ -171,25 +155,21 @@ public class Repository {
         index.setRepo(branchHeadCommit.getFilesTable());
         Persistor.saveIndex(index);
         Persistor.setActiveBranchTo(branchName);
+        return Status.SUCCESS;
     }
 
-    public static void reset(String commitID) {
+    public static Status reset(String commitID) {
         if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
+            return Status.ERR_REPO_NOT_INIT;
         }
         Commit commit = Persistor.readCommit(commitID);
         if (commit == null) {
-            System.out.println("No commit with that id exists.");
-            System.exit(0);
+            return Status.ERR_NOT_EXIST_SUCH_COMMIT;
         }
 
         Index index = Persistor.readIndex();
         if (index.untrackedFileInTheWay()) {
-            String message = "There is an untracked file in the way; "
-                    + "delete it, or add and commit it first.";
-            System.out.println(message);
-            System.exit(0);
+            return Status.ERR_UNTRACKED_FILES;
         }
         Persistor.checkoutFilesFromCommit(commit);
         index.clear();
@@ -197,54 +177,50 @@ public class Repository {
         Persistor.saveIndex(index);
         // Also moves the current branch’s head to that commit node.
         Persistor.setActiveCommitTo(commitID);
+        return Status.SUCCESS;
     }
-    public static void remove(String fileName) {
+    public static Status remove(String fileName) {
         if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
+            return Status.ERR_REPO_NOT_INIT;
         }
         Index index = Persistor.readIndex();
         if (index.isUntracked(fileName)) {
-            System.out.println("No reason to remove the file.");
-            System.exit(0);
+            return Status.ERR_NO_REASON_TO_REMOVE_FILE;
         }
         index.remove(fileName);
         Persistor.saveIndex(index);
+        return Status.SUCCESS;
     }
 
-    public static void branch(String branchName) {
+    public static Status branch(String branchName) {
         if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
+            return Status.ERR_REPO_NOT_INIT;
         }
         if (Persistor.branchExists(branchName)) {
-            System.out.println("A branch with that name already exists.");
-            System.exit(0);
+            return Status.ERR_BRANCH_ALREADY_EXIST;
         }
         Persistor.createBranch(branchName);
+        return Status.SUCCESS;
     }
 
-    public static void removeBranch(String branchName) {
+    public static Status removeBranch(String branchName) {
         if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
+            return Status.ERR_REPO_NOT_INIT;
         }
         if (!Persistor.branchExists(branchName)) {
-            System.out.println("A branch with that name does not exist.");
-            System.exit(0);
+            return Status.ERR_BRANCH_NOT_EXIST2;
         }
         if (Persistor.getActiveBranchName().equals(branchName)) {
-            System.out.println("Cannot remove the current branch.");
-            System.exit(0);
+            return Status.ERR_CANNOT_REMOVE_BRANCH;
         }
         Persistor.removeBranch(branchName);
+        return Status.SUCCESS;
     }
 
 
-    public static void find(String message) {
+    public static Status find(String message) {
         if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
+            return Status.ERR_REPO_NOT_INIT;
         }
         List<String> foundCommits = new ArrayList<>();
         List<Commit> allCommits = Persistor.getAllCommits();
@@ -254,47 +230,38 @@ public class Repository {
             }
         }
         if (foundCommits.isEmpty()) {
-            System.out.println("Found no commit with that message.");
-            System.exit(0);
+            return Status.ERR_COMMIT_NOT_FOUND;
         }
         System.out.println(String.join("\n", foundCommits));
+        return Status.SUCCESS;
     }
 
-    public static void merge(String branchName) {
+    public static Status merge(String branchName) {
         if (!Persistor.isRepositoryInitialized()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
+            return Status.ERR_REPO_NOT_INIT;
         }
         if (!Persistor.branchExists(branchName)) {
-            System.out.println("A branch with that name does not exist.");
-            System.exit(0);
+            return Status.ERR_BRANCH_NOT_EXIST2;
         }
         if (Persistor.getActiveBranchName().equals(branchName)) {
-            System.out.println("Cannot merge a branch with itself.");
-            System.exit(0);
+            return Status.ERR_BRANCH_CANNOT_MERGE_ITSELF;
         }
         Index index = Persistor.readIndex();
         if (index.untrackedFileInTheWay()) {
-            String message = "There is an untracked file in the way; "
-                    + "delete it, or add and commit it first.";
-            System.out.println(message);
-            System.exit(0);
+            return Status.ERR_UNTRACKED_FILES;
         }
         if (!index.nothingToAddOrRemove()) {
-            System.out.println("You have uncommitted changes.");
-            System.exit(0);
+            return Status.ERR_UNCOMMITED_CHANGES;
         }
         Commit activeCommit = Persistor.getActiveCommit();
         Commit otherCommit = Persistor.getBranchHeadCommit(branchName);
         Commit splitCommit = findSplitCommit(activeCommit, otherCommit);
         if (splitCommit.getUid().equals(otherCommit.getUid())) {
-            System.out.println("Given branch is an ancestor of the current branch.");
-            System.exit(0);
+            return Status.ERR_BRANCH_ANCESTOR;
         }
         if (splitCommit.getUid().equals(activeCommit.getUid())) {
-            System.out.println("Current branch fast-forwarded.");
             checkoutFilesFromBranchHead(branchName);
-            System.exit(0);
+            return Status.ERR_BRANCH_FAST_FORWARDED;
         }
         Set<String> allFileNames = getFileNamesInMerge(splitCommit, activeCommit, otherCommit);
         for (String fileName : allFileNames) {
@@ -319,6 +286,7 @@ public class Repository {
             findSplitCommit(activeCommit, otherCommit);
         }
         commit(message, otherCommit.getUid());
+        return Status.SUCCESS;
     }
 
     private static boolean modifiedInDifferentWays(String fileName,
@@ -360,54 +328,51 @@ public class Repository {
         return dag.getLatestCommonAncestor(c1, c2);
     }
 
-    public static void addRemote(String remoteName, String remoteDirName) {
+    public static Status addRemote(String remoteName, String remoteDirName) {
 //                System.out.println("ARG1 " + remoteName);
 //                System.out.println("ARG2 " + remoteDirName);
         if (Persistor.remoteExists(remoteName)) {
-            System.out.println("A remote with that name already exists.");
-            System.exit(0);
+            return Status.ERR_REMOTE_ALREADY_EXIST;
         }
         Persistor.addRemote(remoteName, remoteDirName);
-        Path path = Paths.get(remoteDirName).toAbsolutePath().normalize();
-        //buildInfrastructure(Utils.join(path.normalize().toFile()));
+        return Status.SUCCESS;
     }
 
-    public static void removeRemote(String remoteName) {
+    public static Status removeRemote(String remoteName) {
         if (!Persistor.remoteExists(remoteName)) {
-            System.out.println("A remote with that name does not exist.");
-            System.exit(0);
+            return Status.ERR_REMOTE_NOT_EXIST;
         }
         Persistor.removeRemote(remoteName);
 
+        return Status.SUCCESS;
     }
 
-    public static void push(String remoteName, String remoteBranchName) {
+    public static Status push(String remoteName, String remoteBranchName) {
         if (!Persistor.remoteDirExists(remoteName)) {
-            System.out.println("Remote directory not found.");
-            System.exit(0);
+            return Status.ERR_REMOTE_DIR_NOT_FOUND;
         }
         if (!Persistor.remoteBranchExists(remoteName, remoteBranchName)) {
-            System.out.println("That remote does not have that branch.");
-            System.exit(0);
+            return Status.ERR_REMOTE_NO_SUCH_BRANCH;
         }
         System.out.println("Please pull down remote changes before pushing.");
         System.exit(0);
+        return Status.SUCCESS;
 
     }
 
-    public static void fetch(String remoteName, String remoteBranchName) {
+    public static Status fetch(String remoteName, String remoteBranchName) {
         if (!Persistor.remoteDirExists(remoteName)) {
-            System.out.println("Remote directory not found.");
-            System.exit(0);
+            return Status.ERR_REMOTE_DIR_NOT_FOUND;
         }
         if (!Persistor.remoteBranchExists(remoteName, remoteBranchName)) {
-            System.out.println("That remote does not have that branch.");
-            System.exit(0);
+            return Status.ERR_REMOTE_NO_SUCH_BRANCH;
         }
+        return Status.SUCCESS;
     }
 
-    public static void pull(String remoteName, String remoteBranchName) {
+    public static Status pull(String remoteName, String remoteBranchName) {
         System.out.println("File does not exist.");
         System.exit(0);
+        return Status.SUCCESS;
     }
 }
