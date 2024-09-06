@@ -1,7 +1,7 @@
 package gitlet.commands;
 
 import gitlet.Repository;
-import gitlet.Error;
+import gitlet.Statuses;
 
 public class MergeCommand implements Command {
     private final String branchName;
@@ -10,7 +10,7 @@ public class MergeCommand implements Command {
     }
 
     @Override
-    public Error execute() {
+    public Statuses execute() {
         return Repository.merge(branchName);
     }
 }

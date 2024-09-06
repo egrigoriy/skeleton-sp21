@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Error;
+import gitlet.Statuses;
 import gitlet.Repository;
 
 public class AddCommand implements Command {
@@ -10,7 +10,7 @@ public class AddCommand implements Command {
     }
 
     @Override
-    public Error execute() {
+    public Statuses execute() {
         return Repository.add(fileName);
     }
 }

@@ -1,7 +1,7 @@
 package gitlet.commands;
 
-import gitlet.Error;
+import gitlet.Statuses;
 
 public interface Command {
-    Error execute();
+    Statuses execute();
 }

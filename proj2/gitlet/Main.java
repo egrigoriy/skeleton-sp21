@@ -17,8 +17,8 @@ public class Main {
             System.exit(0);
         }
         Command command = CommandFactory.parse(args);
-        Error status = command.execute();
-        if (status != Error.SUCCESS) {
+        Statuses status = command.execute();
+        if (status != Statuses.SUCCESS) {
             System.out.println(status.getText());
             System.exit(0);
         }

@@ -1,7 +1,7 @@
 package gitlet.commands;
 
 import gitlet.Repository;
-import gitlet.Error;
+import gitlet.Statuses;
 
 public class RemoveBranchCommand implements Command {
     private final String branchName;
@@ -10,7 +10,7 @@ public class RemoveBranchCommand implements Command {
     }
 
     @Override
-    public Error execute() {
+    public Statuses execute() {
         return Repository.removeBranch(branchName);
     }
 }

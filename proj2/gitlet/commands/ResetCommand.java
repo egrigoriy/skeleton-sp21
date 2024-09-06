@@ -1,7 +1,7 @@
 package gitlet.commands;
 
 import gitlet.Repository;
-import gitlet.Error;
+import gitlet.Statuses;
 
 public class ResetCommand implements Command {
     private final String commitID;
@@ -10,7 +10,7 @@ public class ResetCommand implements Command {
     }
 
     @Override
-    public Error execute() {
+    public Statuses execute() {
         return Repository.reset(commitID);
     }
 }

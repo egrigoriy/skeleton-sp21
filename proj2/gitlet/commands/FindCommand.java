@@ -1,7 +1,7 @@
 package gitlet.commands;
 
 import gitlet.Repository;
-import gitlet.Error;
+import gitlet.Statuses;
 
 public class FindCommand implements Command {
     private final String message;
@@ -10,7 +10,7 @@ public class FindCommand implements Command {
     }
 
     @Override
-    public Error execute() {
+    public Statuses execute() {
         return Repository.find(message);
     }
 }

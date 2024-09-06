@@ -1,7 +1,7 @@
 package gitlet.commands;
 
 import gitlet.Repository;
-import gitlet.Error;
+import gitlet.Statuses;
 
 public class CheckoutCommand implements Command {
     private final String[] args;
@@ -10,7 +10,7 @@ public class CheckoutCommand implements Command {
     }
 
     @Override
-    public Error execute() {
+    public Statuses execute() {
         String fileName;
         if (args.length == 3) {
             fileName = args[2];
@@ -31,6 +31,6 @@ public class CheckoutCommand implements Command {
             String branchName = args[1];
             return Repository.checkoutFilesFromBranchHead(branchName);
         }
-        return Error.SUCCESS;
+        return Statuses.SUCCESS;
     }
 }

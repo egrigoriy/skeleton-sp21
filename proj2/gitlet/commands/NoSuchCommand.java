@@ -1,10 +1,10 @@
 package gitlet.commands;
 
-import gitlet.Error;
+import gitlet.Statuses;
 
 public class NoSuchCommand implements Command {
     @Override
-    public Error execute() {
-        return Error.ERR_NO_SUCH_COMMAND;
+    public Statuses execute() {
+        return Statuses.ERR_NO_SUCH_COMMAND;
     }
 }
