@@ -16,43 +16,43 @@ public class Repository {
      * variable is used. We've provided two examples for you.
      */
 
-    public static Status init() {
+    public static Error init() {
         if (Persistor.isRepositoryInitialized()) {
-            return Status.ERR_REPO_ALREADY_INIT;
+            return Error.ERR_REPO_ALREADY_INIT;
         }
         Persistor.buildInfrastructure();
         Commit initialCommit = new Commit();
         String commitId = Persistor.saveCommit(initialCommit);
         Persistor.setActiveBranchTo("master");
         Persistor.setActiveCommitTo(commitId);
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
-    public static Status add(String fileName) {
+    public static Error add(String fileName) {
         if (!Persistor.isRepositoryInitialized()) {
-            return Status.ERR_REPO_NOT_INIT;
+            return Error.ERR_REPO_NOT_INIT;
         }
         if (!WorkingDir.fileExists(fileName)) {
-            return Status.ERR_FILE_NOT_EXIST;
+            return Error.ERR_FILE_NOT_EXIST;
         }
         Index index = Persistor.readIndex();
         index.add(fileName);
         Persistor.saveIndex(index);
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
-    public static Status status() {
+    public static Error status() {
         if (!Persistor.isRepositoryInitialized()) {
-            return Status.ERR_REPO_NOT_INIT;
+            return Error.ERR_REPO_NOT_INIT;
         }
         Index index = Persistor.readIndex();
         index.status();
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
-    public static Status log() {
+    public static Error log() {
         if (!Persistor.isRepositoryInitialized()) {
-            return Status.ERR_REPO_NOT_INIT;
+            return Error.ERR_REPO_NOT_INIT;
         }
         Commit current = Persistor.getActiveCommit();
         List<String> result = new ArrayList<>();
@@ -61,30 +61,30 @@ public class Repository {
             current = Persistor.readCommit(current.getFirstParent());
         }
         System.out.println(String.join("\n", result));
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
-    public static Status globalLog() {
+    public static Error globalLog() {
         if (!Persistor.isRepositoryInitialized()) {
-            return Status.ERR_REPO_NOT_INIT;
+            return Error.ERR_REPO_NOT_INIT;
         }
         List<Commit> allCommits = Persistor.getAllCommits();
         for (Commit commit : allCommits) {
             System.out.println(commit);
         }
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
-    public static Status commit(String  message, String secondParent) {
+    public static Error commit(String  message, String secondParent) {
         if (!Persistor.isRepositoryInitialized()) {
-            return Status.ERR_REPO_NOT_INIT;
+            return Error.ERR_REPO_NOT_INIT;
         }
         if (message.isEmpty()) {
-            return Status.ERR_EMPTY_COMMIT_MESSAGE;
+            return Error.ERR_EMPTY_COMMIT_MESSAGE;
         }
         Index index = Persistor.readIndex();
         if (index.nothingToAddOrRemove()) {
-            return Status.ERR_NO_CHANGES_TO_COMMIT;
+            return Error.ERR_NO_CHANGES_TO_COMMIT;
         }
         Commit newCommit = new Commit(message, index);
         newCommit.setSecondParent(secondParent);
@@ -92,62 +92,62 @@ public class Repository {
         Persistor.setActiveCommitTo(commitId);
         index.clear();
         Persistor.saveIndex(index);
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
-    public static Status commit(String message) {
+    public static Error commit(String message) {
         if (!Persistor.isRepositoryInitialized()) {
-            return Status.ERR_REPO_NOT_INIT;
+            return Error.ERR_REPO_NOT_INIT;
         }
         if (message.isEmpty()) {
-            return Status.ERR_EMPTY_COMMIT_MESSAGE;
+            return Error.ERR_EMPTY_COMMIT_MESSAGE;
         }
         Index index = Persistor.readIndex();
         if (index.nothingToAddOrRemove()) {
-            return Status.ERR_NO_CHANGES_TO_COMMIT;
+            return Error.ERR_NO_CHANGES_TO_COMMIT;
         }
         Commit newCommit = new Commit(message, index);
         String commitId = Persistor.saveCommit(newCommit);
         Persistor.setActiveCommitTo(commitId);
         index.clear();
         Persistor.saveIndex(index);
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
-    public static Status checkoutFileFromActiveCommit(String fileName) {
+    public static Error checkoutFileFromActiveCommit(String fileName) {
         String commitId = Persistor.getActiveCommitId();
         checkoutFileFromCommit(fileName, commitId);
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
-    public static Status checkoutFileFromCommit(String fileName, String commitID) {
+    public static Error checkoutFileFromCommit(String fileName, String commitID) {
         if (!Persistor.isRepositoryInitialized()) {
-            return Status.ERR_REPO_NOT_INIT;
+            return Error.ERR_REPO_NOT_INIT;
         }
         Commit commit = Persistor.readCommit(commitID);
         if (commit == null) {
-            return Status.ERR_NOT_EXIST_SUCH_COMMIT;
+            return Error.ERR_NOT_EXIST_SUCH_COMMIT;
         }
         if (!commit.hasFile(fileName)) {
-            return Status.ERR_FILE_NOT_EXIST_IN_COMMIT;
+            return Error.ERR_FILE_NOT_EXIST_IN_COMMIT;
         }
         Persistor.checkoutFileFromCommit(fileName, commit);
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
-    public static Status checkoutFilesFromBranchHead(String branchName) {
+    public static Error checkoutFilesFromBranchHead(String branchName) {
         if (!Persistor.isRepositoryInitialized()) {
-            return Status.ERR_REPO_NOT_INIT;
+            return Error.ERR_REPO_NOT_INIT;
         }
         if (!Persistor.branchExists(branchName)) {
-            return Status.ERR_BRANCH_NOT_EXIST;
+            return Error.ERR_BRANCH_NOT_EXIST;
         }
         if (Persistor.getActiveBranchName().equals(branchName)) {
-            return Status.ERR_BRANCH_NOT_NEED_CHECKOUT;
+            return Error.ERR_BRANCH_NOT_NEED_CHECKOUT;
         }
 
         Index index = Persistor.readIndex();
         if (index.untrackedFileInTheWay()) {
-            return Status.ERR_UNTRACKED_FILES;
+            return Error.ERR_UNTRACKED_FILES;
         }
         Commit branchHeadCommit = Persistor.getBranchHeadCommit(branchName);
         Persistor.checkoutFilesFromCommit(branchHeadCommit);
@@ -155,21 +155,21 @@ public class Repository {
         index.setRepo(branchHeadCommit.getFilesTable());
         Persistor.saveIndex(index);
         Persistor.setActiveBranchTo(branchName);
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
-    public static Status reset(String commitID) {
+    public static Error reset(String commitID) {
         if (!Persistor.isRepositoryInitialized()) {
-            return Status.ERR_REPO_NOT_INIT;
+            return Error.ERR_REPO_NOT_INIT;
         }
         Commit commit = Persistor.readCommit(commitID);
         if (commit == null) {
-            return Status.ERR_NOT_EXIST_SUCH_COMMIT;
+            return Error.ERR_NOT_EXIST_SUCH_COMMIT;
         }
 
         Index index = Persistor.readIndex();
         if (index.untrackedFileInTheWay()) {
-            return Status.ERR_UNTRACKED_FILES;
+            return Error.ERR_UNTRACKED_FILES;
         }
         Persistor.checkoutFilesFromCommit(commit);
         index.clear();
@@ -177,50 +177,50 @@ public class Repository {
         Persistor.saveIndex(index);
         // Also moves the current branch’s head to that commit node.
         Persistor.setActiveCommitTo(commitID);
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
-    public static Status remove(String fileName) {
+    public static Error remove(String fileName) {
         if (!Persistor.isRepositoryInitialized()) {
-            return Status.ERR_REPO_NOT_INIT;
+            return Error.ERR_REPO_NOT_INIT;
         }
         Index index = Persistor.readIndex();
         if (index.isUntracked(fileName)) {
-            return Status.ERR_NO_REASON_TO_REMOVE_FILE;
+            return Error.ERR_NO_REASON_TO_REMOVE_FILE;
         }
         index.remove(fileName);
         Persistor.saveIndex(index);
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
-    public static Status branch(String branchName) {
+    public static Error branch(String branchName) {
         if (!Persistor.isRepositoryInitialized()) {
-            return Status.ERR_REPO_NOT_INIT;
+            return Error.ERR_REPO_NOT_INIT;
         }
         if (Persistor.branchExists(branchName)) {
-            return Status.ERR_BRANCH_ALREADY_EXIST;
+            return Error.ERR_BRANCH_ALREADY_EXIST;
         }
         Persistor.createBranch(branchName);
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
-    public static Status removeBranch(String branchName) {
+    public static Error removeBranch(String branchName) {
         if (!Persistor.isRepositoryInitialized()) {
-            return Status.ERR_REPO_NOT_INIT;
+            return Error.ERR_REPO_NOT_INIT;
         }
         if (!Persistor.branchExists(branchName)) {
-            return Status.ERR_BRANCH_NOT_EXIST2;
+            return Error.ERR_BRANCH_NOT_EXIST2;
         }
         if (Persistor.getActiveBranchName().equals(branchName)) {
-            return Status.ERR_CANNOT_REMOVE_BRANCH;
+            return Error.ERR_CANNOT_REMOVE_BRANCH;
         }
         Persistor.removeBranch(branchName);
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
 
-    public static Status find(String message) {
+    public static Error find(String message) {
         if (!Persistor.isRepositoryInitialized()) {
-            return Status.ERR_REPO_NOT_INIT;
+            return Error.ERR_REPO_NOT_INIT;
         }
         List<String> foundCommits = new ArrayList<>();
         List<Commit> allCommits = Persistor.getAllCommits();
@@ -230,38 +230,38 @@ public class Repository {
             }
         }
         if (foundCommits.isEmpty()) {
-            return Status.ERR_COMMIT_NOT_FOUND;
+            return Error.ERR_COMMIT_NOT_FOUND;
         }
         System.out.println(String.join("\n", foundCommits));
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
-    public static Status merge(String branchName) {
+    public static Error merge(String branchName) {
         if (!Persistor.isRepositoryInitialized()) {
-            return Status.ERR_REPO_NOT_INIT;
+            return Error.ERR_REPO_NOT_INIT;
         }
         if (!Persistor.branchExists(branchName)) {
-            return Status.ERR_BRANCH_NOT_EXIST2;
+            return Error.ERR_BRANCH_NOT_EXIST2;
         }
         if (Persistor.getActiveBranchName().equals(branchName)) {
-            return Status.ERR_BRANCH_CANNOT_MERGE_ITSELF;
+            return Error.ERR_BRANCH_CANNOT_MERGE_ITSELF;
         }
         Index index = Persistor.readIndex();
         if (index.untrackedFileInTheWay()) {
-            return Status.ERR_UNTRACKED_FILES;
+            return Error.ERR_UNTRACKED_FILES;
         }
         if (!index.nothingToAddOrRemove()) {
-            return Status.ERR_UNCOMMITED_CHANGES;
+            return Error.ERR_UNCOMMITED_CHANGES;
         }
         Commit activeCommit = Persistor.getActiveCommit();
         Commit otherCommit = Persistor.getBranchHeadCommit(branchName);
         Commit splitCommit = findSplitCommit(activeCommit, otherCommit);
         if (splitCommit.getUid().equals(otherCommit.getUid())) {
-            return Status.ERR_BRANCH_ANCESTOR;
+            return Error.ERR_BRANCH_ANCESTOR;
         }
         if (splitCommit.getUid().equals(activeCommit.getUid())) {
             checkoutFilesFromBranchHead(branchName);
-            return Status.ERR_BRANCH_FAST_FORWARDED;
+            return Error.ERR_BRANCH_FAST_FORWARDED;
         }
         Set<String> allFileNames = getFileNamesInMerge(splitCommit, activeCommit, otherCommit);
         for (String fileName : allFileNames) {
@@ -286,7 +286,7 @@ public class Repository {
             findSplitCommit(activeCommit, otherCommit);
         }
         commit(message, otherCommit.getUid());
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
     private static boolean modifiedInDifferentWays(String fileName,
@@ -328,51 +328,51 @@ public class Repository {
         return dag.getLatestCommonAncestor(c1, c2);
     }
 
-    public static Status addRemote(String remoteName, String remoteDirName) {
+    public static Error addRemote(String remoteName, String remoteDirName) {
 //                System.out.println("ARG1 " + remoteName);
 //                System.out.println("ARG2 " + remoteDirName);
         if (Persistor.remoteExists(remoteName)) {
-            return Status.ERR_REMOTE_ALREADY_EXIST;
+            return Error.ERR_REMOTE_ALREADY_EXIST;
         }
         Persistor.addRemote(remoteName, remoteDirName);
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
-    public static Status removeRemote(String remoteName) {
+    public static Error removeRemote(String remoteName) {
         if (!Persistor.remoteExists(remoteName)) {
-            return Status.ERR_REMOTE_NOT_EXIST;
+            return Error.ERR_REMOTE_NOT_EXIST;
         }
         Persistor.removeRemote(remoteName);
 
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
-    public static Status push(String remoteName, String remoteBranchName) {
+    public static Error push(String remoteName, String remoteBranchName) {
         if (!Persistor.remoteDirExists(remoteName)) {
-            return Status.ERR_REMOTE_DIR_NOT_FOUND;
+            return Error.ERR_REMOTE_DIR_NOT_FOUND;
         }
         if (!Persistor.remoteBranchExists(remoteName, remoteBranchName)) {
-            return Status.ERR_REMOTE_NO_SUCH_BRANCH;
+            return Error.ERR_REMOTE_NO_SUCH_BRANCH;
         }
         System.out.println("Please pull down remote changes before pushing.");
         System.exit(0);
-        return Status.SUCCESS;
+        return Error.SUCCESS;
 
     }
 
-    public static Status fetch(String remoteName, String remoteBranchName) {
+    public static Error fetch(String remoteName, String remoteBranchName) {
         if (!Persistor.remoteDirExists(remoteName)) {
-            return Status.ERR_REMOTE_DIR_NOT_FOUND;
+            return Error.ERR_REMOTE_DIR_NOT_FOUND;
         }
         if (!Persistor.remoteBranchExists(remoteName, remoteBranchName)) {
-            return Status.ERR_REMOTE_NO_SUCH_BRANCH;
+            return Error.ERR_REMOTE_NO_SUCH_BRANCH;
         }
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 
-    public static Status pull(String remoteName, String remoteBranchName) {
+    public static Error pull(String remoteName, String remoteBranchName) {
         System.out.println("File does not exist.");
         System.exit(0);
-        return Status.SUCCESS;
+        return Error.SUCCESS;
     }
 }
