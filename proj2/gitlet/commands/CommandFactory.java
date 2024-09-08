@@ -9,7 +9,7 @@ public class CommandFactory {
             throw new GitletException(Errors.ERR_NO_COMMAND.getText());
         }
         String firstArg = args[0];
-        switch(firstArg) {
+        switch (firstArg) {
             case "init":
                 return new InitCommand();
             case "add": // Usage: java gitlet.Main add [file name]
@@ -47,54 +47,41 @@ public class CommandFactory {
                 }
                 break;
             case "branch":
-                // Usage: java gitlet.Main branch [branch name]
                 String branchName = args[1];
                 return new BranchCommand(branchName);
             case "rm-branch":
-                // Usage: java gitlet.Main rm-branch [branch name]
                 branchName = args[1];
                 return new RemoveBranchCommand(branchName);
             case "global-log":
-                // Usage: java gitlet.Main global-log
                 return new GlobalLogCommand();
             case "find":
-                // java gitlet.Main find [commit message]
                 message = args[1];
                 return new FindCommand(message);
             case "reset":
-                // Usage: java gitlet.Main reset [commit id]
                 String commitID = args[1];
                 return new ResetCommand(commitID);
             case "merge":
-                // Usage: java gitlet.Main merge [branch name]
                 branchName = args[1];
                 return new MergeCommand(branchName);
             case "add-remote":
-                // Usage: java gitlet.Main add-remote [remote name] [name of remote directory]/.gitlet
                 String remoteName = args[1];
                 String remoteDirName = args[2];
                 return new AddRemoteCommad(remoteName, remoteDirName);
             case "rm-remote":
-                // Usage: java gitlet.Main rm-remote [remote name]
                 remoteName = args[1];
                 return new RemoveRemoteCommand(remoteName);
             case "push":
-                // Usage: java gitlet.Main push [remote name] [remote branch name]
                 remoteName = args[1];
                 String remoteBranchName = args[2];
                 return new PushCommand(remoteName, remoteBranchName);
             case "fetch":
-                // Usage: java gitlet.Main fetch [remote name] [remote branch name]
                 remoteName = args[1];
                 remoteBranchName = args[2];
                 return new FetchCommand(remoteName, remoteBranchName);
             case "pull":
-                // Usage: java gitlet.Main pull [remote name] [remote branch name]
                 remoteName = args[1];
                 remoteBranchName = args[2];
                 return new PullCommand(remoteName, remoteBranchName);
-            default:
-                throw new GitletException(Errors.ERR_NO_SUCH_COMMAND.getText());
         }
         throw new GitletException(Errors.ERR_NO_SUCH_COMMAND.getText());
     }
