@@ -1,7 +1,7 @@
 package gitlet;
 
-public enum Statuses {
-    SUCCESS(""),
+public enum Errors {
+    ERR_NO_COMMAND("Please enter a command."),
     ERR_FILE_NOT_EXIST("File does not exist."),
     ERR_REPO_ALREADY_INIT("A Gitlet version-control system already "
             + "exists in the current directory."),
@@ -30,7 +30,7 @@ public enum Statuses {
     ERR_REMOTE_NO_SUCH_BRANCH("That remote does not have that branch."),
     ERR_NO_SUCH_COMMAND("No command with that name exists.");
     private String text;
-    Statuses(String txt) {
+    Errors(String txt) {
         this.text = txt;
     }
 

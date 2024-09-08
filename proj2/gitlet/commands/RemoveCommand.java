@@ -1,7 +1,6 @@
 package gitlet.commands;
 
 import gitlet.Repository;
-import gitlet.Statuses;
 
 public class RemoveCommand implements Command {
     private final String fileName;
@@ -10,7 +9,7 @@ public class RemoveCommand implements Command {
     }
 
     @Override
-    public Statuses execute() {
-        return Repository.remove(fileName);
+    public void execute() {
+        Repository.remove(fileName);
     }
 }

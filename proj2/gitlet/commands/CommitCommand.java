@@ -1,7 +1,6 @@
 package gitlet.commands;
 
 import gitlet.Repository;
-import gitlet.Statuses;
 
 public class CommitCommand implements Command {
     private final String message;
@@ -10,7 +9,7 @@ public class CommitCommand implements Command {
     }
 
     @Override
-    public Statuses execute() {
-        return Repository.commit(message);
+    public void execute() {
+        Repository.commit(message);
     }
 }

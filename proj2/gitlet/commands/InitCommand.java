@@ -1,11 +1,11 @@
 package gitlet.commands;
 
+import gitlet.GitletException;
 import gitlet.Repository;
-import gitlet.Statuses;
 
 public class InitCommand implements Command {
     @Override
-    public Statuses execute() {
-        return Repository.init();
+    public void execute() throws GitletException {
+        Repository.init();
     }
 }

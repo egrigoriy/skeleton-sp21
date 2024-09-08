@@ -2,14 +2,14 @@ package gitlet.commands;
 
 import gitlet.Repository;
 
-public class RemoveBranchCommand implements Command {
+public class CheckoutBranchCommand implements Command {
     private final String branchName;
-    public RemoveBranchCommand(String branchName) {
+    public CheckoutBranchCommand(String branchName) {
         this.branchName = branchName;
     }
 
     @Override
     public void execute() {
-        Repository.removeBranch(branchName);
+        Repository.checkoutFilesFromBranchHead(branchName);
     }
 }

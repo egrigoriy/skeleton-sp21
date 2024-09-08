@@ -12,14 +12,11 @@ public class Main {
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
     public static void main(String[] args) {
-        if (args.length == 0) {
-            System.out.println("Please enter a command.");
-            System.exit(0);
-        }
-        Command command = CommandFactory.parse(args);
-        Statuses status = command.execute();
-        if (status != Statuses.SUCCESS) {
-            System.out.println(status.getText());
+        try {
+            Command command = CommandFactory.parse(args);
+            command.execute();
+        } catch (GitletException e) {
+            System.out.println(e.getMessage());
             System.exit(0);
         }
     }

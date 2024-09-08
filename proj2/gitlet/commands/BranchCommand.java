@@ -1,7 +1,6 @@
 package gitlet.commands;
 
 import gitlet.Repository;
-import gitlet.Statuses;
 
 public class BranchCommand implements Command {
     private final String branchName;
@@ -10,7 +9,7 @@ public class BranchCommand implements Command {
     }
 
     @Override
-    public Statuses execute() {
-        return Repository.branch(branchName);
+    public void execute() {
+        Repository.branch(branchName);
     }
 }
