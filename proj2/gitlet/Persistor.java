@@ -231,7 +231,7 @@ public class Persistor {
 
     public static void setRemoteUrlToConfig(String remoteName, String remoteUrl) {
         Path url = Paths.get(remoteUrl).toAbsolutePath().normalize();
-        Utils.writeContents(CONFIG, "remote." + remoteName + ".url=" +url);
+        Utils.writeContents(CONFIG, "remote." + remoteName + ".url=" + url);
     }
 
     public static String getRemoteUrlFromConfig(String remoteName) {
@@ -242,7 +242,7 @@ public class Persistor {
     }
 
     public static boolean remoteDirExists(String remoteName) {
-        String remoteUrl =getRemoteUrlFromConfig(remoteName);
+        String remoteUrl = getRemoteUrlFromConfig(remoteName);
         return Utils.join(remoteUrl).exists();
     }
 
@@ -271,7 +271,7 @@ public class Persistor {
 
     }
 
-    public static void copyRemoteBranchCommitsAndBlobs(String remoteName, Commit remoteBranchTipCommit) {
+    public static void copyRemoteBranchCommitsAndBlobs(String remoteName) {
         String remoteUrl = getRemoteUrlFromConfig(remoteName);
         File remoteCommitsDir = Utils.join(remoteUrl, "commits");
         List<String> allRemoteCommitsFileNames = Utils.plainFilenamesIn(remoteCommitsDir);
