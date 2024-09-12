@@ -247,6 +247,9 @@ public class Persistor {
     }
 
     public static void removeRemote(String remoteName) {
+        // remove from config
+        Utils.writeContents(CONFIG, "");
+        // remove from refs
         Utils.join(REF_REMOTES_DIR, remoteName).delete();
     }
 
@@ -302,5 +305,58 @@ public class Persistor {
                                                    String commitId) {
         File branchHeadFile = Utils.join(REF_REMOTES_DIR, remoteName, remoteBranchName);
         Utils.writeContents(branchHeadFile, commitId);
+    }
+
+    public static void copyLocalBranchHeadToRemote(String remoteName, String remoteBranchName) {
+        String localBranchHead = getActiveCommitId();
+        String remoteUrl = getRemoteUrlFromConfig(remoteName);
+        File remoteRefsHeadsDir = Utils.join(remoteUrl, "refs/heads");
+        File remoteBranchHeadFile = Utils.join(remoteRefsHeadsDir, remoteBranchName);
+        Utils.writeContents(remoteBranchHeadFile, localBranchHead);
+    }
+
+    public static void copyLocalBranchCommitsAndBlobs(String remoteName, String remoteBranchName) {
+        String remoteUrl = getRemoteUrlFromConfig(remoteName);
+        File remoteCommitsDir = Utils.join(remoteUrl, "commits");
+        List<String> allLocalCommitsFileNames = Utils.plainFilenamesIn(COMMITS_DIR);
+        for (String fileName : allLocalCommitsFileNames) {
+            Path src = Paths.get(Utils.join(COMMITS_DIR, fileName).toString());
+            Path dst = Paths.get(Utils.join(remoteCommitsDir, fileName).toString());
+            try {
+                Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        File remoteBlobsDir = Utils.join(remoteUrl, "blobs");
+        List<String> allLocalBlobsFileNames = Utils.plainFilenamesIn(BLOBS_DIR);
+        for (String fileName : allLocalBlobsFileNames) {
+            Path src = Paths.get(Utils.join(BLOBS_DIR, fileName).toString());
+            Path dst = Paths.get(Utils.join(remoteBlobsDir, fileName).toString());
+            try {
+                Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+
+
+    public static boolean remoteBranchInHistoryOfLocalBranch(String remoteName, String remoteBranchName) {
+        File remoteRef = Utils.join(REF_REMOTES_DIR, remoteName, remoteBranchName);
+        if (!remoteRef.exists()) {
+            return false;
+        }
+        String remoteCommitId = Utils.readContentsAsString(remoteRef);
+        String localCommitId = getActiveCommitId();
+        Commit current = readCommit(localCommitId);
+        while (current != null) {
+            if (current.getUid().equals(remoteCommitId)) {
+                return true;
+            }
+            current = readCommit(current.getFirstParent());
+        }
+        return false;
     }
 }
