@@ -1,8 +1,11 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 import static gitlet.Utils.*;
@@ -256,4 +259,46 @@ public class Persistor {
     }
 
 
+    public static String getRemoteBranchHeadCommitId(String remoteName, String remoteBranchName) {
+        String remoteUrl = getRemoteUrlFromConfig(remoteName);
+        File path = Utils.join(remoteUrl, "refs/heads/" + remoteBranchName);
+        return Utils.readContentsAsString(path);
+    }
+
+    public static Commit readRemoteCommit(String remoteName, String remoteBranchTipCommitId) {
+        String remoteUrl = getRemoteUrlFromConfig(remoteName);
+        return null;
+
+    }
+
+    public static void copyRemoteBranchCommitsAndBlobs(String remoteName, Commit remoteBranchTipCommit) {
+        String remoteUrl = getRemoteUrlFromConfig(remoteName);
+        File remoteCommitsDir = Utils.join(remoteUrl, "commits");
+        List<String> allRemoteCommitsFileNames = Utils.plainFilenamesIn(remoteCommitsDir);
+        for (String fileName : allRemoteCommitsFileNames) {
+            Path src = Paths.get(Utils.join(remoteCommitsDir, fileName).toString());
+            Path dst = Paths.get(Utils.join(COMMITS_DIR, fileName).toString());
+            try {
+                Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        File remoteBlobsDir = Utils.join(remoteUrl, "blobs");
+        List<String> allRemoteBlobsFileNames = Utils.plainFilenamesIn(remoteBlobsDir);
+        for (String fileName : allRemoteBlobsFileNames) {
+            Path src = Paths.get(Utils.join(remoteBlobsDir, fileName).toString());
+            Path dst = Paths.get(Utils.join(BLOBS_DIR, fileName).toString());
+            try {
+                Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public static void copyRemoteBranchHeadToLocal(String remoteName, String remoteBranchName, String remoteBranchTipCommitId) {
+        File branchHeadFile = Utils.join(REF_REMOTES_DIR, remoteName, remoteBranchName);
+        Utils.writeContents(branchHeadFile, remoteBranchTipCommitId);
+    }
 }
