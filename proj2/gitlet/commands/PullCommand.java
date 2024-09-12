@@ -2,6 +2,10 @@ package gitlet.commands;
 
 import gitlet.Repository;
 
+/**
+ *  Command used for pulling branch from remote repository to the local repository
+ *  @author Grigoriy Emiliyanov
+ */
 public class PullCommand implements Command {
     private final String remoteName;
     private final String remoteBranchName;

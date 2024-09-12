@@ -2,6 +2,10 @@ package gitlet.commands;
 
 import gitlet.Repository;
 
+/**
+ *  Command used for checking out a file from the repository
+ *  @author Grigoriy Emiliyanov
+ */
 public class CheckoutFileCommand implements Command {
     private final String fileName;
     private final String commitId;

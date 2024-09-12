@@ -3,17 +3,17 @@ package gitlet.commands;
 import gitlet.Repository;
 
 /**
- *  Command used for adding file to the repository
+ *  Command used for removing a given file from tracking in the repository
  *  @author Grigoriy Emiliyanov
  */
-public class AddCommand implements Command {
+public class RemoveFileCommand implements Command {
     private final String fileName;
-    public AddCommand(String fileName) {
+    public RemoveFileCommand(String fileName) {
         this.fileName = fileName;
     }
 
     @Override
     public void execute() {
-        Repository.add(fileName);
+        Repository.removeFile(fileName);
     }
 }

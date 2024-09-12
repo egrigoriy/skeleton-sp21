@@ -3,7 +3,21 @@ package gitlet.commands;
 import gitlet.GitletException;
 import gitlet.Errors;
 
+/**
+ *  Factory providing the command corresponding to the given args
+ *  @author Grigoriy Emiliyanov
+ */
+
 public class CommandFactory {
+
+    /**
+     * Returns the command corresponding to the given args.
+     * In case of error, throws a GitletExeption
+     *
+     * @param args
+     * @return a Command
+     * @throws GitletException
+     */
     public static Command parse(String[] args) throws GitletException {
         if (args.length == 0) {
             throw new GitletException(Errors.ERR_NO_COMMAND.getText());
@@ -32,78 +46,82 @@ public class CommandFactory {
         };
     }
 
-    private static Command handlePull(String[] args) {
-        // Usage: java gitlet.Main pull [remote name] [remote branch name]
-        String remoteName = args[1];
-        String remoteBranchName = args[2];
-        return new PullCommand(remoteName, remoteBranchName);
+    /**
+     * Parses args and returns an InitCommand
+     * Usage: java gitlet.Main init
+     *
+     * @return new InitCommand
+     */
+    private static InitCommand handleInit() {
+        return new InitCommand();
     }
 
-    private static Command handleFetch(String[] args) {
-        // Usage: java gitlet.Main fetch [remote name] [remote branch name]
-        String remoteName = args[1];
-        String remoteBranchName = args[2];
-        return new FetchCommand(remoteName, remoteBranchName);
+    /**
+     * Parses args and returns an AddCommand
+     * Usage: java gitlet.Main add [file name]
+     *
+     * @return new AddCommand
+     */
+    private static Command handleAdd(String[] args) {
+        validateNumArgs("add", args, 2);
+        String fileName = args[1];
+        return new AddCommand(fileName);
     }
 
-    private static Command handlePush(String[] args) {
-        // Usage: java gitlet.Main push [remote name] [remote branch name]
-        String remoteName = args[1];
-        String remoteBranchName = args[2];
-        return new PushCommand(remoteName, remoteBranchName);
-    }
-
-    private static Command handleRemoveRemote(String[] args) {
-        // Usage: java gitlet.Main rm-remote [remote name]
-        String remoteName = args[1];
-        return new RemoveRemoteCommand(remoteName);
-    }
-
-    private static Command handleAddRemote(String[] args) {
-        // Usage: java gitlet.Main add-remote [remote name] [name of remote directory]/.gitlet
-        String remoteName = args[1];
-        String remoteDirName = args[2];
-        return new AddRemoteCommad(remoteName, remoteDirName);
-    }
-
-    private static Command handleMerge(String[] args) {
-        // Usage: java gitlet.Main merge [branch name]
-        String branchName = args[1];
-        return new MergeCommand(branchName);
-    }
-
-    private static Command handleReset(String[] args) {
-        // Usage: java gitlet.Main reset [commit id]
-        String commitID = args[1];
-        return new ResetCommand(commitID);
-    }
-
-    private static Command handleGlobalLog() {
-        // Usage: java gitlet.Main global-log
-        return new GlobalLogCommand();
-    }
-
-    private static Command handleFind(String[] args) {
-        // Usage: java gitlet.Main find [commit message]
+    /**
+     * Parses args and returns a CommitCommand
+     * Usage: java gitlet.Main commit [message]
+     *
+     * @return new CommitCommand
+     */
+    private static Command handleCommit(String[] args) {
+        validateNumArgs("commit", args, 2);
         String message = args[1];
-        return new FindCommand(message);
+        return new CommitCommand(message);
     }
 
-    private static Command handleRemoveBranch(String[] args) {
-        // Usage: java gitlet.Main rm-branch [branch name]
-        String branchName = args[1];
-        return new RemoveBranchCommand(branchName);
+    /**
+     * Parses args and returns a RemoveFileCommand
+     * Usage: java gitlet.Main rm [file name]
+     *
+     * @return new RemoveFileCommand
+     */
+    private static Command handleRemove(String[] args) {
+        validateNumArgs("remove", args, 2);
+        String fileName = args[1];
+        return new RemoveFileCommand(fileName);
     }
 
-    private static Command handleBranch(String[] args) {
-        // Usage: java gitlet.Main branch [branch name]
-        String branchName = args[1];
-        return new BranchCommand(branchName);
+    /**
+     * Parses args and returns a LogCommand
+     * Usage: java gitlet.Main log
+     *
+     * @return new LogCommand
+     */
+    private static Command handleLog() {
+        return new LogCommand();
     }
 
+    /**
+     * Parses args and returns a StatusCommand
+     * Usage: java gitlet.Main status
+     *
+     * @return new StatusCommand
+     */
+    private static Command handleStatus() {
+        return new StatusCommand();
+    }
+
+    /**
+     * Parses args and returns a corresponding checkout command
+     * Usage: java gitlet.Main checkout -- [file name]
+     * Usage: java gitlet.Main checkout [commit id] -- [file name]
+     * Usage: java gitlet.Main checkout [branch name]
+     *
+     * @return a corresponding checkout command
+     */
     private static Command handleCheckout(String[] args) {
         if (args.length == 3) {
-            // Usage: java gitlet.Main checkout -- [file name]
             if (!args[1].equals("--")) {
                 throw new GitletException("Wrong checkout format!");
             }
@@ -111,7 +129,6 @@ public class CommandFactory {
             return new CheckoutFileCommand(fileName);
         }
         if (args.length == 4) {
-            // Usage: java gitlet.Main checkout [commit id] -- [file name]
             String commitId = args[1];
             if (!args[2].equals("--")) {
                 throw new GitletException("Incorrect operands.");
@@ -119,40 +136,156 @@ public class CommandFactory {
             String fileName = args[3];
             return new CheckoutFileCommand(fileName, commitId);
         }
-        // Usage: java gitlet.Main checkout [branch name]
         String branchName = args[1];
         return new CheckoutBranchCommand(branchName);
     }
 
-    private static Command handleStatus() {
-        // Usage: java gitlet.Main status
-        return new StatusCommand();
+    /**
+     * Parses args and returns a BranchCommand
+     * Usage: java gitlet.Main branch [branch name]
+     *
+     * @return new BranchCommand
+     */
+    private static Command handleBranch(String[] args) {
+        validateNumArgs("branch", args, 2);
+        String branchName = args[1];
+        return new BranchCommand(branchName);
     }
 
-    private static Command handleLog() {
-        // Usage: java gitlet.Main log
-        return new LogCommand();
+    /**
+     * Parses args and returns a RemoveBranchCommand
+     * Usage: java gitlet.Main rm-branch [branch name]
+     *
+     * @return new RemoveBranchCommand
+     */
+    private static Command handleRemoveBranch(String[] args) {
+        validateNumArgs("rm-branch", args, 2);
+        String branchName = args[1];
+        return new RemoveBranchCommand(branchName);
     }
 
-    private static Command handleRemove(String[] args) {
-        // Usage: java gitlet.Main rm [file name]
-        String fileName = args[1];
-        return new RemoveCommand(fileName);
+    /**
+     * Parses args and returns a GlobalLogComamnd
+     * Usage: java gitlet.Main global-log
+     *
+     * @return new GlobalLogComamnd
+     */
+    private static Command handleGlobalLog() {
+        return new GlobalLogCommand();
     }
 
-    private static Command handleCommit(String[] args) {
-        // Usage: java gitlet.Main commit [message]
+    /**
+     * Parses args and returns a FindCommand
+     * Usage: java gitlet.Main find [commit message]
+     *
+     * @return new FindCommand
+     */
+    private static Command handleFind(String[] args) {
+        validateNumArgs("find", args, 2);
         String message = args[1];
-        return new CommitCommand(message);
+        return new FindCommand(message);
     }
 
-    private static Command handleAdd(String[] args) {
-        // Usage: java gitlet.Main add [file name]
-        String fileName = args[1];
-        return new AddCommand(fileName);
+    /**
+     * Parses args and returns a ResetCommand
+     * Usage: java gitlet.Main reset [commit id]
+     *
+     * @return new ResetCommand
+     */
+    private static Command handleReset(String[] args) {
+        validateNumArgs("reset", args, 2);
+        String commitID = args[1];
+        return new ResetCommand(commitID);
     }
 
-    private static InitCommand handleInit() {
-        return new InitCommand();
+    /**
+     * Parses args and returns a MergeCommand
+     * Usage: java gitlet.Main merge [branch name]
+     *
+     * @return new MergeCommand
+     */
+    private static Command handleMerge(String[] args) {
+        validateNumArgs("merge", args, 2);
+        String branchName = args[1];
+        return new MergeCommand(branchName);
+    }
+
+    /**
+     * Parses args and returns an AddRemoteCommand
+     * Usage:java gitlet.Main add-remote [remote name] [name of remote directory]/.gitlet
+     *
+     * @return new AddRemoteCommand
+     */
+    private static Command handleAddRemote(String[] args) {
+        validateNumArgs("add-remote", args, 3);
+        String remoteName = args[1];
+        String remoteDirName = args[2];
+        return new AddRemoteCommad(remoteName, remoteDirName);
+    }
+
+    /**
+     * Parses args and returns a RemoveRemoteCommand
+     * Usage: java gitlet.Main rm-remote [remote name]
+     *
+     * @return new RemoveRemoteCommand
+     */
+    private static Command handleRemoveRemote(String[] args) {
+        validateNumArgs("rm-remote", args, 2);
+        String remoteName = args[1];
+        return new RemoveRemoteCommand(remoteName);
+    }
+
+    /**
+     * Parses args and returns a PushCommand
+     * Usage: java gitlet.Main push [remote name] [remote branch name]
+     *
+     * @return new PushCommand
+     */
+    private static Command handlePush(String[] args) {
+        validateNumArgs("push", args, 3);
+        String remoteName = args[1];
+        String remoteBranchName = args[2];
+        return new PushCommand(remoteName, remoteBranchName);
+    }
+
+    /**
+     * Parses args and returns a FetchCommand
+     * Usage: java gitlet.Main fetch [remote name] [remote branch name]
+     *
+     * @return new FetchCommand
+     */
+    private static Command handleFetch(String[] args) {
+        validateNumArgs("fetch", args, 3);
+        String remoteName = args[1];
+        String remoteBranchName = args[2];
+        return new FetchCommand(remoteName, remoteBranchName);
+    }
+
+    /**
+     * Parses args and returns a PullCommand
+     * Usage: java gitlet.Main pull [remote name] [remote branch name]
+     *
+     * @return new PullCommand
+     */
+    private static Command handlePull(String[] args) {
+        validateNumArgs("pull", args, 3);
+        String remoteName = args[1];
+        String remoteBranchName = args[2];
+        return new PullCommand(remoteName, remoteBranchName);
+    }
+
+    /**
+     * Checks the number of arguments versus the expected number,
+     * throws a RuntimeException if they do not match.
+     *
+     * @param cmd Name of command you are validating
+     * @param args Argument array from command line
+     * @param n Number of expected arguments
+     */
+    public static void validateNumArgs(String cmd, String[] args, int n) {
+        if (args.length != n) {
+            throw new RuntimeException(
+                    String.format("Invalid number of arguments for: %s.", cmd));
+        }
     }
 }

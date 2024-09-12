@@ -169,7 +169,7 @@ public class Repository {
         // Also moves the current branch’s head to that commit node.
         Persistor.setActiveCommitTo(commitID);
     }
-    public static void remove(String fileName) {
+    public static void removeFile(String fileName) {
         if (!Persistor.isRepositoryInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
@@ -253,7 +253,7 @@ public class Repository {
         for (String fileName : allFileNames) {
             if (activeCommit.hasSameEntryFor(fileName, splitCommit)
                     && !otherCommit.hasFile(fileName)) {
-                remove(fileName);
+                removeFile(fileName);
             }
             if (otherCommit.hasCreated(fileName, splitCommit)
                     || otherCommit.hasModified(fileName, splitCommit)) {
