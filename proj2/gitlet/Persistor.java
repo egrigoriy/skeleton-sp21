@@ -341,22 +341,20 @@ public class Persistor {
         }
     }
 
-
-
-    public static boolean remoteBranchInHistoryOfLocalBranch(String remoteName, String remoteBranchName) {
+    public static boolean isLocalBehindRemote(String remoteName, String remoteBranchName) {
         File remoteRef = Utils.join(REF_REMOTES_DIR, remoteName, remoteBranchName);
         if (!remoteRef.exists()) {
-            return false;
+            return true;
         }
         String remoteCommitId = Utils.readContentsAsString(remoteRef);
         String localCommitId = getActiveCommitId();
         Commit current = readCommit(localCommitId);
         while (current != null) {
             if (current.getUid().equals(remoteCommitId)) {
-                return true;
+                return false;
             }
             current = readCommit(current.getFirstParent());
         }
-        return false;
+        return true;
     }
 }

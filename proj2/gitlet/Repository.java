@@ -334,8 +334,8 @@ public class Repository {
         if (!Persistor.remoteBranchExists(remoteName, remoteBranchName)) {
             throw new GitletException(Errors.ERR_REMOTE_NO_SUCH_BRANCH.getText());
         }
-        if (!Persistor.remoteBranchInHistoryOfLocalBranch(remoteName, remoteBranchName)) {
-            throw new GitletException("Please pull down remote changes before pushing.");
+        if (Persistor.isLocalBehindRemote(remoteName, remoteBranchName)) {
+            throw new GitletException(Errors.ERR_LOCAL_BEHIND_REMOTE.getText());
         }
         // 2. Copy fetching repo the tip commit and the objects it depends on
         Persistor.copyLocalBranchCommitsAndBlobs(remoteName, remoteBranchName);

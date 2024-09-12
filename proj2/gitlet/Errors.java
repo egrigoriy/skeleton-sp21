@@ -28,6 +28,7 @@ public enum Errors {
     ERR_REMOTE_NOT_EXIST("A remote with that name does not exist."),
     ERR_REMOTE_DIR_NOT_FOUND("Remote directory not found."),
     ERR_REMOTE_NO_SUCH_BRANCH("That remote does not have that branch."),
+    ERR_LOCAL_BEHIND_REMOTE("Please pull down remote changes before pushing."),
     ERR_NO_SUCH_COMMAND("No command with that name exists.");
     private String text;
     Errors(String txt) {
