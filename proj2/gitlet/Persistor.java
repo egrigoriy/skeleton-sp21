@@ -42,8 +42,7 @@ public class Persistor {
                 commit.getTimestamp().toString().getBytes(),
                 commit.getMessage().getBytes());
         commit.setUid(commitId);
-        File savePath = Utils.join(COMMITS_DIR, commitId);
-        Utils.writeObject(savePath, commit);
+        Utils.writeObject(getCommitFile(commitId), commit);
         return commitId;
     }
 
@@ -51,26 +50,33 @@ public class Persistor {
         if (commitId == null) {
             return null;
         }
-        File readPath = getCommitPath(commitId);
+        File readPath = getCommitFile(commitId);
         if (!readPath.exists()) {
             return null;
         }
         return Utils.readObject(readPath, Commit.class);
     }
 
-    private static File getCommitPath(String commitID) {
-        return Utils.join(COMMITS_DIR, getCommitFileName(commitID));
+    private static File getCommitFile(String commitId) {
+        return Utils.join(COMMITS_DIR, getCommitFileName(commitId));
     }
 
-    private static String getCommitFileName(String commitID) {
-        if (commitID.length() == UID_LENGTH) {
-            return commitID;
+    private static String getCommitFileName(String commitId) {
+        if (commitId.length() == UID_LENGTH) {
+            return commitId;
         }
-        return fullCommitId(commitID);
+        return fullCommitId(commitId);
     }
 
+    private static List<String> getAllCommitsNames() {
+        return Utils.plainFilenamesIn(COMMITS_DIR);
+    }
+
+    private static List<String> getAllBlobsNames() {
+        return Utils.plainFilenamesIn(BLOBS_DIR);
+    }
     private static String fullCommitId(String commitID) {
-        for (String fileName : Utils.plainFilenamesIn(COMMITS_DIR)) {
+        for (String fileName : getAllCommitsNames()) {
             if (fileName.contains(commitID)) {
                 return fileName;
             }
@@ -90,10 +96,14 @@ public class Persistor {
         }
         return result;
     }
+
+    private static File getBlobFile(String fileName) {
+        return Utils.join(BLOBS_DIR, fileName);
+    }
     public static String saveBlob(String fileName) {
         byte[] fileContent = WorkingDir.readFileContent(fileName);
         String hash = Utils.sha1(fileContent);
-        File savePath = Utils.join(BLOBS_DIR, hash);
+        File savePath = getBlobFile(hash);
         if (!savePath.exists()) {
             Utils.writeContents(savePath, fileContent);
         }
@@ -101,8 +111,7 @@ public class Persistor {
     }
 
     public static String readBlob(String hash) {
-        File readPath = Utils.join(BLOBS_DIR, hash);
-        return Utils.readContentsAsString(readPath);
+        return Utils.readContentsAsString(getBlobFile(hash));
     }
 
     public static void saveIndex(Index index) {
@@ -121,6 +130,7 @@ public class Persistor {
         String activeBranchName = getActiveBranchName();
         setBranchHeadCommit(activeBranchName, commitId);
     }
+
 
     private static File getBranchHeadFile(String branchName) {
         if (branchName.contains("/")) {
@@ -143,7 +153,7 @@ public class Persistor {
 
     public static List<Commit> getAllCommits() {
         List<Commit> result = new ArrayList<>();
-        for (String fileName : plainFilenamesIn(COMMITS_DIR)) {
+        for (String fileName : getAllCommitsNames()) {
             Commit commit = readCommit(fileName);
             result.add(commit);
         }
@@ -189,8 +199,11 @@ public class Persistor {
         return getBranchHeadFile(branchName).exists();
     }
 
+    private static List<String> getBranchNames() {
+        return Utils.plainFilenamesIn(REF_LOCAL_HEADS_DIR);
+    }
     public static Set<String> getBranchesStatus() {
-        List<String> branchNames = Utils.plainFilenamesIn(REF_LOCAL_HEADS_DIR);
+        List<String> branchNames = getBranchNames();
         String activeBranch = Persistor.getActiveBranchName();
         TreeSet<String> result = new TreeSet<>();
         for (String branchName : branchNames) {
@@ -218,15 +231,18 @@ public class Persistor {
     }
 
     public static boolean remoteExists(String remoteName) {
-        File remoteRefDirThisRemote = Utils.join(REF_REMOTES_DIR, remoteName);
-        return remoteRefDirThisRemote.exists();
+        return getRemoteRefsDir(remoteName).exists();
+    }
+
+    private static File getRemoteRefsDir(String remoteName) {
+        return Utils.join(REF_REMOTES_DIR, remoteName);
     }
 
     public static void addRemote(String remoteName, String remoteDirName) {
         // add to config
         setRemoteUrlToConfig(remoteName, remoteDirName);
         // add to refs
-        Utils.join(REF_REMOTES_DIR, remoteName).mkdirs();
+        getRemoteRefsDir(remoteName).mkdirs();
     }
 
     public static void setRemoteUrlToConfig(String remoteName, String remoteUrl) {
@@ -237,8 +253,6 @@ public class Persistor {
     public static String getRemoteUrlFromConfig(String remoteName) {
         String configLine = Utils.readContentsAsString(CONFIG);
         return configLine.split("=")[1];
-
-
     }
 
     public static boolean remoteDirExists(String remoteName) {
@@ -250,7 +264,7 @@ public class Persistor {
         // remove from config
         Utils.writeContents(CONFIG, "");
         // remove from refs
-        Utils.join(REF_REMOTES_DIR, remoteName).delete();
+        getRemoteRefsDir(remoteName).delete();
     }
 
 
@@ -303,7 +317,7 @@ public class Persistor {
     public static void copyRemoteBranchHeadToLocal(String remoteName,
                                                    String remoteBranchName,
                                                    String commitId) {
-        File branchHeadFile = Utils.join(REF_REMOTES_DIR, remoteName, remoteBranchName);
+        File branchHeadFile = Utils.join(getRemoteRefsDir(remoteName), remoteBranchName);
         Utils.writeContents(branchHeadFile, commitId);
     }
 
@@ -318,8 +332,7 @@ public class Persistor {
     public static void copyLocalBranchCommitsAndBlobs(String remoteName, String remoteBranchName) {
         String remoteUrl = getRemoteUrlFromConfig(remoteName);
         File remoteCommitsDir = Utils.join(remoteUrl, "commits");
-        List<String> allLocalCommitsFileNames = Utils.plainFilenamesIn(COMMITS_DIR);
-        for (String fileName : allLocalCommitsFileNames) {
+        for (String fileName : getAllCommitsNames()) {
             Path src = Paths.get(Utils.join(COMMITS_DIR, fileName).toString());
             Path dst = Paths.get(Utils.join(remoteCommitsDir, fileName).toString());
             try {

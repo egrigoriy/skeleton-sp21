@@ -27,15 +27,15 @@ public class Commit implements Serializable {
     private TreeMap<String, String> filesTable = new TreeMap<>();
 
     public Commit() {
-        message = "initial commit";
-        timestamp = new Date(0);
+        this.message = "initial commit";
+        this.timestamp = new Date(0);
     }
 
     public Commit(String message, Index index) {
         this.firstParent = Persistor.getActiveCommit().getUid();
         this.message = message;
         this.filesTable = new TreeMap<>(index.getFilesToCommit());
-        timestamp = new Date();
+        this.timestamp = new Date();
     }
 
     @Override
@@ -118,6 +118,4 @@ public class Commit implements Serializable {
     public boolean hasCreated(String fileName, Commit other) {
         return this.hasFile(fileName) && !other.hasFile(fileName);
     }
-
-
 }

@@ -4,19 +4,10 @@ package gitlet;
 import java.util.*;
 
 /** Represents a gitlet repository.
- *  TOD: It's a good idea to give a description here of what else this Class
- *  does at a high level.
  *
  *  @author Grigoriy Emiliyanov
  */
 public class Repository {
-    /**
-     *
-     * List all instance variables of the Repository class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided two examples for you.
-     */
-
     public static void init() throws GitletException {
         if (Persistor.isRepositoryInitialized()) {
             throw new GitletException(Errors.ERR_REPO_ALREADY_INIT.getText());
@@ -268,9 +259,6 @@ public class Repository {
             }
         }
         String message = "Merged " + branchName + " into " + Persistor.getActiveBranchName() + ".";
-        if (Objects.equals(branchName, "B2")) {
-            findSplitCommit(activeCommit, otherCommit);
-        }
         commit(message, otherCommit.getUid());
     }
 
@@ -349,22 +337,16 @@ public class Repository {
         if (!Persistor.remoteBranchExists(remoteName, remoteBranchName)) {
             throw new GitletException(Errors.ERR_REMOTE_NO_SUCH_BRANCH.getText());
         }
-        // 1. find the tip commit on the branch being fetched from remote
         String remoteCommitId = Persistor.getRemoteBranchHeadCommitId(
                 remoteName,
                 remoteBranchName);
-        Commit remoteBranchTipCommit = Persistor.readRemoteCommit(remoteName, remoteCommitId);
-        // 2. Copy fetching repo the tip commit and the objects it depends on
         Persistor.copyRemoteBranchCommitsAndBlobs(remoteName);
-        // 3. Point the ref for the remote branch at the fetched commit->refs/remotes/bravo/master
         Persistor.copyRemoteBranchHeadToLocal(remoteName, remoteBranchName, remoteCommitId);
-        // 4. point FETCH_HEAD at the fetched commit
     }
 
     public static void pull(String remoteName, String remoteBranchName) {
         fetch(remoteName, remoteBranchName);
         String branchName = remoteName + "/" + remoteBranchName;
-//        System.out.println(branchName);
         merge(branchName);
     }
 }
