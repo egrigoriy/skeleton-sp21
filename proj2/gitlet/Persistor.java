@@ -297,7 +297,9 @@ public class Persistor {
         }
     }
 
-    public static void copyRemoteBranchHeadToLocal(String remoteName, String remoteBranchName, String commitId) {
+    public static void copyRemoteBranchHeadToLocal(String remoteName,
+                                                   String remoteBranchName,
+                                                   String commitId) {
         File branchHeadFile = Utils.join(REF_REMOTES_DIR, remoteName, remoteBranchName);
         Utils.writeContents(branchHeadFile, commitId);
     }
