@@ -346,10 +346,20 @@ public class Repository {
         if (!Persistor.remoteBranchExists(remoteName, remoteBranchName)) {
             throw new GitletException(Errors.ERR_REMOTE_NO_SUCH_BRANCH.getText());
         }
+        // 1. find the tip commit on the branch being fetched from remote
+        String remoteBranchTipCommitId = Persistor.getRemoteBranchHeadCommitId(remoteName, remoteBranchName);
+        Commit remoteBranchTipCommit = Persistor.readRemoteCommit(remoteName, remoteBranchTipCommitId);
+        // 2. Copy fetching repo the tip commit and the objects it depends on
+        Persistor.copyRemoteBranchCommitsAndBlobs(remoteName, remoteBranchTipCommit);
+        // 3. Point the ref for the remote branch at the fetched commit -> refs/remotes/bravo/master
+        Persistor.copyRemoteBranchHeadToLocal(remoteName, remoteBranchName, remoteBranchTipCommitId);
+        // 4. point FETCH_HEAD at the fetched commit
     }
 
     public static void pull(String remoteName, String remoteBranchName) {
-        System.out.println("File does not exist.");
-        System.exit(0);
+        fetch(remoteName, remoteBranchName);
+        String branchName =remoteName + "/" + remoteBranchName ;
+//        System.out.println(branchName);
+        merge(branchName);
     }
 }
