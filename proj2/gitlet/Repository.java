@@ -19,7 +19,7 @@ public class Repository {
         Persistor.setActiveCommitTo(commitId);
     }
 
-    public static void add(String fileName) throws GitletException {
+    public static void addFile(String fileName) throws GitletException {
         if (!Persistor.isRepositoryInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
@@ -62,24 +62,6 @@ public class Repository {
         }
     }
 
-    public static void commit(String  message, String secondParent) {
-        if (!Persistor.isRepositoryInitialized()) {
-            throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
-        }
-        if (message.isEmpty()) {
-            throw new GitletException(Errors.ERR_EMPTY_COMMIT_MESSAGE.getText());
-        }
-        Index index = Persistor.readIndex();
-        if (index.nothingToAddOrRemove()) {
-            throw new GitletException(Errors.ERR_NO_CHANGES_TO_COMMIT.getText());
-        }
-        Commit newCommit = new Commit(message, index);
-        newCommit.setSecondParent(secondParent);
-        String commitId = Persistor.saveCommit(newCommit);
-        Persistor.setActiveCommitTo(commitId);
-        index.clear();
-        Persistor.saveIndex(index);
-    }
     public static void commit(String message) {
         if (!Persistor.isRepositoryInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
@@ -195,7 +177,6 @@ public class Repository {
         Persistor.removeBranch(branchName);
     }
 
-
     public static void find(String message) {
         if (!Persistor.isRepositoryInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
@@ -249,17 +230,23 @@ public class Repository {
             if (otherCommit.hasCreated(fileName, splitCommit)
                     || otherCommit.hasModified(fileName, splitCommit)) {
                 checkoutFileFromCommit(fileName, otherCommit.getUid());
-                add(fileName);
+                addFile(fileName);
             }
             if (modifiedInDifferentWays(fileName, activeCommit, otherCommit, splitCommit)) {
                 System.out.println("Encountered a merge conflict.");
                 String fixedContent = fixConflict(fileName, activeCommit, otherCommit);
                 WorkingDir.writeContentToFile(fileName, fixedContent);
-                add(fileName);
+                addFile(fileName);
             }
         }
         String message = "Merged " + branchName + " into " + Persistor.getActiveBranchName() + ".";
-        commit(message, otherCommit.getUid());
+        index = Persistor.readIndex();
+        Commit newCommit = new Commit(message, index);
+        newCommit.setSecondParent(otherCommit.getUid());
+        String commitId = Persistor.saveCommit(newCommit);
+        Persistor.setActiveCommitTo(commitId);
+        index.clear();
+        Persistor.saveIndex(index);
     }
 
     private static boolean modifiedInDifferentWays(String fileName,
@@ -325,9 +312,8 @@ public class Repository {
         if (Persistor.isLocalBehindRemote(remoteName, remoteBranchName)) {
             throw new GitletException(Errors.ERR_LOCAL_BEHIND_REMOTE.getText());
         }
-        // 2. Copy fetching repo the tip commit and the objects it depends on
         Persistor.copyLocalBranchCommitsAndBlobs(remoteName, remoteBranchName);
-        Persistor.copyLocalBranchHeadToRemote(remoteName, remoteBranchName);
+        Persistor.copyLocalBranchHeadToDistant(remoteName, remoteBranchName);
     }
 
     public static void fetch(String remoteName, String remoteBranchName) {
@@ -337,11 +323,8 @@ public class Repository {
         if (!Persistor.remoteBranchExists(remoteName, remoteBranchName)) {
             throw new GitletException(Errors.ERR_REMOTE_NO_SUCH_BRANCH.getText());
         }
-        String remoteCommitId = Persistor.getRemoteBranchHeadCommitId(
-                remoteName,
-                remoteBranchName);
         Persistor.copyRemoteBranchCommitsAndBlobs(remoteName);
-        Persistor.copyRemoteBranchHeadToLocal(remoteName, remoteBranchName, remoteCommitId);
+        Persistor.copyDistantBranchHeadToLocal(remoteName, remoteBranchName);
     }
 
     public static void pull(String remoteName, String remoteBranchName) {
