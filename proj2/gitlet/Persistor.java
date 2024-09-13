@@ -2,19 +2,22 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
-import static gitlet.Utils.*;
+import static gitlet.Utils.UID_LENGTH;
+import static gitlet.Utils.join;
 
 public class Persistor {
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(WorkingDir.CWD, ".gitlet");
     public static final File CONFIG = join(GITLET_DIR, "config");
     public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
+    public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
     public static final File BLOBS_DIR = join(GITLET_DIR, "blobs");
     public static final File REFS_DIR = join(GITLET_DIR, "refs");
     public static final File REF_LOCAL_HEADS_DIR = join(GITLET_DIR, "refs/heads");
@@ -29,10 +32,39 @@ public class Persistor {
         return GITLET_DIR.exists();
     }
 
+    private static ArrayList<Object> readRawObjectContent(String fileName) {
+        ArrayList<Object> content = Utils.readObject(Utils.join(OBJECTS_DIR, fileName), ArrayList.class);
+        return content;
+    }
+    private static void saveRawObject(String fileName, Object content, Object type) {
+        ArrayList<Object> objects = new ArrayList<>();
+        objects.add(type);
+        objects.add(content);
+        Utils.writeObject(Utils.join(OBJECTS_DIR, fileName), (Serializable) objects);
+    }
+
+    public static Object readRawObject(String fileName) {
+        ArrayList<Object> content = readRawObjectContent(fileName);
+        Object type = content.get(0);
+        return content.get(1);
+    }
+
+    public static boolean isObjectCommit(String fileName) {
+        List<Object> content = readRawObjectContent(fileName);
+        return content.get(0).toString().equals("commit");
+    }
+
+
+    public static boolean isObjectBlob(String fileName) {
+        List<Object> content = readRawObjectContent(fileName);
+        return content.get(0).toString().equals("blob");
+    }
+
     public static void buildInfrastructure() {
         GITLET_DIR.mkdir();
         REFS_DIR.mkdir();
         REF_LOCAL_HEADS_DIR.mkdir();
+        OBJECTS_DIR.mkdirs();
         COMMITS_DIR.mkdir();
         BLOBS_DIR.mkdir();
     }
@@ -42,7 +74,8 @@ public class Persistor {
                 commit.getTimestamp().toString().getBytes(),
                 commit.getMessage().getBytes());
         commit.setUid(commitId);
-        Utils.writeObject(getCommitFile(commitId), commit);
+        //Utils.writeObject(getCommitFile(commitId), commit);
+        saveRawObject(getCommitFileName(commitId), commit, "commit");
         return commitId;
     }
 
@@ -54,13 +87,18 @@ public class Persistor {
         if (!readPath.exists()) {
             return null;
         }
-        return Utils.readObject(readPath, Commit.class);
+//        return Utils.readObject(readPath, Commit.class);
+        return (Commit)readRawObject(commitId);
     }
 
     private static File getCommitFile(String commitId) {
-        return Utils.join(COMMITS_DIR, getCommitFileName(commitId));
+//        return Utils.join(COMMITS_DIR, getCommitFileName(commitId));
+        return getRawCommitFile(commitId);
     }
 
+    private static File getRawCommitFile(String commitId) {
+        return Utils.join(OBJECTS_DIR, getCommitFileName(commitId));
+    }
     private static String getCommitFileName(String commitId) {
         if (commitId.length() == UID_LENGTH) {
             return commitId;
@@ -69,11 +107,34 @@ public class Persistor {
     }
 
     private static List<String> getAllCommitsNames() {
-        return Utils.plainFilenamesIn(COMMITS_DIR);
+//        return Utils.plainFilenamesIn(COMMITS_DIR);
+        return getAllRawCommitsNames();
+    }
+
+    private static List<String> getAllRawCommitsNames() {
+        List<String> result = new ArrayList<>();
+        for (String fileName : Utils.plainFilenamesIn(OBJECTS_DIR)) {
+            if (isObjectCommit(fileName)) {
+                result.add(fileName);
+            }
+        }
+        return result;
     }
 
     private static List<String> getAllBlobsNames() {
-        return Utils.plainFilenamesIn(BLOBS_DIR);
+//        return Utils.plainFilenamesIn(BLOBS_DIR);
+        return getAllRawBlobsNames();
+    }
+
+
+    private static List<String> getAllRawBlobsNames() {
+        List<String> result = new ArrayList<>();
+        for (String fileName : Utils.plainFilenamesIn(OBJECTS_DIR)) {
+            if (isObjectBlob(fileName)) {
+                result.add(fileName);
+            }
+        }
+        return result;
     }
     private static String fullCommitId(String commitID) {
         for (String fileName : getAllCommitsNames()) {
@@ -98,20 +159,27 @@ public class Persistor {
     }
 
     private static File getBlobFile(String fileName) {
-        return Utils.join(BLOBS_DIR, fileName);
+        return getRawBlobFile(fileName);
+//        return Utils.join(BLOBS_DIR, fileName);
     }
+    private static File getRawBlobFile(String fileName) {
+        return Utils.join(OBJECTS_DIR, fileName);
+    }
+
     public static String saveBlob(String fileName) {
         byte[] fileContent = WorkingDir.readFileContent(fileName);
         String hash = Utils.sha1(fileContent);
         File savePath = getBlobFile(hash);
         if (!savePath.exists()) {
-            Utils.writeContents(savePath, fileContent);
+            saveRawObject(fileName, fileContent, "blob");
+//            Utils.writeContents(savePath, fileContent);
         }
         return hash;
     }
 
     public static String readBlob(String hash) {
-        return Utils.readContentsAsString(getBlobFile(hash));
+        return readRawObject(hash).toString();
+//        return Utils.readContentsAsString(getBlobFile(hash));
     }
 
     public static void saveIndex(Index index) {
