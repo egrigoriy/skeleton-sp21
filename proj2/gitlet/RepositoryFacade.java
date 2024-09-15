@@ -1,6 +1,8 @@
 package gitlet;
 
 
+import gitlet.storage.Commit;
+
 import java.util.*;
 
 /** Represents a gitlet repository.
