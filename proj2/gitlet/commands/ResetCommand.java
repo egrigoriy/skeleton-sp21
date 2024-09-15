@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for the head of active branch to given commit from the repository
@@ -14,6 +14,6 @@ public class ResetCommand implements Command {
 
     @Override
     public void execute() {
-        Repository.reset(commitId);
+        RepositoryFacade.reset(commitId);
     }
 }

@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for pushing branch to remote repository from the local repository
@@ -16,6 +16,6 @@ public class PushCommand implements Command {
     }
 
     public void execute() {
-        Repository.push(remoteName, remoteBranchName);
+        RepositoryFacade.push(remoteName, remoteBranchName);
     }
 }

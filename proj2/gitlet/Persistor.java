@@ -1,8 +1,12 @@
 package gitlet;
 
+import gitlet.storage.Blob;
+import gitlet.storage.Commit;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,32 +36,22 @@ public class Persistor {
         return GITLET_DIR.exists();
     }
 
-    private static ArrayList<Object> readRawObjectContent(String fileName) {
-        ArrayList<Object> content = Utils.readObject(Utils.join(OBJECTS_DIR, fileName), ArrayList.class);
+    private static ArrayList<Object> readRawObjectContent(File fileName) {
+        ArrayList<Object> content = Utils.readObject(fileName, ArrayList.class);
         return content;
     }
-    private static void saveRawObject(String fileName, Object content, Object type) {
+
+    private static void saveRawObject(File fileName, Object content, Object type) {
         ArrayList<Object> objects = new ArrayList<>();
         objects.add(type);
         objects.add(content);
-        Utils.writeObject(Utils.join(OBJECTS_DIR, fileName), (Serializable) objects);
+        Utils.writeObject(fileName, (Serializable) objects);
     }
 
-    public static Object readRawObject(String fileName) {
+    public static Object readRawObject(File fileName) {
         ArrayList<Object> content = readRawObjectContent(fileName);
         Object type = content.get(0);
         return content.get(1);
-    }
-
-    public static boolean isObjectCommit(String fileName) {
-        List<Object> content = readRawObjectContent(fileName);
-        return content.get(0).toString().equals("commit");
-    }
-
-
-    public static boolean isObjectBlob(String fileName) {
-        List<Object> content = readRawObjectContent(fileName);
-        return content.get(0).toString().equals("blob");
     }
 
     public static void buildInfrastructure() {
@@ -65,85 +59,55 @@ public class Persistor {
         REFS_DIR.mkdir();
         REF_LOCAL_HEADS_DIR.mkdir();
         OBJECTS_DIR.mkdirs();
-        COMMITS_DIR.mkdir();
-        BLOBS_DIR.mkdir();
     }
 
     public static String saveCommit(Commit commit) {
-        String commitId = Utils.sha1(
-                commit.getTimestamp().toString().getBytes(),
-                commit.getMessage().getBytes());
-        commit.setUid(commitId);
-        //Utils.writeObject(getCommitFile(commitId), commit);
-        saveRawObject(getCommitFileName(commitId), commit, "commit");
+        String commitId = commit.getUid();
+        saveRawObject(getObjectFile(commitId), commit, "commit");
         return commitId;
     }
 
-    public static Commit readCommit(String commitId) {
-        if (commitId == null) {
-            return null;
+    private static File getObjectFile(String fileName) {
+        return Utils.join(OBJECTS_DIR, getObjectFileName(fileName));
+    }
+    private static String getObjectFileName(String fileName) {
+        if (fileName.length() == UID_LENGTH) {
+            return fileName;
         }
-        File readPath = getCommitFile(commitId);
-        if (!readPath.exists()) {
-            return null;
-        }
-//        return Utils.readObject(readPath, Commit.class);
-        return (Commit)readRawObject(commitId);
+        return fullObjectId(fileName);
     }
-
-    private static File getCommitFile(String commitId) {
-//        return Utils.join(COMMITS_DIR, getCommitFileName(commitId));
-        return getRawCommitFile(commitId);
-    }
-
-    private static File getRawCommitFile(String commitId) {
-        return Utils.join(OBJECTS_DIR, getCommitFileName(commitId));
-    }
-    private static String getCommitFileName(String commitId) {
-        if (commitId.length() == UID_LENGTH) {
-            return commitId;
-        }
-        return fullCommitId(commitId);
-    }
-
-    private static List<String> getAllCommitsNames() {
-//        return Utils.plainFilenamesIn(COMMITS_DIR);
-        return getAllRawCommitsNames();
-    }
-
-    private static List<String> getAllRawCommitsNames() {
-        List<String> result = new ArrayList<>();
+    private static String fullObjectId(String commitID) {
         for (String fileName : Utils.plainFilenamesIn(OBJECTS_DIR)) {
-            if (isObjectCommit(fileName)) {
-                result.add(fileName);
-            }
-        }
-        return result;
-    }
-
-    private static List<String> getAllBlobsNames() {
-//        return Utils.plainFilenamesIn(BLOBS_DIR);
-        return getAllRawBlobsNames();
-    }
-
-
-    private static List<String> getAllRawBlobsNames() {
-        List<String> result = new ArrayList<>();
-        for (String fileName : Utils.plainFilenamesIn(OBJECTS_DIR)) {
-            if (isObjectBlob(fileName)) {
-                result.add(fileName);
-            }
-        }
-        return result;
-    }
-    private static String fullCommitId(String commitID) {
-        for (String fileName : getAllCommitsNames()) {
             if (fileName.contains(commitID)) {
                 return fileName;
             }
         }
         return "";
     }
+
+    public static Commit readCommit(String commitId) {
+        if (commitId == null) {
+            return null;
+        }
+        File readPath = getObjectFile(commitId);
+        if (!readPath.exists()) {
+            return null;
+        }
+        return (Commit)readRawObject(readPath);
+    }
+
+    private static List<String> getAllCommitsNames() {
+        List<String> result = new ArrayList<>();
+        for (String fileName : Utils.plainFilenamesIn(OBJECTS_DIR)) {
+            ArrayList<Object> content = readRawObjectContent(Utils.join(OBJECTS_DIR, fileName));
+            if (content.get(0).equals("commit")) {
+                result.add(fileName);
+            }
+        }
+        return result;
+    }
+
+
 
     public static List<Commit> getCommitParents(Commit c) {
         List<Commit> result = new LinkedList<>();
@@ -158,28 +122,22 @@ public class Persistor {
         return result;
     }
 
-    private static File getBlobFile(String fileName) {
-        return getRawBlobFile(fileName);
-//        return Utils.join(BLOBS_DIR, fileName);
-    }
-    private static File getRawBlobFile(String fileName) {
-        return Utils.join(OBJECTS_DIR, fileName);
-    }
-
     public static String saveBlob(String fileName) {
         byte[] fileContent = WorkingDir.readFileContent(fileName);
-        String hash = Utils.sha1(fileContent);
-        File savePath = getBlobFile(hash);
+        Blob blob = new Blob(fileContent);
+        String hash = blob.getUid();
+        File savePath = getObjectFile(hash);
+//        System.out.println("PATH: " + savePath);
         if (!savePath.exists()) {
-            saveRawObject(fileName, fileContent, "blob");
-//            Utils.writeContents(savePath, fileContent);
+            saveRawObject(savePath, fileContent, "blob");
         }
         return hash;
     }
 
     public static String readBlob(String hash) {
-        return readRawObject(hash).toString();
-//        return Utils.readContentsAsString(getBlobFile(hash));
+        Object rawObject = readRawObject(Utils.join(OBJECTS_DIR, hash));
+        String result = new String((byte[]) rawObject, StandardCharsets.UTF_8);
+        return result;
     }
 
     public static void saveIndex(Index index) {
@@ -356,30 +314,10 @@ public class Persistor {
         return Utils.readContentsAsString(path);
     }
 
-    public static void copyRemoteBranchCommitsAndBlobs(String remoteName) {
+    public static void copyDistantObjectsToLocal(String remoteName) {
         File remoteUrl = getRemoteUrlFromConfig(remoteName);
-        File remoteCommitsDir = Utils.join(remoteUrl, "commits");
-        List<String> allRemoteCommitsFileNames = Utils.plainFilenamesIn(remoteCommitsDir);
-        for (String fileName : allRemoteCommitsFileNames) {
-            Path src = Paths.get(Utils.join(remoteCommitsDir, fileName).toString());
-            Path dst = Paths.get(Utils.join(COMMITS_DIR, fileName).toString());
-            try {
-                Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        File remoteBlobsDir = Utils.join(remoteUrl, "blobs");
-        List<String> allRemoteBlobsFileNames = Utils.plainFilenamesIn(remoteBlobsDir);
-        for (String fileName : allRemoteBlobsFileNames) {
-            Path src = Paths.get(Utils.join(remoteBlobsDir, fileName).toString());
-            Path dst = Paths.get(Utils.join(BLOBS_DIR, fileName).toString());
-            try {
-                Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        File distantObjectsDir = Utils.join(remoteUrl, "objects");
+        copyObjects(distantObjectsDir, OBJECTS_DIR);
     }
 
     public static void copyDistantBranchHeadToLocal(String remoteName, String remoteBranchName) {
@@ -394,23 +332,16 @@ public class Persistor {
         Utils.writeContents(distantBranchHeadFile, localBranchHead);
     }
 
-    public static void copyLocalBranchCommitsAndBlobs(String remoteName, String remoteBranchName) {
+    public static void copyLocalObjectsToDistant(String remoteName) {
         File remoteUrl = getRemoteUrlFromConfig(remoteName);
-        File remoteCommitsDir = Utils.join(remoteUrl, "commits");
-        for (String fileName : getAllCommitsNames()) {
-            Path src = Paths.get(Utils.join(COMMITS_DIR, fileName).toString());
-            Path dst = Paths.get(Utils.join(remoteCommitsDir, fileName).toString());
-            try {
-                Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        File remoteBlobsDir = Utils.join(remoteUrl, "blobs");
-        List<String> allLocalBlobsFileNames = Utils.plainFilenamesIn(BLOBS_DIR);
-        for (String fileName : allLocalBlobsFileNames) {
-            Path src = Paths.get(Utils.join(BLOBS_DIR, fileName).toString());
-            Path dst = Paths.get(Utils.join(remoteBlobsDir, fileName).toString());
+        File distantObjectsDir = Utils.join(remoteUrl, "objects");
+        copyObjects(OBJECTS_DIR, distantObjectsDir);
+    }
+
+    private static void copyObjects(File srcDir, File dstDir) {
+        for (String fileName : Utils.plainFilenamesIn(srcDir)) {
+            Path src = Paths.get(Utils.join(srcDir, fileName).toString());
+            Path dst = Paths.get(Utils.join(dstDir, fileName).toString());
             try {
                 Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
@@ -418,7 +349,6 @@ public class Persistor {
             }
         }
     }
-
     public static boolean isLocalBehindRemote(String remoteName, String remoteBranchName) {
         File remoteRef = Utils.join(REF_REMOTES_DIR, remoteName, remoteBranchName);
         if (!remoteRef.exists()) {

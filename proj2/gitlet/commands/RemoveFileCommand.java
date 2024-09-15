@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for removing a given file from tracking in the repository
@@ -14,6 +14,6 @@ public class RemoveFileCommand implements Command {
 
     @Override
     public void execute() {
-        Repository.removeFile(fileName);
+        RepositoryFacade.removeFile(fileName);
     }
 }

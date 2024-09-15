@@ -1,5 +1,7 @@
 package gitlet;
 
+import gitlet.storage.Commit;
+
 import java.util.*;
 
 public class DAG {

@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for checking out a file from the repository
@@ -21,9 +21,9 @@ public class CheckoutFileCommand implements Command {
     @Override
     public void execute() {
         if (commitId == null) {
-            Repository.checkoutFileFromActiveCommit(fileName);
+            RepositoryFacade.checkoutFileFromActiveCommit(fileName);
         } else {
-            Repository.checkoutFileFromCommit(fileName, commitId);
+            RepositoryFacade.checkoutFileFromCommit(fileName, commitId);
         }
     }
 }

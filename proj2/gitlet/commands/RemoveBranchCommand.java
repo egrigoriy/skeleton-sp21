@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for removing given branch from the repository
@@ -14,6 +14,6 @@ public class RemoveBranchCommand implements Command {
 
     @Override
     public void execute() {
-        Repository.removeBranch(branchName);
+        RepositoryFacade.removeBranch(branchName);
     }
 }

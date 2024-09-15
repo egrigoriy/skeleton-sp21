@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for showing the status of the working directory
@@ -9,6 +9,6 @@ import gitlet.Repository;
 public class StatusCommand implements Command {
     @Override
     public void execute() {
-        Repository.status();
+        RepositoryFacade.status();
     }
 }

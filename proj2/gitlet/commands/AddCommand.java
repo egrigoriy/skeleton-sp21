@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for adding file to the repository
@@ -14,6 +14,6 @@ public class AddCommand implements Command {
 
     @Override
     public void execute() {
-        Repository.addFile(fileName);
+        RepositoryFacade.addFile(fileName);
     }
 }

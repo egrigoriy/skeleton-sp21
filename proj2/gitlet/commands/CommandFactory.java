@@ -23,27 +23,46 @@ public class CommandFactory {
             throw new GitletException(Errors.ERR_NO_COMMAND.getText());
         }
         String firstArg = args[0];
-        return switch (firstArg) {
-            case "init" -> handleInit();
-            case "add" -> handleAdd(args);
-            case "commit" -> handleCommit(args);
-            case "rm" -> handleRemove(args);
-            case "log" -> handleLog();
-            case "status" -> handleStatus();
-            case "checkout" -> handleCheckout(args);
-            case "branch" -> handleBranch(args);
-            case "rm-branch" -> handleRemoveBranch(args);
-            case "global-log" -> handleGlobalLog();
-            case "find" -> handleFind(args);
-            case "reset" -> handleReset(args);
-            case "merge" -> handleMerge(args);
-            case "add-remote" -> handleAddRemote(args);
-            case "rm-remote" -> handleRemoveRemote(args);
-            case "push" -> handlePush(args);
-            case "fetch" -> handleFetch(args);
-            case "pull" -> handlePull(args);
-            default -> throw new GitletException(Errors.ERR_NO_SUCH_COMMAND.getText());
-        };
+        switch (firstArg) {
+            case "init":
+                return handleInit();
+            case "add":
+                return handleAdd(args);
+            case "commit":
+                return handleCommit(args);
+            case "rm":
+                return handleRemove(args);
+            case "log":
+                return handleLog();
+            case "status":
+                return handleStatus();
+            case "checkout":
+                return handleCheckout(args);
+            case "branch":
+                return handleBranch(args);
+            case "rm-branch":
+                return handleRemoveBranch(args);
+            case "global-log":
+                return handleGlobalLog();
+            case "find":
+                return handleFind(args);
+            case "reset":
+                return handleReset(args);
+            case "merge":
+                return handleMerge(args);
+            case "add-remote":
+                return handleAddRemote(args);
+            case "rm-remote":
+                return handleRemoveRemote(args);
+            case "push":
+                return handlePush(args);
+            case "fetch":
+                return handleFetch(args);
+            case "pull":
+                return handlePull(args);
+            default:
+                throw new GitletException(Errors.ERR_NO_SUCH_COMMAND.getText());
+        }
     }
 
     /**

@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for creating a branch in the repository
@@ -14,6 +14,6 @@ public class BranchCommand implements Command {
 
     @Override
     public void execute() {
-        Repository.branch(branchName);
+        RepositoryFacade.branch(branchName);
     }
 }

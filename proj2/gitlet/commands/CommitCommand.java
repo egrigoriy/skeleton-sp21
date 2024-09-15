@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for committing to the repository
@@ -14,6 +14,6 @@ public class CommitCommand implements Command {
 
     @Override
     public void execute() {
-        Repository.commit(message);
+        RepositoryFacade.commit(message);
     }
 }

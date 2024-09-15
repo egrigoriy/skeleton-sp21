@@ -1,4 +1,8 @@
-package gitlet;
+package gitlet.storage;
+
+import gitlet.Index;
+import gitlet.Persistor;
+import gitlet.Utils;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -10,7 +14,7 @@ import java.util.*;
  *
  *  @author Grigoriy Emiliyanov
  */
-public class Commit implements Serializable {
+public class Commit implements StorageObject, Serializable {
     /**
      *
      * List all instance variables of the Commit class here with a useful
@@ -29,6 +33,7 @@ public class Commit implements Serializable {
     public Commit() {
         this.message = "initial commit";
         this.timestamp = new Date(0);
+        setUid();
     }
 
     public Commit(String message, Index index) {
@@ -36,6 +41,7 @@ public class Commit implements Serializable {
         this.message = message;
         this.filesTable = new TreeMap<>(index.getFilesToCommit());
         this.timestamp = new Date();
+        setUid();
     }
 
     @Override
@@ -82,8 +88,10 @@ public class Commit implements Serializable {
         return timestamp;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    private void setUid() {
+        this.uid = Utils.sha1(
+                this.getTimestamp().toString().getBytes(),
+                this.getMessage().getBytes());
     }
 
     public void setSecondParent(String commitId) {

@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for checking out a branch from the repository
@@ -14,6 +14,6 @@ public class CheckoutBranchCommand implements Command {
 
     @Override
     public void execute() {
-        Repository.checkoutFilesFromBranchHead(branchName);
+        RepositoryFacade.checkoutFilesFromBranchHead(branchName);
     }
 }

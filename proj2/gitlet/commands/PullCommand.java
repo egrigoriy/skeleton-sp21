@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for pulling branch from remote repository to the local repository
@@ -16,6 +16,6 @@ public class PullCommand implements Command {
     }
 
     public void execute() {
-        Repository.pull(remoteName, remoteBranchName);
+        RepositoryFacade.pull(remoteName, remoteBranchName);
     }
 }

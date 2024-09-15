@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for removing given remote from the repository
@@ -14,6 +14,6 @@ public class RemoveRemoteCommand implements Command {
     }
 
     public void execute() {
-        Repository.removeRemote(remoteName);
+        RepositoryFacade.removeRemote(remoteName);
     }
 }

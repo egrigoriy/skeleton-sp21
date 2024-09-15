@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for fetching from remote repository branch to the local repository
@@ -16,6 +16,6 @@ public class FetchCommand implements Command {
     }
 
     public void execute() {
-        Repository.fetch(remoteName, remoteBranchName);
+        RepositoryFacade.fetch(remoteName, remoteBranchName);
     }
 }

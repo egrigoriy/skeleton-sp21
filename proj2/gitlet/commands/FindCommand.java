@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for finding a commit with particular message the repository
@@ -14,6 +14,6 @@ public class FindCommand implements Command {
 
     @Override
     public void execute() {
-        Repository.find(message);
+        RepositoryFacade.find(message);
     }
 }

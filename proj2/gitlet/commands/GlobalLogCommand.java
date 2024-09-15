@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for showing all commits the repository
@@ -9,6 +9,6 @@ import gitlet.Repository;
 public class GlobalLogCommand implements Command {
     @Override
     public void execute() {
-        Repository.globalLog();
+        RepositoryFacade.globalLog();
     }
 }

@@ -1,6 +1,6 @@
 package gitlet.commands;
 
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for adding remote to the repository
@@ -16,6 +16,6 @@ public class AddRemoteCommad implements Command {
     }
 
     public void execute() {
-        Repository.addRemote(remoteName, remoteUrl);
+        RepositoryFacade.addRemote(remoteName, remoteUrl);
     }
 }

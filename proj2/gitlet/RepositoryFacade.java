@@ -9,7 +9,7 @@ import java.util.*;
  *
  *  @author Grigoriy Emiliyanov
  */
-public class Repository {
+public class RepositoryFacade {
     public static void init() throws GitletException {
         if (Persistor.isRepositoryInitialized()) {
             throw new GitletException(Errors.ERR_REPO_ALREADY_INIT.getText());
@@ -314,7 +314,7 @@ public class Repository {
         if (Persistor.isLocalBehindRemote(remoteName, remoteBranchName)) {
             throw new GitletException(Errors.ERR_LOCAL_BEHIND_REMOTE.getText());
         }
-        Persistor.copyLocalBranchCommitsAndBlobs(remoteName, remoteBranchName);
+        Persistor.copyLocalObjectsToDistant(remoteName);
         Persistor.copyLocalBranchHeadToDistant(remoteName, remoteBranchName);
     }
 
@@ -325,7 +325,7 @@ public class Repository {
         if (!Persistor.remoteBranchExists(remoteName, remoteBranchName)) {
             throw new GitletException(Errors.ERR_REMOTE_NO_SUCH_BRANCH.getText());
         }
-        Persistor.copyRemoteBranchCommitsAndBlobs(remoteName);
+        Persistor.copyDistantObjectsToLocal(remoteName);
         Persistor.copyDistantBranchHeadToLocal(remoteName, remoteBranchName);
     }
 

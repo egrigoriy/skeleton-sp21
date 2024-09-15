@@ -1,7 +1,7 @@
 package gitlet.commands;
 
 import gitlet.GitletException;
-import gitlet.Repository;
+import gitlet.RepositoryFacade;
 
 /**
  *  Command used for initializing the repository
@@ -10,6 +10,6 @@ import gitlet.Repository;
 public class InitCommand implements Command {
     @Override
     public void execute() throws GitletException {
-        Repository.init();
+        RepositoryFacade.init();
     }
 }
