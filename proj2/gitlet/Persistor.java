@@ -93,7 +93,7 @@ public class Persistor {
         if (!readPath.exists()) {
             return null;
         }
-        return (Commit)readRawObject(readPath);
+        return (Commit) readRawObject(readPath);
     }
 
     private static List<String> getAllCommitsNames() {
@@ -127,7 +127,6 @@ public class Persistor {
         Blob blob = new Blob(fileContent);
         String hash = blob.getUid();
         File savePath = getObjectFile(hash);
-//        System.out.println("PATH: " + savePath);
         if (!savePath.exists()) {
             saveRawObject(savePath, fileContent, "blob");
         }
