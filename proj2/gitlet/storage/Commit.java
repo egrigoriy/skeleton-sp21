@@ -94,6 +94,19 @@ public class Commit implements StorageObject, Serializable {
                 this.getMessage().getBytes());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Commit commit = (Commit) o;
+        return Objects.equals(getUid(), commit.getUid());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUid());
+    }
+
     public void setSecondParent(String commitId) {
         this.secondParent = commitId;
     }

@@ -14,6 +14,6 @@ public class BranchCommand implements Command {
 
     @Override
     public void execute() {
-        RepositoryFacade.branch(branchName);
+        RepositoryFacade.createBranch(branchName);
     }
 }

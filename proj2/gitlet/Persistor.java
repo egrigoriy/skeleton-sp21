@@ -20,9 +20,7 @@ public class Persistor {
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(WorkingDir.CWD, ".gitlet");
     public static final File CONFIG = join(GITLET_DIR, "config");
-    public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
     public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
-    public static final File BLOBS_DIR = join(GITLET_DIR, "blobs");
     public static final File REFS_DIR = join(GITLET_DIR, "refs");
     public static final File REF_LOCAL_HEADS_DIR = join(GITLET_DIR, "refs/heads");
 
@@ -185,6 +183,8 @@ public class Persistor {
         return result;
     }
 
+
+
     public static void setActiveBranchTo(String branchName) {
         if (branchName.contains("/")) {
             Utils.writeContents(HEAD, "ref: refs/remotes/" + branchName);
@@ -281,7 +281,7 @@ public class Persistor {
         return Utils.join(urlString);
     }
 
-    public static boolean remoteDirExists(String remoteName) {
+    public static boolean remoteUrlExists(String remoteName) {
         File remoteUrl = getRemoteUrlFromConfig(remoteName);
         return remoteUrl.exists();
     }
@@ -301,7 +301,7 @@ public class Persistor {
     }
 
 
-    public static boolean remoteBranchExists(String remoteName, String remoteBranchName) {
+    public static boolean distantBranchExists(String remoteName, String remoteBranchName) {
         File remoteRefsHeadsDir = getDistantRemoteRefHeadsDir(remoteName);
         List<String> remoteBranchNames = Utils.plainFilenamesIn(remoteRefsHeadsDir);
         return remoteBranchNames.contains(remoteBranchName);

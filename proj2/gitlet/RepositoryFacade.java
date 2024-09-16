@@ -11,18 +11,14 @@ import java.util.*;
  */
 public class RepositoryFacade {
     public static void init() throws GitletException {
-        if (Persistor.isRepositoryInitialized()) {
+        if (Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_ALREADY_INIT.getText());
         }
-        Persistor.buildInfrastructure();
-        Commit initialCommit = new Commit();
-        String commitId = Persistor.saveCommit(initialCommit);
-        Persistor.setActiveBranchTo("master");
-        Persistor.setActiveCommitTo(commitId);
+        Repository.init();
     }
 
     public static void addFile(String fileName) throws GitletException {
-        if (!Persistor.isRepositoryInitialized()) {
+        if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
         if (!WorkingDir.fileExists(fileName)) {
@@ -34,7 +30,7 @@ public class RepositoryFacade {
     }
 
     public static void status() {
-        if (!Persistor.isRepositoryInitialized()) {
+        if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
         Index index = Persistor.readIndex();
@@ -42,30 +38,23 @@ public class RepositoryFacade {
     }
 
     public static void log() {
-        if (!Persistor.isRepositoryInitialized()) {
+        if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        Commit current = Persistor.getActiveCommit();
-        List<String> result = new ArrayList<>();
-        while (current != null) {
-            result.add(current.toString());
-            current = Persistor.readCommit(current.getFirstParent());
-        }
-        System.out.println(String.join("\n", result));
+        List<String> logAsList = Repository.log();
+        System.out.println(String.join("\n", logAsList));
     }
 
     public static void globalLog() {
-        if (!Persistor.isRepositoryInitialized()) {
+        if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        List<Commit> allCommits = Persistor.getAllCommits();
-        for (Commit commit : allCommits) {
-            System.out.println(commit);
-        }
+        List<String> logAsList = Repository.listAllCommits();
+        System.out.println(String.join("\n", logAsList));
     }
 
     public static void commit(String message) {
-        if (!Persistor.isRepositoryInitialized()) {
+        if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
         if (message.isEmpty()) {
@@ -75,40 +64,37 @@ public class RepositoryFacade {
         if (index.nothingToAddOrRemove()) {
             throw new GitletException(Errors.ERR_NO_CHANGES_TO_COMMIT.getText());
         }
-        Commit newCommit = new Commit(message, index);
-        String commitId = Persistor.saveCommit(newCommit);
-        Persistor.setActiveCommitTo(commitId);
+        Repository.makeCommit(message, index);
         index.clear();
         Persistor.saveIndex(index);
     }
 
     public static void checkoutFileFromActiveCommit(String fileName) {
-        String commitId = Persistor.getActiveCommitId();
-        checkoutFileFromCommit(fileName, commitId);
+        Repository.checkoutFileFromActiveCommit(fileName);
     }
 
-    public static void checkoutFileFromCommit(String fileName, String commitID) {
-        if (!Persistor.isRepositoryInitialized()) {
+    public static void checkoutFileFromCommit(String fileName, String commitId) {
+        if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        Commit commit = Persistor.readCommit(commitID);
+        Commit commit = Repository.getCommit(commitId);
         if (commit == null) {
             throw new GitletException(Errors.ERR_NOT_EXIST_SUCH_COMMIT.getText());
         }
         if (!commit.hasFile(fileName)) {
             throw new GitletException(Errors.ERR_FILE_NOT_EXIST_IN_COMMIT.getText());
         }
-        Persistor.checkoutFileFromCommit(fileName, commit);
+        Repository.checkoutFileFromCommit(fileName, commit);
     }
 
     public static void checkoutFilesFromBranchHead(String branchName) {
-        if (!Persistor.isRepositoryInitialized()) {
+        if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        if (!Persistor.branchExists(branchName)) {
+        if (!Repository.branchExists(branchName)) {
             throw new GitletException(Errors.ERR_BRANCH_NOT_EXIST.getText());
         }
-        if (Persistor.getActiveBranchName().equals(branchName)) {
+        if (Repository.isActiveBranch(branchName)) {
             throw new GitletException(Errors.ERR_BRANCH_NOT_NEED_CHECKOUT.getText());
         }
 
@@ -116,19 +102,19 @@ public class RepositoryFacade {
         if (index.untrackedFileInTheWay()) {
             throw new GitletException(Errors.ERR_UNTRACKED_FILES.getText());
         }
-        Commit branchHeadCommit = Persistor.getBranchHeadCommit(branchName);
-        Persistor.checkoutFilesFromCommit(branchHeadCommit);
+        Commit branchHeadCommit = Repository.getBranchHeadCommit(branchName);
+        Repository.checkoutFilesFromCommit(branchHeadCommit);
         index.clear();
         index.setRepo(branchHeadCommit.getFilesTable());
         Persistor.saveIndex(index);
-        Persistor.setActiveBranchTo(branchName);
+        Repository.setActiveBranchTo(branchName);
     }
 
     public static void reset(String commitID) {
-        if (!Persistor.isRepositoryInitialized()) {
+        if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        Commit commit = Persistor.readCommit(commitID);
+        Commit commit = Repository.getCommit(commitID);
         if (commit == null) {
             throw new GitletException(Errors.ERR_NOT_EXIST_SUCH_COMMIT.getText());
         }
@@ -137,15 +123,14 @@ public class RepositoryFacade {
         if (index.untrackedFileInTheWay()) {
             throw new GitletException(Errors.ERR_UNTRACKED_FILES.getText());
         }
-        Persistor.checkoutFilesFromCommit(commit);
+        Repository.checkoutFilesFromCommit(commit);
         index.clear();
         index.setRepo(commit.getFilesTable());
         Persistor.saveIndex(index);
-        // Also moves the current branch’s head to that commit node.
-        Persistor.setActiveCommitTo(commitID);
+        Repository.setActiveCommitTo(commitID);
     }
     public static void removeFile(String fileName) {
-        if (!Persistor.isRepositoryInitialized()) {
+        if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
         Index index = Persistor.readIndex();
@@ -156,40 +141,34 @@ public class RepositoryFacade {
         Persistor.saveIndex(index);
     }
 
-    public static void branch(String branchName) {
-        if (!Persistor.isRepositoryInitialized()) {
+    public static void createBranch(String branchName) {
+        if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        if (Persistor.branchExists(branchName)) {
+        if (Repository.branchExists(branchName)) {
             throw new GitletException(Errors.ERR_BRANCH_ALREADY_EXIST.getText());
         }
-        Persistor.createBranch(branchName);
+        Repository.createBranch(branchName);
     }
 
     public static void removeBranch(String branchName) {
-        if (!Persistor.isRepositoryInitialized()) {
+        if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        if (!Persistor.branchExists(branchName)) {
+        if (!Repository.branchExists(branchName)) {
             throw new GitletException(Errors.ERR_BRANCH_NOT_EXIST2.getText());
         }
-        if (Persistor.getActiveBranchName().equals(branchName)) {
+        if (Repository.isActiveBranch(branchName)) {
             throw new GitletException(Errors.ERR_CANNOT_REMOVE_BRANCH.getText());
         }
-        Persistor.removeBranch(branchName);
+        Repository.removeBranch(branchName);
     }
 
     public static void find(String message) {
-        if (!Persistor.isRepositoryInitialized()) {
+        if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        List<String> foundCommits = new ArrayList<>();
-        List<Commit> allCommits = Persistor.getAllCommits();
-        for (Commit commit : allCommits) {
-            if (commit.getMessage().equals(message)) {
-                foundCommits.add(commit.getUid());
-            }
-        }
+        List<String> foundCommits = Repository.find(message);
         if (foundCommits.isEmpty()) {
             throw new GitletException(Errors.ERR_COMMIT_NOT_FOUND.getText());
         }
@@ -197,13 +176,13 @@ public class RepositoryFacade {
     }
 
     public static void merge(String branchName) {
-        if (!Persistor.isRepositoryInitialized()) {
+        if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        if (!Persistor.branchExists(branchName)) {
+        if (!Repository.branchExists(branchName)) {
             throw new GitletException(Errors.ERR_BRANCH_NOT_EXIST2.getText());
         }
-        if (Persistor.getActiveBranchName().equals(branchName)) {
+        if (Repository.isActiveBranch(branchName)) {
             throw new GitletException(Errors.ERR_BRANCH_CANNOT_MERGE_ITSELF.getText());
         }
         Index index = Persistor.readIndex();
@@ -214,16 +193,16 @@ public class RepositoryFacade {
             throw new GitletException(Errors.ERR_UNCOMMITED_CHANGES.getText());
         }
         Commit activeCommit = Persistor.getActiveCommit();
-        Commit otherCommit = Persistor.getBranchHeadCommit(branchName);
-        Commit splitCommit = findSplitCommit(activeCommit, otherCommit);
-        if (splitCommit.getUid().equals(otherCommit.getUid())) {
+        Commit otherCommit = Repository.getBranchHeadCommit(branchName);
+        Commit splitCommit = Repository.findSplitCommit(activeCommit, otherCommit);
+        if (splitCommit.equals(otherCommit)) {
             throw new GitletException(Errors.ERR_BRANCH_ANCESTOR.getText());
         }
-        if (splitCommit.getUid().equals(activeCommit.getUid())) {
+        if (splitCommit.equals(activeCommit)) {
             checkoutFilesFromBranchHead(branchName);
             throw new GitletException(Errors.ERR_BRANCH_FAST_FORWARDED.getText());
         }
-        Set<String> allFileNames = getFileNamesInMerge(splitCommit, activeCommit, otherCommit);
+        Set<String> allFileNames = Repository.getFileNamesInMerge(splitCommit, activeCommit, otherCommit);
         for (String fileName : allFileNames) {
             if (activeCommit.hasSameEntryFor(fileName, splitCommit)
                     && !otherCommit.hasFile(fileName)) {
@@ -234,9 +213,9 @@ public class RepositoryFacade {
                 checkoutFileFromCommit(fileName, otherCommit.getUid());
                 addFile(fileName);
             }
-            if (modifiedInDifferentWays(fileName, activeCommit, otherCommit, splitCommit)) {
+            if (Repository.modifiedInDifferentWays(fileName, activeCommit, otherCommit, splitCommit)) {
                 System.out.println("Encountered a merge conflict.");
-                String fixedContent = fixConflict(fileName, activeCommit, otherCommit);
+                String fixedContent = Repository.fixConflict(fileName, activeCommit, otherCommit);
                 WorkingDir.writeContentToFile(fileName, fixedContent);
                 addFile(fileName);
             }
@@ -246,87 +225,47 @@ public class RepositoryFacade {
         Commit newCommit = new Commit(message, index);
         newCommit.setSecondParent(otherCommit.getUid());
         String commitId = Persistor.saveCommit(newCommit);
-        Persistor.setActiveCommitTo(commitId);
+        Repository.setActiveCommitTo(commitId);
         index.clear();
         Persistor.saveIndex(index);
     }
 
-    private static boolean modifiedInDifferentWays(String fileName,
-                                                   Commit activeCommit,
-                                                   Commit otherCommit,
-                                                   Commit splitCommit) {
-        return splitCommit.hasFile(fileName)
-                && !activeCommit.hasSameEntryFor(fileName, splitCommit)
-                && otherCommit.hasModified(fileName, splitCommit)
-                || splitCommit.hasFile(fileName)
-                && activeCommit.hasModified(fileName, splitCommit)
-                && !otherCommit.hasFile(fileName);
-    }
-    private static String fixConflict(String fileName, Commit activeCommit, Commit otherCommit) {
-        String result = "<<<<<<< HEAD" + "\n";
-        if (activeCommit.hasFile(fileName)) {
-            result += Persistor.readBlob(activeCommit.getFileHash(fileName));
-        }
-        result += "=======" + "\n";
-        if (otherCommit.hasFile(fileName)) {
-            result += Persistor.readBlob(otherCommit.getFileHash(fileName));
-        }
-        result += ">>>>>>>" + "\n";
-        return result;
-    }
-
-    private static Set<String> getFileNamesInMerge(Commit c1, Commit c2, Commit c3) {
-        Set<String> result = new HashSet<>();
-        result.addAll(c1.getFileNames());
-        result.addAll(c2.getFileNames());
-        result.addAll(c3.getFileNames());
-        return result;
-    }
-
-    private static Commit findSplitCommit(Commit c1, Commit c2) {
-        DAG dag = new DAG();
-        dag.addSourceNode(c1);
-        dag.addSourceNode(c2);
-        return dag.getLatestCommonAncestor(c1, c2);
-    }
 
     public static void addRemote(String remoteName, String remoteDirName) {
         if (Persistor.remoteExists(remoteName)) {
             throw new GitletException(Errors.ERR_REMOTE_ALREADY_EXIST.getText());
         }
-        Persistor.addRemote(remoteName, remoteDirName);
+        Repository.addRemote(remoteName, remoteDirName);
     }
 
     public static void removeRemote(String remoteName) {
-        if (!Persistor.remoteExists(remoteName)) {
+        if (!Repository.remoteExists(remoteName)) {
             throw new GitletException(Errors.ERR_REMOTE_NOT_EXIST.getText());
         }
-        Persistor.removeRemote(remoteName);
+        Repository.removeRemote(remoteName);
     }
 
     public static void push(String remoteName, String remoteBranchName) {
-        if (!Persistor.remoteDirExists(remoteName)) {
+        if (!Repository.remoteUrlExists(remoteName)) {
             throw new GitletException(Errors.ERR_REMOTE_DIR_NOT_FOUND.getText());
         }
-        if (!Persistor.remoteBranchExists(remoteName, remoteBranchName)) {
+        if (!Repository.remoteBranchExists(remoteName, remoteBranchName)) {
             throw new GitletException(Errors.ERR_REMOTE_NO_SUCH_BRANCH.getText());
         }
         if (Persistor.isLocalBehindRemote(remoteName, remoteBranchName)) {
             throw new GitletException(Errors.ERR_LOCAL_BEHIND_REMOTE.getText());
         }
-        Persistor.copyLocalObjectsToDistant(remoteName);
-        Persistor.copyLocalBranchHeadToDistant(remoteName, remoteBranchName);
+        Repository.push(remoteName, remoteBranchName);
     }
 
     public static void fetch(String remoteName, String remoteBranchName) {
-        if (!Persistor.remoteDirExists(remoteName)) {
+        if (!Repository.remoteUrlExists(remoteName)) {
             throw new GitletException(Errors.ERR_REMOTE_DIR_NOT_FOUND.getText());
         }
-        if (!Persistor.remoteBranchExists(remoteName, remoteBranchName)) {
+        if (!Repository.remoteBranchExists(remoteName, remoteBranchName)) {
             throw new GitletException(Errors.ERR_REMOTE_NO_SUCH_BRANCH.getText());
         }
-        Persistor.copyDistantObjectsToLocal(remoteName);
-        Persistor.copyDistantBranchHeadToLocal(remoteName, remoteBranchName);
+        Repository.fetch(remoteName, remoteBranchName);
     }
 
     public static void pull(String remoteName, String remoteBranchName) {
