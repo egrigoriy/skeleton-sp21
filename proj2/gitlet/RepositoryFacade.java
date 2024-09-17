@@ -24,16 +24,16 @@ public class RepositoryFacade {
         if (!WorkingDir.fileExists(fileName)) {
             throw new GitletException(Errors.ERR_FILE_NOT_EXIST.getText());
         }
-        Index index = Store.readIndex();
+        Index index = Repository.readIndex();
         index.add(fileName);
-        Store.saveIndex(index);
+        Repository.saveIndex(index);
     }
 
     public static void status() {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        Index index = Store.readIndex();
+        Index index = Repository.readIndex();
         index.status();
     }
 
@@ -60,13 +60,13 @@ public class RepositoryFacade {
         if (message.isEmpty()) {
             throw new GitletException(Errors.ERR_EMPTY_COMMIT_MESSAGE.getText());
         }
-        Index index = Store.readIndex();
+        Index index = Repository.readIndex();
         if (index.nothingToAddOrRemove()) {
             throw new GitletException(Errors.ERR_NO_CHANGES_TO_COMMIT.getText());
         }
         Repository.makeCommit(message, index);
         index.clear();
-        Store.saveIndex(index);
+        Repository.saveIndex(index);
     }
 
     public static void checkoutFileFromActiveCommit(String fileName) {
@@ -99,7 +99,7 @@ public class RepositoryFacade {
             throw new GitletException(Errors.ERR_BRANCH_NOT_NEED_CHECKOUT.getText());
         }
 
-        Index index = Store.readIndex();
+        Index index = Repository.readIndex();
         if (index.untrackedFileInTheWay()) {
             throw new GitletException(Errors.ERR_UNTRACKED_FILES.getText());
         }
@@ -107,39 +107,38 @@ public class RepositoryFacade {
         Repository.checkoutFilesFromCommit(branchHeadCommit);
         index.clear();
         index.setRepo(branchHeadCommit.getFilesTable());
-        Store.saveIndex(index);
+        Repository.saveIndex(index);
         branch.activate();
     }
 
-    public static void reset(String commitID) {
+    public static void reset(String commitId) {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        Commit commit = Repository.getCommit(commitID);
+        Commit commit = Repository.getCommit(commitId);
         if (commit == null) {
             throw new GitletException(Errors.ERR_NOT_EXIST_SUCH_COMMIT.getText());
         }
-
-        Index index = Store.readIndex();
+        Index index = Repository.readIndex();
         if (index.untrackedFileInTheWay()) {
             throw new GitletException(Errors.ERR_UNTRACKED_FILES.getText());
         }
         Repository.checkoutFilesFromCommit(commit);
         index.clear();
         index.setRepo(commit.getFilesTable());
-        Store.saveIndex(index);
-        Repository.setActiveCommitTo(commitID);
+        Repository.saveIndex(index);
+        Repository.setActiveCommitTo(commitId);
     }
     public static void removeFile(String fileName) {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        Index index = Store.readIndex();
+        Index index = Repository.readIndex();
         if (index.isUntracked(fileName)) {
             throw new GitletException(Errors.ERR_NO_REASON_TO_REMOVE_FILE.getText());
         }
         index.remove(fileName);
-        Store.saveIndex(index);
+        Repository.saveIndex(index);
     }
 
     public static void createBranch(String branchName) {
@@ -189,15 +188,16 @@ public class RepositoryFacade {
         if (otherBranch.isActive()) {
             throw new GitletException(Errors.ERR_BRANCH_CANNOT_MERGE_ITSELF.getText());
         }
-        Index index = Store.readIndex();
+        Index index = Repository.readIndex();
         if (index.untrackedFileInTheWay()) {
             throw new GitletException(Errors.ERR_UNTRACKED_FILES.getText());
         }
         if (!index.nothingToAddOrRemove()) {
             throw new GitletException(Errors.ERR_UNCOMMITED_CHANGES.getText());
         }
-        Commit activeCommit = Repository.getActiveCommit();
-        Commit otherCommit = Repository.getBranchHeadCommit(branchName);
+        Branch currentBranch = new Branch();
+        Commit activeCommit = currentBranch.getHeadCommit();
+        Commit otherCommit = otherBranch.getHeadCommit();
         Commit splitCommit = Repository.findSplitCommit(activeCommit, otherCommit);
         if (otherCommit.equals(splitCommit)) {
             throw new GitletException(Errors.ERR_BRANCH_ANCESTOR.getText());
@@ -206,11 +206,11 @@ public class RepositoryFacade {
             checkoutFilesFromBranchHead(branchName);
             throw new GitletException(Errors.ERR_BRANCH_FAST_FORWARDED.getText());
         }
-        Repository.updateIndexOnMerge(index, activeCommit, otherCommit, splitCommit);
-        String message = "Merged " + branchName + " into " + Repository.getActiveBranchName() + ".";
+        index.updateOnMerge(index, activeCommit, otherCommit, splitCommit);
+        String message = "Merged " + branchName + " into " + currentBranch.getName() + ".";
         Repository.makeCommit(message, index, otherCommit.getUid());
         index.clear();
-        Store.saveIndex(index);
+        Repository.saveIndex(index);
     }
 
 

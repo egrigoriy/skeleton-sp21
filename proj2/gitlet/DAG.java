@@ -86,5 +86,12 @@ public class DAG {
     public String toString() {
         return adjMap.toString();
     }
+
+    public static Commit findSplitCommit(Commit c1, Commit c2) {
+        DAG dag = new DAG();
+        dag.addSourceNode(c1);
+        dag.addSourceNode(c2);
+        return dag.getLatestCommonAncestor(c1, c2);
+    }
 }
 

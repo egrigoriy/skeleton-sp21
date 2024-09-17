@@ -17,6 +17,10 @@ public class Branch {
         return Store.getBranchHeadCommit(name);
     }
 
+    public void setHeadCommitTo(String commitId) {
+        Store.setActiveCommitTo(commitId);
+    }
+
     public String getHeadCommitId() {
         return Store.getBranchHeadCommitId(name);
     }
@@ -39,6 +43,10 @@ public class Branch {
 
     public void activate() {
         Store.setActiveBranchTo(name);
+    }
+
+    public String getName() {
+        return name;
     }
 }
 

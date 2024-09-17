@@ -1,5 +1,7 @@
 package gitlet;
 
+import gitlet.storage.Commit;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.*;
@@ -128,4 +130,59 @@ public class Index implements Serializable {
         }
         return String.join("\n", aSet) + "\n";
     }
+    public void updateOnMerge(Index index,
+                              Commit activeCommit,
+                              Commit otherCommit,
+                              Commit splitCommit) {
+        Set<String> allFileNames = getFileNamesInMerge(splitCommit,
+                activeCommit,
+                otherCommit);
+        for (String fileName : allFileNames) {
+            if (activeCommit.hasSameEntryFor(fileName, splitCommit)
+                    && !otherCommit.hasFile(fileName)) {
+                index.remove(fileName);
+            }
+            if (otherCommit.hasCreated(fileName, splitCommit)
+                    || otherCommit.hasModified(fileName, splitCommit)) {
+                Store.checkoutFileFromCommit(fileName, otherCommit);
+                index.add(fileName);
+            }
+            if (modifiedInDifferentWays(fileName, activeCommit, otherCommit, splitCommit)) {
+                System.out.println("Encountered a merge conflict.");
+                String fixedContent = fixConflict(fileName, activeCommit, otherCommit);
+                WorkingDir.writeContentToFile(fileName, fixedContent);
+                index.add(fileName);
+            }
+        }
+    }
+    private static boolean modifiedInDifferentWays(String fileName,
+                                                   Commit activeCommit,
+                                                   Commit otherCommit,
+                                                   Commit splitCommit) {
+        return splitCommit.hasFile(fileName)
+                && activeCommit.hasModified(fileName, splitCommit)
+                && !activeCommit.hasSameEntryFor(fileName, otherCommit);
+    }
+    private static String fixConflict(String fileName, Commit activeCommit, Commit otherCommit) {
+        String result = "<<<<<<< HEAD" + "\n";
+        if (activeCommit.hasFile(fileName)) {
+            result += Store.readBlob(activeCommit.getFileHash(fileName));
+        }
+        result += "=======" + "\n";
+        if (otherCommit.hasFile(fileName)) {
+            result += Store.readBlob(otherCommit.getFileHash(fileName));
+        }
+        result += ">>>>>>>" + "\n";
+        return result;
+    }
+
+    private static Set<String> getFileNamesInMerge(Commit c1, Commit c2, Commit c3) {
+        Set<String> result = new HashSet<>();
+        result.addAll(c1.getFileNames());
+        result.addAll(c2.getFileNames());
+        result.addAll(c3.getFileNames());
+        return result;
+    }
+
+
 }
