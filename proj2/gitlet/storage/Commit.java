@@ -1,7 +1,7 @@
 package gitlet.storage;
 
 import gitlet.Index;
-import gitlet.Persistor;
+import gitlet.Store;
 import gitlet.Utils;
 
 import java.io.Serializable;
@@ -37,7 +37,7 @@ public class Commit implements StorageObject, Serializable {
     }
 
     public Commit(String message, Index index) {
-        this.firstParent = Persistor.getActiveCommit().getUid();
+        this.firstParent = Store.getActiveCommit().getUid();
         this.message = message;
         this.filesTable = new TreeMap<>(index.getFilesToCommit());
         this.timestamp = new Date();
@@ -96,8 +96,12 @@ public class Commit implements StorageObject, Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Commit commit = (Commit) o;
         return Objects.equals(getUid(), commit.getUid());
     }

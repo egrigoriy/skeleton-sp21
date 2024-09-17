@@ -17,7 +17,7 @@ public class Index implements Serializable {
         if (inRepo(fileName)) {
             return;
         }
-        String hash = Persistor.saveBlob(fileName);
+        String hash = Store.saveBlob(fileName);
         filesToAdd.put(fileName, hash);
     }
 
@@ -36,7 +36,7 @@ public class Index implements Serializable {
 
     public void status() {
         String result = "=== Branches ===" + "\n"
-                + formatSetToString(Persistor.getBranchesStatus()) + "\n"
+                + formatSetToString(Store.getBranchesStatus()) + "\n"
                 + "=== Staged Files ===" + "\n"
                 + formatSetToString(filesToAdd.keySet()) + "\n"
                 + "=== Removed Files ===" + "\n"

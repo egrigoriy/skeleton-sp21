@@ -10,30 +10,30 @@ import java.util.Set;
 public class Repository {
 
     public static boolean isInitialized() {
-        return Persistor.isRepositoryInitialized();
+        return Store.isInitialized();
     }
 
     public static void init() {
-        Persistor.buildInfrastructure();
+        Store.buildInfrastructure();
         Commit initialCommit = new Commit();
-        String commitId = Persistor.saveCommit(initialCommit);
-        Persistor.setActiveBranchTo("master");
-        Persistor.setActiveCommitTo(commitId);
+        String commitId = Store.saveCommit(initialCommit);
+        Store.setActiveBranchTo("master");
+        Store.setActiveCommitTo(commitId);
     }
 
     public static List<String> log() {
-        Commit current = Persistor.getActiveCommit();
+        Commit current = Store.getActiveCommit();
         List<String> result = new ArrayList<>();
         while (current != null) {
             result.add(current.toString());
-            current = Persistor.readCommit(current.getFirstParent());
+            current = Store.readCommit(current.getFirstParent());
         }
         return result;
     }
 
     public static List<String> listAllCommits() {
         List<String> result = new ArrayList<>();
-        List<Commit> allCommits = Persistor.getAllCommits();
+        List<Commit> allCommits = Store.getAllCommits();
         for (Commit commit : allCommits) {
             result.add(commit.toString());
         }
@@ -42,17 +42,24 @@ public class Repository {
 
     public static void makeCommit(String message, Index index) {
         Commit newCommit = new Commit(message, index);
-        String commitId = Persistor.saveCommit(newCommit);
-        Persistor.setActiveCommitTo(commitId);
+        String commitId = Store.saveCommit(newCommit);
+        Store.setActiveCommitTo(commitId);
+    }
+
+    public static void makeCommit(String message, Index index, String secondParent) {
+        Commit newCommit = new Commit(message, index);
+        newCommit.setSecondParent(secondParent);
+        String commitId = Store.saveCommit(newCommit);
+        Repository.setActiveCommitTo(commitId);
     }
 
     public static Commit getCommit(String commitId) {
-        return Persistor.readCommit(commitId);
+        return Store.readCommit(commitId);
 
     }
     public static List<String> find(String message) {
         List<String> foundCommits = new ArrayList<>();
-        List<Commit> allCommits = Persistor.getAllCommits();
+        List<Commit> allCommits = Store.getAllCommits();
         for (Commit commit : allCommits) {
             if (commit.getMessage().equals(message)) {
                 foundCommits.add(commit.getUid());
@@ -60,38 +67,41 @@ public class Repository {
         }
         return foundCommits;
     }
-    public static void checkoutFileFromCommit(String fileName, Commit commit) {
-        Persistor.checkoutFileFromCommit(fileName, commit);
-    }
 
     public static void createBranch(String branchName) {
-        Persistor.createBranch(branchName);
+        Store.createBranch(branchName);
     }
 
     public static void removeBranch(String branchName) {
-        Persistor.removeBranch(branchName);
+        Store.removeBranch(branchName);
     }
 
     public static boolean branchExists(String branchName) {
-        return Persistor.branchExists(branchName);
+        return Store.branchExists(branchName);
     }
 
     public static boolean isActiveBranch(String branchName) {
-        return Persistor.getActiveBranchName().equals(branchName);
+        return Store.getActiveBranchName().equals(branchName);
     }
 
+
+    public static void checkoutFileFromCommit(String fileName, Commit commit) {
+        Store.checkoutFileFromCommit(fileName, commit);
+    }
+
+
     public static void setActiveCommitTo(String commitId) {
-        Persistor.setActiveCommitTo(commitId);
+        Store.setActiveCommitTo(commitId);
     }
 
     public static void checkoutFileFromActiveCommit(String fileName) {
-        String commitId = Persistor.getActiveCommitId();
+        String commitId = Store.getActiveCommitId();
         Commit commit = getCommit(commitId);
         checkoutFileFromCommit(fileName, commit);
     }
 
 
-    public static boolean modifiedInDifferentWays(String fileName,
+    private static boolean modifiedInDifferentWays(String fileName,
                                                    Commit activeCommit,
                                                    Commit otherCommit,
                                                    Commit splitCommit) {
@@ -102,20 +112,20 @@ public class Repository {
                 && activeCommit.hasModified(fileName, splitCommit)
                 && !otherCommit.hasFile(fileName);
     }
-    public static String fixConflict(String fileName, Commit activeCommit, Commit otherCommit) {
+    private static String fixConflict(String fileName, Commit activeCommit, Commit otherCommit) {
         String result = "<<<<<<< HEAD" + "\n";
         if (activeCommit.hasFile(fileName)) {
-            result += Persistor.readBlob(activeCommit.getFileHash(fileName));
+            result += Store.readBlob(activeCommit.getFileHash(fileName));
         }
         result += "=======" + "\n";
         if (otherCommit.hasFile(fileName)) {
-            result += Persistor.readBlob(otherCommit.getFileHash(fileName));
+            result += Store.readBlob(otherCommit.getFileHash(fileName));
         }
         result += ">>>>>>>" + "\n";
         return result;
     }
 
-    public static Set<String> getFileNamesInMerge(Commit c1, Commit c2, Commit c3) {
+    private static Set<String> getFileNamesInMerge(Commit c1, Commit c2, Commit c3) {
         Set<String> result = new HashSet<>();
         result.addAll(c1.getFileNames());
         result.addAll(c2.getFileNames());
@@ -130,48 +140,83 @@ public class Repository {
         return dag.getLatestCommonAncestor(c1, c2);
     }
 
-
-
     public static boolean remoteExists(String remoteName) {
-        return Persistor.remoteExists(remoteName);
+        return Store.remoteExists(remoteName);
     }
     public static void addRemote(String remoteName, String remoteDirName) {
-        Persistor.addRemote(remoteName, remoteDirName);
+        Store.addRemote(remoteName, remoteDirName);
     }
 
     public static void removeRemote(String remoteName) {
-        Persistor.removeRemote(remoteName);
+        Store.removeRemote(remoteName);
     }
 
     public static void push(String remoteName, String remoteBranchName) {
-        Persistor.copyLocalObjectsToDistant(remoteName);
-        Persistor.copyLocalBranchHeadToDistant(remoteName, remoteBranchName);
+        Store.copyLocalObjectsToDistant(remoteName);
+        Store.copyLocalBranchHeadToDistant(remoteName, remoteBranchName);
     }
 
 
     public static void fetch(String remoteName, String remoteBranchName) {
-        Persistor.copyDistantObjectsToLocal(remoteName);
-        Persistor.copyDistantBranchHeadToLocal(remoteName, remoteBranchName);
+        Store.copyDistantObjectsToLocal(remoteName);
+        Store.copyDistantBranchHeadToLocal(remoteName, remoteBranchName);
     }
 
     public static boolean remoteUrlExists(String remoteName) {
-        return Persistor.remoteUrlExists(remoteName);
+        return Store.remoteUrlExists(remoteName);
     }
 
     public static boolean remoteBranchExists(String remoteName, String remoteBranchName) {
-        return Persistor.distantBranchExists(remoteName, remoteBranchName);
+        return Store.distantBranchExists(remoteName, remoteBranchName);
     }
 
 
     public static Commit getBranchHeadCommit(String branchName) {
-        return Persistor.getBranchHeadCommit(branchName);
+        return Store.getBranchHeadCommit(branchName);
     }
 
     public static void checkoutFilesFromCommit(Commit branchHeadCommit) {
-        Persistor.checkoutFilesFromCommit(branchHeadCommit);
+        Store.checkoutFilesFromCommit(branchHeadCommit);
     }
 
     public static void setActiveBranchTo(String branchName) {
-        Persistor.setActiveBranchTo(branchName);
+        Store.setActiveBranchTo(branchName);
+    }
+
+    public static void updateIndexOnMerge(Index index, Commit activeCommit, Commit otherCommit, Commit splitCommit) {
+        Set<String> allFileNames = Repository.getFileNamesInMerge(splitCommit,
+                activeCommit,
+                otherCommit);
+        for (String fileName : allFileNames) {
+            if (activeCommit.hasSameEntryFor(fileName, splitCommit)
+                    && !otherCommit.hasFile(fileName)) {
+                index.remove(fileName);
+            }
+            if (otherCommit.hasCreated(fileName, splitCommit)
+                    || otherCommit.hasModified(fileName, splitCommit)) {
+                checkoutFileFromCommit(fileName, otherCommit);
+                index.add(fileName);
+            }
+            if (Repository.modifiedInDifferentWays(fileName, activeCommit,
+                    otherCommit,
+                    splitCommit)) {
+                System.out.println("Encountered a merge conflict.");
+                String fixedContent = Repository.fixConflict(fileName, activeCommit, otherCommit);
+                WorkingDir.writeContentToFile(fileName, fixedContent);
+                index.add(fileName);
+            }
+        }
+    }
+
+    public static String getActiveBranchName() {
+        return Store.getActiveBranchName();
+    }
+
+    public static Commit getActiveCommit() {
+        return Store.getActiveCommit();
+    }
+
+    public static boolean isLocalBehindRemote(String remoteName, String remoteBranchName) {
+        return Store.isLocalBehindRemote(remoteName, remoteBranchName);
     }
 }

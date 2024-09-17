@@ -16,8 +16,7 @@ import java.util.*;
 import static gitlet.Utils.UID_LENGTH;
 import static gitlet.Utils.join;
 
-public class Persistor {
-    /** The .gitlet directory. */
+public class Store {
     public static final File GITLET_DIR = join(WorkingDir.CWD, ".gitlet");
     public static final File CONFIG = join(GITLET_DIR, "config");
     public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
@@ -30,7 +29,7 @@ public class Persistor {
 
     public static final File INDEX = Utils.join(GITLET_DIR, "index");
 
-    public static boolean isRepositoryInitialized() {
+    public static boolean isInitialized() {
         return GITLET_DIR.exists();
     }
 
@@ -46,7 +45,7 @@ public class Persistor {
         Utils.writeObject(fileName, (Serializable) objects);
     }
 
-    public static Object readRawObject(File fileName) {
+    private static Object readRawObject(File fileName) {
         ArrayList<Object> content = readRawObjectContent(fileName);
         Object type = content.get(0);
         return content.get(1);
@@ -105,21 +104,6 @@ public class Persistor {
         return result;
     }
 
-
-
-    public static List<Commit> getCommitParents(Commit c) {
-        List<Commit> result = new LinkedList<>();
-        String firstParent = c.getFirstParent();
-        String secondParent = c.getSecondParent();
-        if (firstParent != null) {
-            result.add(Persistor.readCommit(firstParent));
-        }
-        if (secondParent != null) {
-            result.add(Persistor.readCommit(secondParent));
-        }
-        return result;
-    }
-
     public static String saveBlob(String fileName) {
         byte[] fileContent = WorkingDir.readFileContent(fileName);
         Blob blob = new Blob(fileContent);
@@ -171,7 +155,7 @@ public class Persistor {
     }
 
     public static String getActiveCommitId() {
-        return getBranchHeadCommitId(getActiveBranchName());
+        return getActiveCommit().getUid();
     }
 
     public static List<Commit> getAllCommits() {
@@ -229,7 +213,7 @@ public class Persistor {
     }
     public static Set<String> getBranchesStatus() {
         List<String> branchNames = getBranchNames();
-        String activeBranch = Persistor.getActiveBranchName();
+        String activeBranch = Store.getActiveBranchName();
         TreeSet<String> result = new TreeSet<>();
         for (String branchName : branchNames) {
             if (branchName.equals(activeBranch)) {
@@ -270,12 +254,12 @@ public class Persistor {
         getRemoteRefsDir(remoteName).mkdirs();
     }
 
-    public static void setRemoteUrlToConfig(String remoteName, String remoteUrl) {
+    private static void setRemoteUrlToConfig(String remoteName, String remoteUrl) {
         Path url = Paths.get(remoteUrl).toAbsolutePath().normalize();
         Utils.writeContents(CONFIG, "remote." + remoteName + ".url=" + url);
     }
 
-    public static File getRemoteUrlFromConfig(String remoteName) {
+    private static File getRemoteUrlFromConfig(String remoteName) {
         String configLine = Utils.readContentsAsString(CONFIG);
         String urlString = configLine.split("=")[1];
         return Utils.join(urlString);
@@ -286,11 +270,11 @@ public class Persistor {
         return remoteUrl.exists();
     }
 
-    public static File getDistantRemoteRefHeadsDir(String remoteName) {
+    private static File getDistantRemoteRefHeadsDir(String remoteName) {
         return Utils.join(getRemoteUrlFromConfig(remoteName), "refs/heads");
     }
 
-    public static File getDistantBranchHeadFile(String remoteName, String remoteBranchName) {
+    private static File getDistantBranchHeadFile(String remoteName, String remoteBranchName) {
         return Utils.join(getDistantRemoteRefHeadsDir(remoteName), remoteBranchName);
     }
     public static void removeRemote(String remoteName) {
@@ -308,7 +292,7 @@ public class Persistor {
     }
 
 
-    public static String getDistantBranchHeadCommitId(String remoteName, String remoteBranchName) {
+    private static String getDistantBranchHeadCommitId(String remoteName, String remoteBranchName) {
         File path = getDistantBranchHeadFile(remoteName, remoteBranchName);
         return Utils.readContentsAsString(path);
     }

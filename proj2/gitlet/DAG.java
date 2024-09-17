@@ -16,12 +16,12 @@ public class DAG {
         }
     }
     public void addSourceNode(Commit c) {
-        List<Commit> parents = Persistor.getCommitParents(c);
+        List<Commit> parents = getCommitParents(c);
         adjMap.put(c.getUid(), getUids(parents));
         Queue<Commit> queue = new LinkedList<>(parents);
         while (!queue.isEmpty()) {
             Commit current = queue.poll();
-            parents = Persistor.getCommitParents(current);
+            parents = getCommitParents(current);
             queue.addAll(parents);
             adjMap.put(current.getUid(), getUids(parents));
         }
@@ -59,7 +59,7 @@ public class DAG {
                 }
             }
         }
-        return Persistor.readCommit(best);
+        return Store.readCommit(best);
     }
 
     private List<String> getUids(List<Commit> commits) {
@@ -70,6 +70,18 @@ public class DAG {
         return uids;
     }
 
+    public static List<Commit> getCommitParents(Commit c) {
+        List<Commit> result = new LinkedList<>();
+        String firstParent = c.getFirstParent();
+        String secondParent = c.getSecondParent();
+        if (firstParent != null) {
+            result.add(Store.readCommit(firstParent));
+        }
+        if (secondParent != null) {
+            result.add(Store.readCommit(secondParent));
+        }
+        return result;
+    }
     @Override
     public String toString() {
         return adjMap.toString();
