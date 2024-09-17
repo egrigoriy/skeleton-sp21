@@ -227,7 +227,7 @@ public class RepositoryFacade {
         if (!remote.exists()) {
             throw new GitletException(Errors.ERR_REMOTE_NOT_EXIST.getText());
         }
-        remote.remove(remoteName);
+        remote.remove();
     }
 
     public static void push(String remoteName, String remoteBranchName) {

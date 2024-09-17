@@ -134,7 +134,10 @@ public class Repository {
     }
 
 
-    public static void updateIndexOnMerge(Index index, Commit activeCommit, Commit otherCommit, Commit splitCommit) {
+    public static void updateIndexOnMerge(Index index,
+                                          Commit activeCommit,
+                                          Commit otherCommit,
+                                          Commit splitCommit) {
         Set<String> allFileNames = Repository.getFileNamesInMerge(splitCommit,
                 activeCommit,
                 otherCommit);

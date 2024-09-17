@@ -4,7 +4,7 @@ public class Remote {
     private final String remoteName;
 
     public Remote(String name) {
-       this.remoteName = name;
+        this.remoteName = name;
     }
     public void add(String remoteDirName) {
         Store.addRemote(remoteName, remoteDirName);
@@ -13,7 +13,7 @@ public class Remote {
     public boolean exists() {
         return Store.remoteExists(remoteName);
     }
-    public void remove(String remoteName) {
+    public void remove() {
         Store.removeRemote(remoteName);
     }
     public void fetch(String remoteBranchName) {
