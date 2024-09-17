@@ -91,10 +91,11 @@ public class RepositoryFacade {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        if (!Repository.branchExists(branchName)) {
+        Branch branch = new Branch(branchName);
+        if (!branch.exists()) {
             throw new GitletException(Errors.ERR_BRANCH_NOT_EXIST.getText());
         }
-        if (Repository.isActiveBranch(branchName)) {
+        if (branch.isActive()) {
             throw new GitletException(Errors.ERR_BRANCH_NOT_NEED_CHECKOUT.getText());
         }
 
@@ -102,12 +103,12 @@ public class RepositoryFacade {
         if (index.untrackedFileInTheWay()) {
             throw new GitletException(Errors.ERR_UNTRACKED_FILES.getText());
         }
-        Commit branchHeadCommit = Repository.getBranchHeadCommit(branchName);
+        Commit branchHeadCommit = branch.getHeadCommit();
         Repository.checkoutFilesFromCommit(branchHeadCommit);
         index.clear();
         index.setRepo(branchHeadCommit.getFilesTable());
         Store.saveIndex(index);
-        Repository.setActiveBranchTo(branchName);
+        branch.activate();
     }
 
     public static void reset(String commitID) {
@@ -145,23 +146,25 @@ public class RepositoryFacade {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        if (Repository.branchExists(branchName)) {
+        Branch branch = new Branch(branchName);
+        if (branch.exists()) {
             throw new GitletException(Errors.ERR_BRANCH_ALREADY_EXIST.getText());
         }
-        Repository.createBranch(branchName);
+        branch.create();
     }
 
     public static void removeBranch(String branchName) {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        if (!Repository.branchExists(branchName)) {
+        Branch branch = new Branch(branchName);
+        if (!branch.exists()) {
             throw new GitletException(Errors.ERR_BRANCH_NOT_EXIST2.getText());
         }
-        if (Repository.isActiveBranch(branchName)) {
+        if (branch.isActive()) {
             throw new GitletException(Errors.ERR_CANNOT_REMOVE_BRANCH.getText());
         }
-        Repository.removeBranch(branchName);
+        branch.remove();
     }
 
     public static void find(String message) {
@@ -179,10 +182,11 @@ public class RepositoryFacade {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        if (!Repository.branchExists(branchName)) {
+        Branch otherBranch = new Branch(branchName);
+        if (!otherBranch.exists()) {
             throw new GitletException(Errors.ERR_BRANCH_NOT_EXIST2.getText());
         }
-        if (Repository.isActiveBranch(branchName)) {
+        if (otherBranch.isActive()) {
             throw new GitletException(Errors.ERR_BRANCH_CANNOT_MERGE_ITSELF.getText());
         }
         Index index = Store.readIndex();
@@ -195,10 +199,10 @@ public class RepositoryFacade {
         Commit activeCommit = Repository.getActiveCommit();
         Commit otherCommit = Repository.getBranchHeadCommit(branchName);
         Commit splitCommit = Repository.findSplitCommit(activeCommit, otherCommit);
-        if (splitCommit.equals(otherCommit)) {
+        if (otherCommit.equals(splitCommit)) {
             throw new GitletException(Errors.ERR_BRANCH_ANCESTOR.getText());
         }
-        if (splitCommit.equals(activeCommit)) {
+        if (activeCommit.equals(splitCommit)) {
             checkoutFilesFromBranchHead(branchName);
             throw new GitletException(Errors.ERR_BRANCH_FAST_FORWARDED.getText());
         }
@@ -211,40 +215,44 @@ public class RepositoryFacade {
 
 
     public static void addRemote(String remoteName, String remoteDirName) {
-        if (Repository.remoteExists(remoteName)) {
+        Remote remote = new Remote(remoteName);
+        if (remote.exists()) {
             throw new GitletException(Errors.ERR_REMOTE_ALREADY_EXIST.getText());
         }
-        Repository.addRemote(remoteName, remoteDirName);
+        remote.add(remoteDirName);
     }
 
     public static void removeRemote(String remoteName) {
-        if (!Repository.remoteExists(remoteName)) {
+        Remote remote = new Remote(remoteName);
+        if (!remote.exists()) {
             throw new GitletException(Errors.ERR_REMOTE_NOT_EXIST.getText());
         }
-        Repository.removeRemote(remoteName);
+        remote.remove(remoteName);
     }
 
     public static void push(String remoteName, String remoteBranchName) {
-        if (!Repository.remoteUrlExists(remoteName)) {
+        Remote remote = new Remote(remoteName);
+        if (!remote.remoteUrlExists()) {
             throw new GitletException(Errors.ERR_REMOTE_DIR_NOT_FOUND.getText());
         }
-        if (!Repository.remoteBranchExists(remoteName, remoteBranchName)) {
+        if (!remote.branchExists(remoteBranchName)) {
             throw new GitletException(Errors.ERR_REMOTE_NO_SUCH_BRANCH.getText());
         }
-        if (Repository.isLocalBehindRemote(remoteName, remoteBranchName)) {
+        if (remote.isLocalBehindRemote(remoteBranchName)) {
             throw new GitletException(Errors.ERR_LOCAL_BEHIND_REMOTE.getText());
         }
-        Repository.push(remoteName, remoteBranchName);
+        remote.push(remoteBranchName);
     }
 
     public static void fetch(String remoteName, String remoteBranchName) {
-        if (!Repository.remoteUrlExists(remoteName)) {
+        Remote remote = new Remote(remoteName);
+        if (!remote.remoteUrlExists()) {
             throw new GitletException(Errors.ERR_REMOTE_DIR_NOT_FOUND.getText());
         }
-        if (!Repository.remoteBranchExists(remoteName, remoteBranchName)) {
+        if (!remote.branchExists(remoteBranchName)) {
             throw new GitletException(Errors.ERR_REMOTE_NO_SUCH_BRANCH.getText());
         }
-        Repository.fetch(remoteName, remoteBranchName);
+        remote.fetch(remoteBranchName);
     }
 
     public static void pull(String remoteName, String remoteBranchName) {

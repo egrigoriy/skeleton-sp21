@@ -68,21 +68,6 @@ public class Repository {
         return foundCommits;
     }
 
-    public static void createBranch(String branchName) {
-        Store.createBranch(branchName);
-    }
-
-    public static void removeBranch(String branchName) {
-        Store.removeBranch(branchName);
-    }
-
-    public static boolean branchExists(String branchName) {
-        return Store.branchExists(branchName);
-    }
-
-    public static boolean isActiveBranch(String branchName) {
-        return Store.getActiveBranchName().equals(branchName);
-    }
 
 
     public static void checkoutFileFromCommit(String fileName, Commit commit) {
@@ -140,37 +125,6 @@ public class Repository {
         return dag.getLatestCommonAncestor(c1, c2);
     }
 
-    public static boolean remoteExists(String remoteName) {
-        return Store.remoteExists(remoteName);
-    }
-    public static void addRemote(String remoteName, String remoteDirName) {
-        Store.addRemote(remoteName, remoteDirName);
-    }
-
-    public static void removeRemote(String remoteName) {
-        Store.removeRemote(remoteName);
-    }
-
-    public static void push(String remoteName, String remoteBranchName) {
-        Store.copyLocalObjectsToDistant(remoteName);
-        Store.copyLocalBranchHeadToDistant(remoteName, remoteBranchName);
-    }
-
-
-    public static void fetch(String remoteName, String remoteBranchName) {
-        Store.copyDistantObjectsToLocal(remoteName);
-        Store.copyDistantBranchHeadToLocal(remoteName, remoteBranchName);
-    }
-
-    public static boolean remoteUrlExists(String remoteName) {
-        return Store.remoteUrlExists(remoteName);
-    }
-
-    public static boolean remoteBranchExists(String remoteName, String remoteBranchName) {
-        return Store.distantBranchExists(remoteName, remoteBranchName);
-    }
-
-
     public static Commit getBranchHeadCommit(String branchName) {
         return Store.getBranchHeadCommit(branchName);
     }
@@ -179,9 +133,6 @@ public class Repository {
         Store.checkoutFilesFromCommit(branchHeadCommit);
     }
 
-    public static void setActiveBranchTo(String branchName) {
-        Store.setActiveBranchTo(branchName);
-    }
 
     public static void updateIndexOnMerge(Index index, Commit activeCommit, Commit otherCommit, Commit splitCommit) {
         Set<String> allFileNames = Repository.getFileNamesInMerge(splitCommit,
@@ -216,7 +167,5 @@ public class Repository {
         return Store.getActiveCommit();
     }
 
-    public static boolean isLocalBehindRemote(String remoteName, String remoteBranchName) {
-        return Store.isLocalBehindRemote(remoteName, remoteBranchName);
-    }
+
 }

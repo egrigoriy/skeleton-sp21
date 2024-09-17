@@ -151,11 +151,11 @@ public class Store {
     }
 
     public static Commit getActiveCommit() {
-        return getBranchHeadCommit(getActiveBranchName());
+        return readCommit(getActiveCommitId());
     }
 
     public static String getActiveCommitId() {
-        return getActiveCommit().getUid();
+        return getBranchHeadCommitId(getActiveBranchName());
     }
 
     public static List<Commit> getAllCommits() {
@@ -184,7 +184,7 @@ public class Store {
         return headContent.substring(headContent.lastIndexOf("/") + 1);
     }
 
-    private static String getBranchHeadCommitId(String branchName) {
+    public static String getBranchHeadCommitId(String branchName) {
         File branchHeadFile = getBranchHeadFile(branchName);
         return Utils.readContentsAsString(branchHeadFile);
     }
