@@ -1,15 +1,19 @@
 package gitlet;
 
 
-import gitlet.storage.Commit;
+import gitlet.commands.Commit;
 
-import java.util.*;
-
-/** Represents a gitlet repository.
+/** Represents a Facade to Repository.
  *
  *  @author Grigoriy Emiliyanov
  */
 public class RepositoryFacade {
+
+    /**
+     * Initializes the repository.
+     * Throws exception in case of error.
+     * @throws GitletException
+     */
     public static void init() throws GitletException {
         if (Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_ALREADY_INIT.getText());
@@ -17,6 +21,12 @@ public class RepositoryFacade {
         Repository.init();
     }
 
+    /**
+     * Add file with given file name to the Repository
+     * Throws exception in case of error.
+     * @param fileName
+     * @throws GitletException
+     */
     public static void addFile(String fileName) throws GitletException {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
@@ -29,31 +39,68 @@ public class RepositoryFacade {
         Repository.saveIndex(index);
     }
 
-    public static void status() {
+    /**
+     * Removes file with given file name from the index.
+     * Throws exception in case of error.
+     * @param fileName
+     * @throws GitletException
+     */
+    public static void removeFile(String fileName) throws GitletException {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
         Index index = Repository.readIndex();
-        index.status();
+        if (index.isUntracked(fileName)) {
+            throw new GitletException(Errors.ERR_NO_REASON_TO_REMOVE_FILE.getText());
+        }
+        index.remove(fileName);
+        Repository.saveIndex(index);
     }
 
-    public static void log() {
+    /**
+     *  Prints the status of the index including branches information.
+     * Throws exception in case of error.
+     * @throws GitletException
+     */
+    public static void status() throws GitletException {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        List<String> logAsList = Repository.log();
-        System.out.println(String.join("\n", logAsList));
+        Index index = Repository.readIndex();
+        System.out.println(index.status());
     }
 
-    public static void globalLog() {
+    /**
+     *  Prints the history of the active branch.
+     * Throws exception in case of error.
+     * @throws GitletException
+     */
+    public static void log() throws GitletException {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        List<String> logAsList = Repository.listAllCommits();
-        System.out.println(String.join("\n", logAsList));
+        System.out.println(Repository.log());
     }
 
-    public static void commit(String message) {
+    /**
+     *  Prints all commits.
+     * Throws exception in case of error.
+     * @throws GitletException
+     */
+    public static void globalLog() throws GitletException {
+        if (!Repository.isInitialized()) {
+            throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
+        }
+        System.out.println(Repository.listAllCommits());
+    }
+
+    /**
+     * Makes a commit of staged files .
+     * Throws exception in case of error.
+     * @param message
+     * @throws GitletException
+     */
+    public static void commit(String message) throws GitletException {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
@@ -69,11 +116,24 @@ public class RepositoryFacade {
         Repository.saveIndex(index);
     }
 
-    public static void checkoutFileFromActiveCommit(String fileName) {
+    /**
+     * Checkouts file with given name from the active commit.
+     * Throws exception in case of error.
+     * @param fileName
+     * @throws GitletException
+     */
+    public static void checkoutFileFromActiveCommit(String fileName) throws GitletException {
         Repository.checkoutFileFromActiveCommit(fileName);
     }
 
-    public static void checkoutFileFromCommit(String fileName, String commitId) {
+    /**
+     * Checkouts file with given name from a commit with given id.
+     * Throws exception in case of error.
+     * @param fileName
+     * @param commitId
+     * @throws GitletException
+     */
+    public static void checkoutFileFromCommit(String fileName, String commitId) throws GitletException {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
@@ -87,7 +147,13 @@ public class RepositoryFacade {
         Repository.checkoutFileFromCommit(fileName, commit);
     }
 
-    public static void checkoutFilesFromBranchHead(String branchName) {
+    /**
+     * Checkouts all files from the head commit of a branch with given name.
+     * Throws exception in case of error.
+     * @param branchName
+     * @throws GitletException
+     */
+    public static void checkoutFilesFromBranchHead(String branchName) throws GitletException {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
@@ -111,7 +177,13 @@ public class RepositoryFacade {
         branch.activate();
     }
 
-    public static void reset(String commitId) {
+    /**
+     * Checkouts all files tracked by a commit with given id and set it as current branch head
+     * Throws exception in case of error.
+     * @param commitId
+     * @throws GitletException
+     */
+    public static void reset(String commitId) throws GitletException {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
@@ -129,19 +201,14 @@ public class RepositoryFacade {
         Repository.saveIndex(index);
         Repository.setActiveCommitTo(commitId);
     }
-    public static void removeFile(String fileName) {
-        if (!Repository.isInitialized()) {
-            throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
-        }
-        Index index = Repository.readIndex();
-        if (index.isUntracked(fileName)) {
-            throw new GitletException(Errors.ERR_NO_REASON_TO_REMOVE_FILE.getText());
-        }
-        index.remove(fileName);
-        Repository.saveIndex(index);
-    }
 
-    public static void createBranch(String branchName) {
+    /**
+     * Creates a branch with given name.
+     * Throws exception in case of error.
+     * @param branchName
+     * @throws GitletException
+     */
+    public static void createBranch(String branchName) throws GitletException {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
@@ -152,7 +219,13 @@ public class RepositoryFacade {
         branch.create();
     }
 
-    public static void removeBranch(String branchName) {
+    /**
+     * Removes branch with given name.
+     * Throws exception in case of error.
+     * @param branchName
+     * @throws GitletException
+     */
+    public static void removeBranch(String branchName) throws GitletException {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
@@ -166,18 +239,30 @@ public class RepositoryFacade {
         branch.remove();
     }
 
-    public static void find(String message) {
+    /**
+     * Prints all commits with message containing given search text.
+     * Throws exception in case of error.
+     * @param searchText
+     * @throws GitletException
+     */
+    public static void find(String searchText) throws GitletException {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        List<String> foundCommits = Repository.find(message);
+        String foundCommits = Repository.find(searchText);
         if (foundCommits.isEmpty()) {
             throw new GitletException(Errors.ERR_COMMIT_NOT_FOUND.getText());
         }
-        System.out.println(String.join("\n", foundCommits));
+        System.out.println(foundCommits);
     }
 
-    public static void merge(String branchName) {
+    /**
+     * Merges the branch with given name to the active branch.
+     * Throws exception in case of error.
+     * @param branchName
+     * @throws GitletException
+     */
+    public static void merge(String branchName) throws GitletException {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
@@ -213,8 +298,14 @@ public class RepositoryFacade {
         Repository.saveIndex(index);
     }
 
-
-    public static void addRemote(String remoteName, String remoteDirName) {
+    /**
+     * Adds under given name a remote for tracking which is located at given directory.
+     * Throws exception in case of error.
+     * @param remoteName
+     * @param remoteDirName
+     * @throws GitletException
+     */
+    public static void addRemote(String remoteName, String remoteDirName) throws GitletException {
         Remote remote = new Remote(remoteName);
         if (remote.exists()) {
             throw new GitletException(Errors.ERR_REMOTE_ALREADY_EXIST.getText());
@@ -222,7 +313,13 @@ public class RepositoryFacade {
         remote.add(remoteDirName);
     }
 
-    public static void removeRemote(String remoteName) {
+    /**
+     * Removes tracking of remote having given name.
+     * Throws exception in case of error.
+     * @param remoteName
+     * @throws GitletException
+     */
+    public static void removeRemote(String remoteName) throws GitletException {
         Remote remote = new Remote(remoteName);
         if (!remote.exists()) {
             throw new GitletException(Errors.ERR_REMOTE_NOT_EXIST.getText());
@@ -230,7 +327,14 @@ public class RepositoryFacade {
         remote.remove();
     }
 
-    public static void push(String remoteName, String remoteBranchName) {
+    /**
+     * Pushes branch with given name to a remote tracked under given name.
+     * Throws exception in case of error.
+     * @param remoteName
+     * @param remoteBranchName
+     * @throws GitletException
+     */
+    public static void push(String remoteName, String remoteBranchName) throws GitletException {
         Remote remote = new Remote(remoteName);
         if (!remote.remoteUrlExists()) {
             throw new GitletException(Errors.ERR_REMOTE_DIR_NOT_FOUND.getText());
@@ -244,7 +348,14 @@ public class RepositoryFacade {
         remote.push(remoteBranchName);
     }
 
-    public static void fetch(String remoteName, String remoteBranchName) {
+    /**
+     * Fetches the branch with given name from remote tracked under given name.
+     * Throws exception in case of error.
+     * @param remoteName
+     * @param remoteBranchName
+     * @throws GitletException
+     */
+    public static void fetch(String remoteName, String remoteBranchName) throws GitletException {
         Remote remote = new Remote(remoteName);
         if (!remote.remoteUrlExists()) {
             throw new GitletException(Errors.ERR_REMOTE_DIR_NOT_FOUND.getText());
@@ -255,7 +366,14 @@ public class RepositoryFacade {
         remote.fetch(remoteBranchName);
     }
 
-    public static void pull(String remoteName, String remoteBranchName) {
+    /**
+     * Pulls the branch with given name from remote tracked under given name.
+     * Throws exception in case of error.
+     * @param remoteName
+     * @param remoteBranchName
+     * @throws GitletException
+     */
+    public static void pull(String remoteName, String remoteBranchName) throws GitletException {
         fetch(remoteName, remoteBranchName);
         String branchName = remoteName + "/" + remoteBranchName;
         merge(branchName);

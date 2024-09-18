@@ -1,8 +1,9 @@
-package gitlet.storage;
+package gitlet.commands;
 
 import gitlet.Index;
 import gitlet.Store;
 import gitlet.Utils;
+import gitlet.StorageObject;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;

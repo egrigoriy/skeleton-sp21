@@ -1,6 +1,4 @@
-package gitlet.storage;
-
-import gitlet.Utils;
+package gitlet;
 
 public class Blob implements StorageObject {
     byte[] content;

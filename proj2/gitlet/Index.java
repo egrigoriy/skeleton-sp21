@@ -1,6 +1,6 @@
 package gitlet;
 
-import gitlet.storage.Commit;
+import gitlet.commands.Commit;
 
 import java.io.File;
 import java.io.Serializable;
@@ -36,7 +36,7 @@ public class Index implements Serializable {
         filesToRemove.clear();
     }
 
-    public void status() {
+    public String status() {
         String result = "=== Branches ===" + "\n"
                 + formatSetToString(Store.getBranchesStatus()) + "\n"
                 + "=== Staged Files ===" + "\n"
@@ -47,7 +47,7 @@ public class Index implements Serializable {
                 + formatSetToString(getModifiedNotStaged()) + "\n"
                 + "=== Untracked Files ===" + "\n"
                 + formatSetToString(getUntrackedFileNames());
-        System.out.println(result);
+        return result;
     }
 
 

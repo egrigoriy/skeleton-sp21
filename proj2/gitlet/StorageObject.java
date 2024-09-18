@@ -1,4 +1,4 @@
-package gitlet.storage;
+package gitlet;
 
 public interface StorageObject {
     String getUid();

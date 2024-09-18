@@ -1,6 +1,6 @@
 package gitlet;
 
-import gitlet.storage.Commit;
+import gitlet.commands.Commit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,23 +20,23 @@ public class Repository {
         setActiveCommitTo(commitId);
     }
 
-    public static List<String> log() {
+    public static String log() {
         Commit current = getActiveCommit();
         List<String> result = new ArrayList<>();
         while (current != null) {
             result.add(current.toString());
             current = Store.readCommit(current.getFirstParent());
         }
-        return result;
+        return String.join("\n", result);
     }
 
-    public static List<String> listAllCommits() {
+    public static String listAllCommits() {
         List<String> result = new ArrayList<>();
         List<Commit> allCommits = Store.getAllCommits();
         for (Commit commit : allCommits) {
             result.add(commit.toString());
         }
-        return result;
+        return String.join("\n", result) ;
     }
 
     public static void makeCommit(String message, Index index) {
@@ -55,7 +55,7 @@ public class Repository {
     public static Commit getCommit(String commitId) {
         return Store.readCommit(commitId);
     }
-    public static List<String> find(String message) {
+    public static String find(String message) {
         List<String> foundCommits = new ArrayList<>();
         List<Commit> allCommits = Store.getAllCommits();
         for (Commit commit : allCommits) {
@@ -63,7 +63,7 @@ public class Repository {
                 foundCommits.add(commit.getUid());
             }
         }
-        return foundCommits;
+        return String.join("\n", foundCommits);
     }
 
     public static Commit getActiveCommit() {

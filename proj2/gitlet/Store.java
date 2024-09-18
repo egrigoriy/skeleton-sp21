@@ -1,7 +1,6 @@
 package gitlet;
 
-import gitlet.storage.Blob;
-import gitlet.storage.Commit;
+import gitlet.commands.Commit;
 
 import java.io.File;
 import java.io.IOException;

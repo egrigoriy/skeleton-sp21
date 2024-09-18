@@ -1,6 +1,6 @@
 package gitlet;
 
-import gitlet.storage.Commit;
+import gitlet.commands.Commit;
 
 public class Branch {
     private final String name;
