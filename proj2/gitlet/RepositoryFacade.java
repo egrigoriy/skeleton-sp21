@@ -92,7 +92,7 @@ public class RepositoryFacade {
     }
 
     /**
-     * Makes a commit of staged files .
+     * Makes a commit of staged files and clear the index.
      * Throws exception in case of error.
      * @param message
      * @throws GitletException
@@ -147,6 +147,7 @@ public class RepositoryFacade {
 
     /**
      * Checkouts all files from the head commit of a branch with given name.
+     * Index is cleared afterward. Branch with the given name is activated.
      * Throws exception in case of error.
      * @param branchName
      * @throws GitletException
@@ -177,6 +178,7 @@ public class RepositoryFacade {
 
     /**
      * Checkouts all files tracked by a commit with given id and set it as current branch head
+     * Index is cleared afterward. The commit with given id is set as head of the current branch.
      * Throws exception in case of error.
      * @param commitId
      * @throws GitletException
@@ -256,6 +258,8 @@ public class RepositoryFacade {
 
     /**
      * Merges the branch with given name to the active branch.
+     * Index is updated with result of merge and then commit is made.
+     * At the end index is cleared.
      * Throws exception in case of error.
      * @param branchName
      * @throws GitletException
@@ -366,6 +370,7 @@ public class RepositoryFacade {
 
     /**
      * Pulls the branch with given name from remote tracked under given name.
+     * First fetch remote branch then merge with it
      * Throws exception in case of error.
      * @param remoteName
      * @param remoteBranchName
