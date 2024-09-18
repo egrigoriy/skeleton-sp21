@@ -17,11 +17,10 @@ public class Repository {
         String commitId = Store.saveCommit(initialCommit);
         Branch branch = new Branch("master");
         branch.activate();
-        Store.setActiveCommitTo(commitId);
-    }
+        setActiveCommitTo(commitId);
 
     public static List<String> log() {
-        Commit current = Store.getActiveCommit();
+        Commit current = getActiveCommit();
         List<String> result = new ArrayList<>();
         while (current != null) {
             result.add(current.toString());
@@ -42,7 +41,7 @@ public class Repository {
     public static void makeCommit(String message, Index index) {
         Commit newCommit = new Commit(message, index);
         String commitId = Store.saveCommit(newCommit);
-        Store.setActiveCommitTo(commitId);
+        setActiveCommitTo(commitId);
     }
 
     public static void makeCommit(String message, Index index, String secondParent) {
