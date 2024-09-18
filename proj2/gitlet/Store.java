@@ -55,9 +55,9 @@ public class Store {
 
     public static void buildInfrastructure() {
         GITLET_DIR.mkdir();
+        OBJECTS_DIR.mkdirs();
         REFS_DIR.mkdir();
         REF_LOCAL_HEADS_DIR.mkdir();
-        OBJECTS_DIR.mkdirs();
     }
 
     public static String saveCommit(Commit commit) {
@@ -73,11 +73,11 @@ public class Store {
         if (fileName.length() == UID_LENGTH) {
             return fileName;
         }
-        return fullObjectId(fileName);
+        return findFullFileName(fileName);
     }
-    private static String fullObjectId(String commitID) {
+    private static String findFullFileName(String shortFileName) {
         for (String fileName : Utils.plainFilenamesIn(OBJECTS_DIR)) {
-            if (fileName.contains(commitID)) {
+            if (fileName.contains(shortFileName)) {
                 return fileName;
             }
         }
@@ -95,7 +95,7 @@ public class Store {
         return (Commit) readRawObject(readPath);
     }
 
-    private static List<String> getAllCommitsNames() {
+    public static List<String> getAllCommitsIds() {
         List<String> result = new ArrayList<>();
         for (String fileName : Utils.plainFilenamesIn(OBJECTS_DIR)) {
             ArrayList<Object> content = readRawObjectContent(Utils.join(OBJECTS_DIR, fileName));
@@ -159,16 +159,6 @@ public class Store {
     public static String getActiveCommitId() {
         return getBranchHeadCommitId(getActiveBranchName());
     }
-
-    public static List<Commit> getAllCommits() {
-        List<Commit> result = new ArrayList<>();
-        for (String fileName : getAllCommitsNames()) {
-            Commit commit = readCommit(fileName);
-            result.add(commit);
-        }
-        return result;
-    }
-
 
 
     public static void setActiveBranchTo(String branchName) {

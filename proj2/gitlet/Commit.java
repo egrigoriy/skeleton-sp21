@@ -33,7 +33,12 @@ public class Commit implements StorageObject, Serializable {
     }
 
     public Commit(String message, Index index) {
+        this(message, index, null);
+    }
+
+    public Commit(String message, Index index, String secondParent) {
         this.firstParent = Store.getActiveCommit().getUid();
+        this.secondParent = secondParent;
         this.message = message;
         this.filesTable = new TreeMap<>(index.getFilesToCommit());
         this.timestamp = new Date();
@@ -80,7 +85,7 @@ public class Commit implements StorageObject, Serializable {
         return message;
     }
 
-    public Date getTimestamp() {
+    private Date getTimestamp() {
         return timestamp;
     }
 
@@ -105,10 +110,6 @@ public class Commit implements StorageObject, Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(getUid());
-    }
-
-    public void setSecondParent(String commitId) {
-        this.secondParent = commitId;
     }
 
     public String getSecondParent() {

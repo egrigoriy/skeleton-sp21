@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents an interface for an object to be stored
+ * Represents an Repository
  *
  *  @author Grigoriy Emiliyanov
  */
@@ -33,9 +33,18 @@ public class Repository {
         return String.join("\n", result);
     }
 
+    private static List<Commit> getAllCommits() {
+        List<Commit> result = new ArrayList<>();
+        for (String fileName : Store.getAllCommitsIds()) {
+            Commit commit = Store.readCommit(fileName);
+            result.add(commit);
+        }
+        return result;
+    }
+
     public static String listAllCommits() {
         List<String> result = new ArrayList<>();
-        List<Commit> allCommits = Store.getAllCommits();
+        List<Commit> allCommits = getAllCommits();
         for (Commit commit : allCommits) {
             result.add(commit.toString());
         }
@@ -49,10 +58,9 @@ public class Repository {
     }
 
     public static void makeCommit(String message, Index index, String secondParent) {
-        Commit newCommit = new Commit(message, index);
-        newCommit.setSecondParent(secondParent);
+        Commit newCommit = new Commit(message, index, secondParent);
         String commitId = Store.saveCommit(newCommit);
-        Repository.setActiveCommitTo(commitId);
+        setActiveCommitTo(commitId);
     }
 
     public static Commit getCommit(String commitId) {
@@ -60,7 +68,7 @@ public class Repository {
     }
     public static String find(String message) {
         List<String> foundCommits = new ArrayList<>();
-        List<Commit> allCommits = Store.getAllCommits();
+        List<Commit> allCommits = getAllCommits();
         for (Commit commit : allCommits) {
             if (commit.getMessage().equals(message)) {
                 foundCommits.add(commit.getUid());
