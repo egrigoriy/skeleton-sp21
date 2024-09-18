@@ -18,6 +18,7 @@ public class Repository {
         Branch branch = new Branch("master");
         branch.activate();
         setActiveCommitTo(commitId);
+    }
 
     public static List<String> log() {
         Commit current = getActiveCommit();
