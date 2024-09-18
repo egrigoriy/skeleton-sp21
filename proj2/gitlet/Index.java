@@ -160,8 +160,14 @@ public class Index implements Serializable {
                                                    Commit otherCommit,
                                                    Commit splitCommit) {
         return splitCommit.hasFile(fileName)
+                && !activeCommit.hasSameEntryFor(fileName, splitCommit)
+                && otherCommit.hasModified(fileName, splitCommit)
+                || splitCommit.hasFile(fileName)
                 && activeCommit.hasModified(fileName, splitCommit)
-                && !activeCommit.hasSameEntryFor(fileName, otherCommit);
+                && !otherCommit.hasFile(fileName);
+//        return splitCommit.hasFile(fileName)
+//                && activeCommit.hasModified(fileName, splitCommit)
+//                && !activeCommit.hasSameEntryFor(fileName, otherCommit);
     }
     private static String fixConflict(String fileName, Commit activeCommit, Commit otherCommit) {
         String result = "<<<<<<< HEAD" + "\n";

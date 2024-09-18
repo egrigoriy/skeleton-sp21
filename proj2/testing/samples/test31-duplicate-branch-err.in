@@ -1,5 +1,5 @@
 # Check that two branches can't be given same name.
-I prelude1.inc
+I init_setup.inc
 > branch other
 <<<
 + f.txt wug.txt

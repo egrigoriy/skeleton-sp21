@@ -1,5 +1,5 @@
 # Test for wrong command name.
-I prelude1.inc
+I init_setup.inc
 > glorp foo
 No command with that name exists.
 <<<
