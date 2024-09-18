@@ -29,7 +29,7 @@ public class RepositoryFacade {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
         if (!WorkingDir.fileExists(fileName)) {
-            throw new GitletException(Errors.ERR_FILE_NOT_EXIST.getText());
+            throw new GitletException(Errors.ERR_ADD_FILE_NOT_EXISTS.getText());
         }
         Index index = Repository.readIndex();
         index.add(fileName);
@@ -48,7 +48,7 @@ public class RepositoryFacade {
         }
         Index index = Repository.readIndex();
         if (index.isUntracked(fileName)) {
-            throw new GitletException(Errors.ERR_NO_REASON_TO_REMOVE_FILE.getText());
+            throw new GitletException(Errors.ERR_REMOVE_FILE_NO_REASON.getText());
         }
         index.remove(fileName);
         Repository.saveIndex(index);
@@ -102,11 +102,11 @@ public class RepositoryFacade {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
         if (message.isEmpty()) {
-            throw new GitletException(Errors.ERR_EMPTY_COMMIT_MESSAGE.getText());
+            throw new GitletException(Errors.ERR_COMMIT_EMPTY_MESSAGE.getText());
         }
         Index index = Repository.readIndex();
         if (index.nothingToAddOrRemove()) {
-            throw new GitletException(Errors.ERR_NO_CHANGES_TO_COMMIT.getText());
+            throw new GitletException(Errors.ERR_COMMIT_NO_CHANGES.getText());
         }
         Repository.makeCommit(message, index);
         index.clear();
@@ -137,10 +137,10 @@ public class RepositoryFacade {
         }
         Commit commit = Repository.getCommit(commitId);
         if (commit == null) {
-            throw new GitletException(Errors.ERR_NOT_EXIST_SUCH_COMMIT.getText());
+            throw new GitletException(Errors.ERR_COMMIT_NO_SUCH_EXISTS.getText());
         }
         if (!commit.hasFile(fileName)) {
-            throw new GitletException(Errors.ERR_FILE_NOT_EXIST_IN_COMMIT.getText());
+            throw new GitletException(Errors.ERR_COMMIT_FILE_NOT_EXIST.getText());
         }
         Repository.checkoutFileFromCommit(fileName, commit);
     }
@@ -187,7 +187,7 @@ public class RepositoryFacade {
         }
         Commit commit = Repository.getCommit(commitId);
         if (commit == null) {
-            throw new GitletException(Errors.ERR_NOT_EXIST_SUCH_COMMIT.getText());
+            throw new GitletException(Errors.ERR_COMMIT_NO_SUCH_EXISTS.getText());
         }
         Index index = Repository.readIndex();
         if (index.untrackedFileInTheWay()) {
@@ -232,7 +232,7 @@ public class RepositoryFacade {
             throw new GitletException(Errors.ERR_BRANCH_NOT_EXIST2.getText());
         }
         if (branch.isActive()) {
-            throw new GitletException(Errors.ERR_CANNOT_REMOVE_BRANCH.getText());
+            throw new GitletException(Errors.ERR_BRANCH_CANNOT_BE_REMOVED.getText());
         }
         branch.remove();
     }
@@ -276,7 +276,7 @@ public class RepositoryFacade {
             throw new GitletException(Errors.ERR_UNTRACKED_FILES.getText());
         }
         if (!index.nothingToAddOrRemove()) {
-            throw new GitletException(Errors.ERR_UNCOMMITED_CHANGES.getText());
+            throw new GitletException(Errors.ERR_MERGE_UNCOMMITTED_CHANGES.getText());
         }
         Branch currentBranch = new Branch();
         Commit activeCommit = currentBranch.getHeadCommit();
