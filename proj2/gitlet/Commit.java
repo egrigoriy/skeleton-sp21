@@ -1,15 +1,10 @@
-package gitlet.commands;
-
-import gitlet.Index;
-import gitlet.Store;
-import gitlet.Utils;
-import gitlet.StorageObject;
+package gitlet;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-/** Represents a gitlet commit object.
+/**
  *  TOD: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *

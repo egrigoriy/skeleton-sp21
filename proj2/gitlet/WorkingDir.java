@@ -3,6 +3,11 @@ package gitlet;
 import java.io.File;
 import java.util.List;
 
+/**
+ * Represents a working directory
+ *
+ *  @author Grigoriy Emiliyanov
+ */
 public class WorkingDir {
     public static final File CWD = new File(System.getProperty("user.dir"));
 

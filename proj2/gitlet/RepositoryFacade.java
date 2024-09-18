@@ -1,8 +1,5 @@
 package gitlet;
 
-
-import gitlet.commands.Commit;
-
 /** Represents a Facade to Repository.
  *
  *  @author Grigoriy Emiliyanov
@@ -133,7 +130,8 @@ public class RepositoryFacade {
      * @param commitId
      * @throws GitletException
      */
-    public static void checkoutFileFromCommit(String fileName, String commitId) throws GitletException {
+    public static void checkoutFileFromCommit(String fileName, String commitId)
+            throws GitletException {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }

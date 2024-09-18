@@ -1,7 +1,5 @@
 package gitlet;
 
-import gitlet.commands.Commit;
-
 import java.io.File;
 import java.io.Serializable;
 import java.util.*;

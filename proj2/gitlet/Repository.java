@@ -1,10 +1,13 @@
 package gitlet;
 
-import gitlet.commands.Commit;
-
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents an interface for an object to be stored
+ *
+ *  @author Grigoriy Emiliyanov
+ */
 public class Repository {
 
     public static boolean isInitialized() {
@@ -36,7 +39,7 @@ public class Repository {
         for (Commit commit : allCommits) {
             result.add(commit.toString());
         }
-        return String.join("\n", result) ;
+        return String.join("\n", result);
     }
 
     public static void makeCommit(String message, Index index) {

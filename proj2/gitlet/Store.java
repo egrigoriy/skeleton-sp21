@@ -1,7 +1,5 @@
 package gitlet;
 
-import gitlet.commands.Commit;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -15,6 +13,11 @@ import java.util.*;
 import static gitlet.Utils.UID_LENGTH;
 import static gitlet.Utils.join;
 
+/**
+ * Represents an interface for an object to be stored
+ *
+ *  @author Grigoriy Emiliyanov
+ */
 public class Store {
     public static final File GITLET_DIR = join(WorkingDir.CWD, ".gitlet");
     public static final File CONFIG = join(GITLET_DIR, "config");

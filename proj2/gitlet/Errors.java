@@ -1,5 +1,10 @@
 package gitlet;
 
+/**
+ * Represents an interface for an object to be stored
+ *
+ *  @author Grigoriy Emiliyanov
+ */
 public enum Errors {
     ERR_NO_COMMAND("Please enter a command."),
     ERR_FILE_NOT_EXIST("File does not exist."),

@@ -1,9 +1,12 @@
 package gitlet;
 
-import gitlet.commands.Commit;
-
 import java.util.*;
 
+/**
+ * Represents an interface for an object to be stored
+ *
+ *  @author Grigoriy Emiliyanov
+ */
 public class DAG {
     private final Map<String, List<String>> adjMap = new HashMap<>();
 
