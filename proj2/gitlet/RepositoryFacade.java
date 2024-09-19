@@ -293,7 +293,7 @@ public class RepositoryFacade {
             checkoutFilesFromBranchHead(branchName);
             throw new GitletException(Errors.ERR_BRANCH_FAST_FORWARDED.getText());
         }
-        index.updateOnMerge(index, activeCommit, otherCommit, splitCommit);
+        index.updateOnMerge(activeCommit, otherCommit, splitCommit);
         String message = "Merged " + branchName + " into " + currentBranch.getName() + ".";
         Repository.makeCommit(message, index, otherCommit.getUid());
         index.clear();
