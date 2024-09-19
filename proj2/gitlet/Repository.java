@@ -33,18 +33,9 @@ public class Repository {
         return String.join("\n", result);
     }
 
-    private static List<Commit> getAllCommits() {
-        List<Commit> result = new ArrayList<>();
-        for (String fileName : Store.getAllCommitsIds()) {
-            Commit commit = Store.readCommit(fileName);
-            result.add(commit);
-        }
-        return result;
-    }
-
-    public static String listAllCommits() {
+    public static String allCommitsAsString() {
         List<String> result = new ArrayList<>();
-        List<Commit> allCommits = getAllCommits();
+        List<Commit> allCommits = Store.getAllCommits();
         for (Commit commit : allCommits) {
             result.add(commit.toString());
         }
@@ -68,7 +59,7 @@ public class Repository {
     }
     public static String find(String message) {
         List<String> foundCommits = new ArrayList<>();
-        List<Commit> allCommits = getAllCommits();
+        List<Commit> allCommits = Store.getAllCommits();
         for (Commit commit : allCommits) {
             if (commit.getMessage().equals(message)) {
                 foundCommits.add(commit.getUid());
@@ -77,7 +68,7 @@ public class Repository {
         return String.join("\n", foundCommits);
     }
 
-    public static Commit getActiveCommit() {
+    private static Commit getActiveCommit() {
         Branch branch = new Branch();
         return branch.getHeadCommit();
     }

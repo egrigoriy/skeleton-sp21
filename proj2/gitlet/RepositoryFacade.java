@@ -88,7 +88,7 @@ public class RepositoryFacade {
         if (!Repository.isInitialized()) {
             throw new GitletException(Errors.ERR_REPO_NOT_INIT.getText());
         }
-        System.out.println(Repository.listAllCommits());
+        System.out.println(Repository.allCommitsAsString());
     }
 
     /**

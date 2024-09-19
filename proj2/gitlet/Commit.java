@@ -37,7 +37,8 @@ public class Commit implements StorageObject, Serializable {
     }
 
     public Commit(String message, Index index, String secondParent) {
-        this.firstParent = Store.getActiveCommit().getUid();
+        Branch currentBranch = new Branch();
+        this.firstParent = currentBranch.getHeadCommitId();
         this.secondParent = secondParent;
         this.message = message;
         this.filesTable = new TreeMap<>(index.getFilesToCommit());

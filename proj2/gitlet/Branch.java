@@ -32,11 +32,18 @@ public class Branch {
     }
 
     /**
+     * Returns the id of the head commit of this branch
+     * @return commitId
+     */
+    public String getHeadCommitId() {
+        return getHeadCommit().getUid();
+    }
+    /**
      * Sets the given commit id as head of this branch
      * @param commitId
      */
     public void setHeadCommitTo(String commitId) {
-        Store.setActiveCommitTo(commitId);
+        Store.setBranchHeadCommitId(name, commitId);
     }
 
     /**
