@@ -238,13 +238,16 @@ public class Index implements Serializable {
     }
 
     /**
-     * Returns the content of a conflicted file with given name based on active commit and other commit
+     * Returns the content of a conflicted file with given name based on
+     * active commit and other commit.
      * @param fileName
      * @param activeCommit
      * @param otherCommit
      * @return fixed file content
      */
-    private static String fixConflictFileContent(String fileName, Commit activeCommit, Commit otherCommit) {
+    private static String fixConflictFileContent(String fileName,
+                                                 Commit activeCommit,
+                                                 Commit otherCommit) {
         String result = "<<<<<<< HEAD" + "\n";
         if (activeCommit.hasFile(fileName)) {
             result += Store.readBlob(activeCommit.getFileHash(fileName));
