@@ -216,6 +216,10 @@ public class Store {
         Utils.writeObject(INDEX, index);
     }
 
+    /**
+     * Returns the index stored in the store or a clear one if it does not exist.
+     * @return index
+     */
     public static Index readIndex() {
         if (INDEX.exists()) {
             return Utils.readObject(INDEX, Index.class);
@@ -224,7 +228,10 @@ public class Store {
         }
     }
 
-    // READ WRITE FROM HEAD
+    /**
+     * Sets the given branch name to the HEAD file
+     * @param branchName
+     */
     public static void setActiveBranchTo(String branchName) {
         if (branchName.contains("/")) {
             Utils.writeContents(HEAD, "ref: refs/remotes/" + branchName);
@@ -232,6 +239,11 @@ public class Store {
             Utils.writeContents(HEAD, "ref: refs/heads/" + branchName);
         }
     }
+
+    /**
+     * Returns the name of the given branch stored at HEAD
+     * @return active branch name
+     */
     public static String getActiveBranchName() {
         String headContent = Utils.readContentsAsString(HEAD);
         if (headContent.contains("remotes")) {
@@ -240,53 +252,94 @@ public class Store {
         return headContent.substring(headContent.lastIndexOf("/") + 1);
     }
 
-    // END
-
-    // GET BRANCH NAME FILE FROM REFS
+    /**
+     * Returns the file pointing to the head commit of the given branch name
+     * @param branchName
+     * @return file with head commit id
+     */
     private static File getBranchHeadFile(String branchName) {
         if (branchName.contains("/")) {
             return Utils.join(REF_REMOTES_DIR, branchName);
         }
         return Utils.join(REF_LOCAL_HEADS_DIR, branchName);
     }
-    // END
 
-
-    // GET SET CONTENT OF BRANCH FILE IN REFS
+    /**
+     * Sets the given commit id to the file referencing to the given branch head commit
+     * @param branchName
+     * @param commitId
+     */
     public static void setBranchHeadCommitId(String branchName, String commitId) {
         File branchHeadFile = getBranchHeadFile(branchName);
         Utils.writeContents(branchHeadFile, commitId);
     }
 
+    /**
+     * Returns the id of the head commit of the given branch name
+     * @param branchName
+     * @return commit id
+     */
     public static String getBranchHeadCommitId(String branchName) {
         File branchHeadFile = getBranchHeadFile(branchName);
         return Utils.readContentsAsString(branchHeadFile);
     }
 
+    /**
+     * Returns the head commit of the given branch name
+     * @param branchName
+     * @return head commit
+     */
     public static Commit getBranchHeadCommit(String branchName) {
         String commitId = getBranchHeadCommitId(branchName);
         return readCommit(commitId);
     }
+
+    /**
+     * Returns the id of the active branch head commit
+     * @return head commit id
+     */
     private static String getActiveCommitId() {
         return getBranchHeadCommitId(getActiveBranchName());
     }
-    // END
 
+    /**
+     * Creates a branch with a given name
+     * @param name
+     */
     public static void createBranch(String name) {
         setBranchHeadCommitId(name, getActiveCommitId());
     }
+
+    /**
+     * Remove the branch with the given name
+     * @param branchName
+     */
     public static void removeBranch(String branchName) {
         File filePath = getBranchHeadFile(branchName);
         filePath.delete();
     }
 
+    /**
+     * Returns true if a branch with given name exists in the store, false otherwise
+     * @param branchName
+     * @return
+     */
     public static boolean branchExists(String branchName) {
         return getBranchHeadFile(branchName).exists();
     }
 
+    /**
+     * Returns a list of all branch names in the store
+     * @return a list of all branch names
+     */
     private static List<String> getBranchNames() {
         return Utils.plainFilenamesIn(REF_LOCAL_HEADS_DIR);
     }
+
+    /**
+     * Returns a set of all branch names, where active one is marked by a star (*)
+     * @return set of all branch names
+     */
     public static Set<String> getBranchesStatus() {
         List<String> branchNames = getBranchNames();
         String activeBranch = Store.getActiveBranchName();
@@ -301,12 +354,22 @@ public class Store {
         return result;
     }
 
+    /**
+     * Checks out the given file name from the given commit to the working directory
+     * @param fileName
+     * @param commit
+     */
     public static void checkoutFileFromCommit(String fileName, Commit commit) {
         String hash = commit.getFileHash(fileName);
         String content = readBlob(hash);
         WorkingDir.writeContentToFile(fileName, content);
     }
 
+    /**
+     * Checks out all files from the given commit to the working directory.
+     * The working directory is first cleaned.
+     * @param commit
+     */
     public static void checkoutFilesFromCommit(Commit commit) {
         WorkingDir.clean();
         Set<String> checkedOutFileNames = commit.getFileNames();
@@ -315,14 +378,31 @@ public class Store {
         }
     }
 
+
+    /**
+     * Returns true if a remote with given name is tracked by the store, otherwise false
+     * @param remoteName
+     * @return boolean
+     */
     public static boolean remoteExists(String remoteName) {
         return getRemoteRefsDir(remoteName).exists();
     }
 
+    /**
+     * Returns the directory tracking the given remote name
+     * @param remoteName
+     * @return
+     */
     private static File getRemoteRefsDir(String remoteName) {
         return Utils.join(REF_REMOTES_DIR, remoteName);
     }
 
+    /**
+     * Adds for tracking under given remote name having given remote url.
+     * The information is stored in config file.
+     * @param remoteName
+     * @param remoteDirName
+     */
     public static void addRemote(String remoteName, String remoteDirName) {
         // add to config
         setRemoteUrlToConfig(remoteName, remoteDirName);
@@ -330,29 +410,60 @@ public class Store {
         getRemoteRefsDir(remoteName).mkdirs();
     }
 
+    /**
+     * Writes to the config file given remote name and its url
+     * @param remoteName
+     * @param remoteUrl
+     */
     private static void setRemoteUrlToConfig(String remoteName, String remoteUrl) {
         Path url = Paths.get(remoteUrl).toAbsolutePath().normalize();
         Utils.writeContents(CONFIG, "remote." + remoteName + ".url=" + url);
     }
 
+    /**
+     * Returns the url corresponding to the given remote name
+     * @param remoteName
+     * @return remote url
+     */
     private static File getRemoteUrlFromConfig(String remoteName) {
         String configLine = Utils.readContentsAsString(CONFIG);
         String urlString = configLine.split("=")[1];
         return Utils.join(urlString);
     }
 
+    /**
+     * Returns true if the remote url does not exist, otherwise false
+     * @param remoteName
+     * @return boolean
+     */
     public static boolean remoteUrlExists(String remoteName) {
         File remoteUrl = getRemoteUrlFromConfig(remoteName);
         return remoteUrl.exists();
     }
 
+    /**
+     * Returns the distant ref heads directory
+     * @param remoteName
+     * @return directory file
+     */
     private static File getDistantRemoteRefHeadsDir(String remoteName) {
         return Utils.join(getRemoteUrlFromConfig(remoteName), "refs/heads");
     }
 
+    /**
+     * Returns the distant head file of the given branch of a given remote
+     * @param remoteName
+     * @param remoteBranchName
+     * @return
+     */
     private static File getDistantBranchHeadFile(String remoteName, String remoteBranchName) {
         return Utils.join(getDistantRemoteRefHeadsDir(remoteName), remoteBranchName);
     }
+
+    /**
+     * Removes the remote with given name from tracking
+     * @param remoteName
+     */
     public static void removeRemote(String remoteName) {
         // remove from config
         Utils.writeContents(CONFIG, "");
@@ -360,6 +471,12 @@ public class Store {
         getRemoteRefsDir(remoteName).delete();
     }
 
+    /**
+     * Returns true if a given branch from given remote exist on remote side, otherwise false
+     * @param remoteName
+     * @param remoteBranchName
+     * @return boolean
+     */
     public static boolean distantBranchExists(String remoteName, String remoteBranchName) {
         File remoteRefsHeadsDir = getDistantRemoteRefHeadsDir(remoteName);
         List<String> remoteBranchNames = Utils.plainFilenamesIn(remoteRefsHeadsDir);
@@ -367,29 +484,31 @@ public class Store {
     }
 
 
+    /**
+     * Returns the head commit id of the given branch of a given remote stored at distant side
+     * @param remoteName
+     * @param remoteBranchName
+     * @return commit id
+     */
     private static String getDistantBranchHeadCommitId(String remoteName, String remoteBranchName) {
         File path = getDistantBranchHeadFile(remoteName, remoteBranchName);
         return Utils.readContentsAsString(path);
     }
 
+    /**
+     * Copies all objects from distant site of given remote to the local store
+     * @param remoteName
+     */
     public static void copyDistantObjectsToLocal(String remoteName) {
         File remoteUrl = getRemoteUrlFromConfig(remoteName);
         File distantObjectsDir = Utils.join(remoteUrl, "objects");
         copyObjects(distantObjectsDir, OBJECTS_DIR);
     }
 
-    public static void copyDistantBranchHeadToLocal(String remoteName, String remoteBranchName) {
-        String commitId = getDistantBranchHeadCommitId(remoteName, remoteBranchName);
-        File localBranchHeadFile = Utils.join(getRemoteRefsDir(remoteName), remoteBranchName);
-        Utils.writeContents(localBranchHeadFile, commitId);
-    }
-
-    public static void copyLocalBranchHeadToDistant(String remoteName, String remoteBranchName) {
-        String localBranchHead = getActiveCommitId();
-        File distantBranchHeadFile = getDistantBranchHeadFile(remoteName, remoteBranchName);
-        Utils.writeContents(distantBranchHeadFile, localBranchHead);
-    }
-
+    /**
+     * Copies all objects from local store to the distant one corresponding to a given remote
+     * @param remoteName
+     */
     public static void copyLocalObjectsToDistant(String remoteName) {
         File remoteUrl = getRemoteUrlFromConfig(remoteName);
         File distantObjectsDir = Utils.join(remoteUrl, "objects");
@@ -407,6 +526,36 @@ public class Store {
             }
         }
     }
+
+    /**
+     * Copies the branch head file from distant side of the given remote and branch to the local
+     * @param remoteName
+     * @param remoteBranchName
+     */
+    public static void copyDistantBranchHeadToLocal(String remoteName, String remoteBranchName) {
+        String commitId = getDistantBranchHeadCommitId(remoteName, remoteBranchName);
+        File localBranchHeadFile = Utils.join(getRemoteRefsDir(remoteName), remoteBranchName);
+        Utils.writeContents(localBranchHeadFile, commitId);
+    }
+
+    /**
+     * Copies the branch head file from local to distant side of the given remote and branch
+     * @param remoteName
+     * @param remoteBranchName
+     */
+    public static void copyLocalBranchHeadToDistant(String remoteName, String remoteBranchName) {
+        String localBranchHead = getActiveCommitId();
+        File distantBranchHeadFile = getDistantBranchHeadFile(remoteName, remoteBranchName);
+        Utils.writeContents(distantBranchHeadFile, localBranchHead);
+    }
+
+    /**
+     * Returns true if the given branch of given remote on local side is behind the distant one,
+     * otherwise false.
+     * @param remoteName
+     * @param remoteBranchName
+     * @return
+     */
     public static boolean isLocalBehindRemote(String remoteName, String remoteBranchName) {
         File remoteRef = Utils.join(REF_REMOTES_DIR, remoteName, remoteBranchName);
         if (!remoteRef.exists()) {
@@ -423,6 +572,4 @@ public class Store {
         }
         return true;
     }
-
-
 }
