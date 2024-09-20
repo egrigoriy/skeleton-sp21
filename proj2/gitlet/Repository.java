@@ -172,6 +172,6 @@ public class Repository {
      * @return
      */
     public static Commit findSplitCommit(Commit commit1, Commit commit2) {
-        return DAG.findSplitCommit(commit1, commit2);
+        return SplitCommitFinder.find(commit1, commit2);
     }
 }

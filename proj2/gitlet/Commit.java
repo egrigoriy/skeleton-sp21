@@ -90,12 +90,21 @@ public class Commit implements StorageObject, Serializable {
         return uid;
     }
 
+
     /**
      * Returns the uid of the first parent of this commit
      * @return uid
      */
     public String getFirstParent() {
         return firstParent;
+    }
+
+    /**
+     * Returns the hash of the second parent of this commit
+     * @return uid
+     */
+    public String getSecondParent() {
+        return secondParent;
     }
 
     /**
@@ -148,14 +157,6 @@ public class Commit implements StorageObject, Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(getUid());
-    }
-
-    /**
-     * Returns the hash of the second parent of this commit
-     * @return uid
-     */
-    public String getSecondParent() {
-        return secondParent;
     }
 
     /**
@@ -222,7 +223,7 @@ public class Commit implements StorageObject, Serializable {
      * but present in the given one. Returns false otherwise.
      * @param fileName
      * @param other
-     * @return
+     * @return boolean
      */
     public boolean hasRemoved(String fileName, Commit other) {
         return !this.hasFile(fileName) && other.hasFile(fileName);
