@@ -229,12 +229,11 @@ public class Index implements Serializable {
                                                    Commit activeCommit,
                                                    Commit otherCommit,
                                                    Commit splitCommit) {
-        return splitCommit.hasFile(fileName)
-                && !activeCommit.hasSameEntryFor(fileName, splitCommit)
+        return (activeCommit.hasModified(fileName, splitCommit)
+                || activeCommit.hasRemoved(fileName, splitCommit))
                 && otherCommit.hasModified(fileName, splitCommit)
-                || splitCommit.hasFile(fileName)
-                && activeCommit.hasModified(fileName, splitCommit)
-                && !otherCommit.hasFile(fileName);
+                || (activeCommit.hasModified(fileName, splitCommit)
+                && (otherCommit.hasRemoved(fileName, splitCommit)));
     }
 
     /**

@@ -183,16 +183,48 @@ public class Commit implements StorageObject, Serializable {
         return filesTable.get(fileName);
     }
 
+    /**
+     * Returns true if this commit has same file entry for given file name as given commit,
+     * otherwise false
+     * @param fileName
+     * @param other
+     * @return boolean
+     */
     public boolean hasSameEntryFor(String fileName, Commit other) {
         return this.hasFile(fileName) && other.hasFile(fileName)
                 && this.getHash(fileName).equals(other.getHash(fileName));
     }
 
+    /**
+     * Returns true if this commit has file hash different from one in the given commit,
+     * otherwise false
+     * @param fileName
+     * @param other
+     * @return boolean
+     */
     public boolean hasModified(String fileName, Commit other) {
         return this.hasFile(fileName) && other.hasFile(fileName)
                 && !this.getHash(fileName).equals(other.getHash(fileName));
     }
+
+    /**
+     * Returns true if this commit has file missing in the given commit, otherwise false
+     * @param fileName
+     * @param other
+     * @return boolean
+     */
     public boolean hasCreated(String fileName, Commit other) {
         return this.hasFile(fileName) && !other.hasFile(fileName);
+    }
+
+    /**
+     * Returns true if a file with given name was removed from this commit,
+     * but present in the given one. Returns false otherwise.
+     * @param fileName
+     * @param other
+     * @return
+     */
+    public boolean hasRemoved(String fileName, Commit other) {
+        return !this.hasFile(fileName) && other.hasFile(fileName);
     }
 }
