@@ -5,10 +5,12 @@ import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-public class BSTMap<K, V> implements Map61B<K, V> {
+public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
+    private int size = 0;
+
     @Override
     public void clear() {
-
+        size = 0;
     }
 
     @Override
@@ -23,12 +25,12 @@ public class BSTMap<K, V> implements Map61B<K, V> {
 
     @Override
     public int size() {
-        return 0;
+        return size;
     }
 
     @Override
     public void put(K key, V value) {
-
+        size++;
     }
 
     @Override
