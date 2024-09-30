@@ -2,8 +2,6 @@ package bstmap;
 
 import java.util.Iterator;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
 
 public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     private int size = 0;
@@ -51,16 +49,6 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     @Override
     public Iterator<K> iterator() {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void forEach(Consumer<? super K> action) {
-        Map61B.super.forEach(action);
-    }
-
-    @Override
-    public Spliterator<K> spliterator() {
-        return Map61B.super.spliterator();
     }
 
     public void printInOrder() {
