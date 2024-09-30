@@ -1,5 +1,6 @@
 package bstmap;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -81,13 +82,72 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     @Override
     public Set<K> keySet() {
-        throw new UnsupportedOperationException();
+        Set<K> set = new HashSet<K>();
+        keyset(root, set);
+        return set;
+    }
+
+    private void keyset(BSTNode node, Set<K> set) {
+        if (node == null) {
+            return;
+        }
+        set.add(node.key);
+        keyset(node.left, set);
+        keyset(node.right, set);
     }
 
     @Override
     public V remove(K key) {
-        throw new UnsupportedOperationException();
+        if (key.compareTo(root.key) == 0) {
+//            V value = root.value;
+//            K lessRootKey = getLessKey(root);
+//            BSTNode lessRootKeyNode = remove(root, lessRootKey);
+//            lessRootKeyNode.left = root.left;
+//            lessRootKeyNode.right = root.right;
+//            root = lessRootKeyNode;
+//            return value;
+        }
+        return remove(root, key).value;
+//        throw new UnsupportedOperationException();
     }
+
+    private K getLessKey(BSTNode node) {
+        BSTNode leftBound = node.left;
+        BSTNode current = leftBound;
+        while (current.right != null) {
+            current = current.right;
+        }
+        return current.key;
+    }
+
+    private BSTNode remove(BSTNode node, K key) {
+        if (isLeaf(node)) {
+            return null;
+        }
+        if (key.compareTo(node.key) < 0) {
+            node.left = remove(node.left, key);
+        }
+        if (key.compareTo(node.key) > 0) {
+            node.right = remove(node.right, key);
+        }
+        if ((node.left == null) && (node.right != null)) {
+            return node.right;
+        }
+        if ((node.left != null) && (node.right == null)) {
+            return node.left;
+        }
+        return node;
+    }
+
+    private boolean isLeaf(BSTNode node) {
+        return (node.left == null) && (node.right == null);
+    }
+
+    private boolean oneChild(BSTNode node) {
+        return ((node.left == null) && (node.right != null))
+                || ((node.left != null) && (node.right == null));
+    }
+
 
     @Override
     public V remove(K key, V value) {
