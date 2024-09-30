@@ -5,15 +5,36 @@ import java.util.Set;
 
 public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     private int size = 0;
+    private BSTNode root = null;
+
+    private class BSTNode {
+        public K key;
+        public V value;
+        public BSTNode left;
+        public BSTNode right;
+
+        public BSTNode(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
 
     @Override
     public void clear() {
+        root = null;
         size = 0;
     }
 
     @Override
     public boolean containsKey(K key) {
-        return false;
+        return containsKey(root, key);
+    }
+
+    private boolean containsKey(BSTNode node, K key) {
+        if (node == null) {
+            return false;
+        }
+        return node.key.equals(key) || containsKey(node.left, key) || containsKey(node.right, key);
     }
 
     @Override
@@ -28,7 +49,21 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     @Override
     public void put(K key, V value) {
+        root = put(root, key, value);
         size++;
+    }
+
+    private BSTNode put(BSTNode node, K key, V value) {
+        if (node == null) {
+            return new BSTNode(key, value);
+        }
+        if (key.compareTo(node.key) < 0) {
+            node.left = put(node.left, key, value);
+        }
+        else if (key.compareTo(node.key) > 0) {
+            node.right = put(node.right, key, value);
+        }
+        return node;
     }
 
     @Override
