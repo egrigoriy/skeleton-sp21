@@ -82,42 +82,37 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     @Override
     public Set<K> keySet() {
-        Set<K> set = new HashSet<K>();
-        keyset(root, set);
-        return set;
+        Set<K> keys = new HashSet<K>();
+        keyset(root, keys);
+        return keys;
     }
 
-    private void keyset(BSTNode node, Set<K> set) {
+    private void keyset(BSTNode node, Set<K> keys) {
         if (node == null) {
             return;
         }
-        set.add(node.key);
-        keyset(node.left, set);
-        keyset(node.right, set);
+        keys.add(node.key);
+        keyset(node.left, keys);
+        keyset(node.right, keys);
     }
 
     @Override
     public V remove(K key) {
-        if (key.compareTo(root.key) == 0) {
-//            V value = root.value;
-//            K lessRootKey = getLessKey(root);
-//            BSTNode lessRootKeyNode = remove(root, lessRootKey);
-//            lessRootKeyNode.left = root.left;
-//            lessRootKeyNode.right = root.right;
-//            root = lessRootKeyNode;
-//            return value;
+        V value = get(key);
+        if (value == null) {
+            return null;
         }
-        return remove(root, key).value;
-//        throw new UnsupportedOperationException();
+        root = remove(root, key);
+        size--;
+        return value;
     }
 
-    private K getLessKey(BSTNode node) {
-        BSTNode leftBound = node.left;
-        BSTNode current = leftBound;
+    private BSTNode predecessor(BSTNode node) {
+        BSTNode current = node;
         while (current.right != null) {
             current = current.right;
         }
-        return current.key;
+        return current;
     }
 
     private BSTNode remove(BSTNode node, K key) {
@@ -130,11 +125,20 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         if (key.compareTo(node.key) > 0) {
             node.right = remove(node.right, key);
         }
-        if ((node.left == null) && (node.right != null)) {
-            return node.right;
-        }
-        if ((node.left != null) && (node.right == null)) {
-            return node.left;
+        if (key.compareTo(node.key) == 0) {
+            if ((node.left == null) && (node.right != null)) {
+                node = node.right;
+            }
+            if ((node.left != null) && (node.right == null)) {
+                node = node.left;
+            }
+            if ((node.left != null) && (node.right != null)) {
+                BSTNode predecessorNode = predecessor(node.left);
+                node.left = remove(node.left, predecessorNode.key);
+                predecessorNode.left = node.left;
+                predecessorNode.right = node.right;
+                node = predecessorNode;
+            }
         }
         return node;
     }
