@@ -1,0 +1,18 @@
+RandomInsert
+
+stringLength = 5
+                    10^4        10^5        10^6
+====================================================
+ULLMap              0.16        SO          SO
+BSTMap (mine)       0.01        0.06        1.05
+TreeMap             0.01        0.04        0.95
+HashMap             0.00        0.04        0.34
+
+InOrderInsert
+
+                    10^4        10^5        10^6
+====================================================
+ULLMap              0.28        SO          SO
+BSTMap (mine)       0.31        SO          SO
+TreeMap             0.01        0.06        0.52
+HashMap             0.00        0.03        1.00
