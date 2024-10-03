@@ -1,9 +1,6 @@
 package hashmap;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  *  A hash table-backed Map implementation. Provides amortized constant time
@@ -34,7 +31,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     // You should probably define some more!
     private int initialSize;
     private double maxLoad;
-    private int size;
+    private HashSet<K> keys = new HashSet<>();
 
     /** Constructors */
     public MyHashMap() {
@@ -111,33 +108,39 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     @Override
     public void clear() {
-        size = 0;
+        buckets = createTable(keys.size());
+        keys.clear();
     }
 
     @Override
     public boolean containsKey(K key) {
-        return false;
+        return keys.contains(key);
     }
 
     @Override
     public V get(K key) {
+        int index = englishToInt((String) key);
+        for (Node node : buckets[index]) {
+        }
         return null;
     }
 
     @Override
     public int size() {
-        return size;
+        return keys.size();
     }
 
     @Override
     public void put(K key, V value) {
-        size++;
+        keys.add(key);
+//        int index = englishToInt((String)key);
+//        buckets[index] = createNode(key, value);
 
     }
 
     @Override
     public Set<K> keySet() {
-        return null;
+        return keys;
     }
 
     @Override
@@ -153,6 +156,24 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     @Override
     public Iterator<K> iterator() {
         return null;
+    }
+
+    /** Converts ith character of String to a letter number.
+     * e.g. 'a' -> 1, 'b' -> 2, 'z' -> 26 */
+    public static int letterNum(String s, int i) {
+        int ithChar = s.charAt(i);
+        if ((ithChar < 'a') || (ithChar > 'z'))
+        { throw new IllegalArgumentException(); }
+        return ithChar - 'a' + 1;
+    }
+
+    public static int englishToInt(String s) {
+        int intRep = 0;
+        for (int i = 0; i < s.length(); i += 1) {
+            intRep = intRep * 27;
+            intRep = intRep + letterNum(s, i);
+        }
+        return intRep;
     }
 
 }
