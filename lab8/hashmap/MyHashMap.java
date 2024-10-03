@@ -129,7 +129,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * @return hash code
      */
     private int getIndexFromKey(K key) {
-        return Math.floorMod(asciiToInt((String)key), buckets.length);
+        return Math.floorMod(asciiToInt((String) key), buckets.length);
     }
 
     /**

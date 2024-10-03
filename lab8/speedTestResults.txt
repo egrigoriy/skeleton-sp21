@@ -1,0 +1,34 @@
+RandomInsert
+-------------
+
+stringLength = 10
+                    10^4        10^5        10^6
+====================================================
+ULLMap              0.16        SO          SO
+MyHashMap (mine)    0.01        0.10        1.01
+HashMap             0.00        0.05        0.39
+
+InOrderInsert
+-------------
+                    10^4        10^5        10^6
+====================================================
+ULLMap              0.27        SO          SO
+MyHashMap (mine)    0.02        0.09        0.65
+HashMap             0.00        0.06        0.43
+
+CONCLUSION: In comparison to MyHashSet (Lab 7) the results for Random insert are almost identical.
+However, in the case of Insert in order MyHashMap is much better than MyHashSet and it is close in performance
+to Java built-in HashMap.
+
+===============================
+Change Bucket Types: Speed Test
+===============================
+
+stringLength = 10
+# string to insert into each map = 10^6
+
+class hashmap.MyHashMapALBuckets: 1.09 sec
+class hashmap.MyHashMapLLBuckets: 0.98 sec
+class hashmap.MyHashMapTSBuckets: 1.38 sec
+class hashmap.MyHashMapHSBuckets: 1.29 sec
+class hashmap.MyHashMapPQBuckets: 2.40 sec
