@@ -24,6 +24,19 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
             key = k;
             value = v;
         }
+
+        @Override
+        public int hashCode() {
+            return key.hashCode() + value.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+//            if (obj instanceof Node other) {
+//                return ((this.key == other.key) && (this.value == this.value));
+//            }
+            return false;
+        }
     }
 
     /* Instance Variables */
@@ -64,7 +77,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * Returns a new node to be placed in a hash table bucket
      */
     private Node createNode(K key, V value) {
-        return null;
+        return new Node(key, value);
     }
 
     /**
@@ -86,7 +99,8 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * OWN BUCKET DATA STRUCTURES WITH THE NEW OPERATOR!
      */
     protected Collection<Node> createBucket() {
-        return null;
+        MyHashMap<K, V> bb = new MyHashMapLLBuckets<>(initialSize, maxLoad);
+        return bb.createBucket();
     }
 
     /**
@@ -119,8 +133,12 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     @Override
     public V get(K key) {
-        int index = englishToInt((String) key);
-        for (Node node : buckets[index]) {
+        int index = Math.floorMod(asciiToInt((String)key), buckets.length);
+        Collection<Node> bucket = buckets[index];
+        for (Node node : bucket) {
+            if (key.equals(node.key)) {
+                return node.value;
+            }
         }
         return null;
     }
@@ -133,9 +151,25 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     @Override
     public void put(K key, V value) {
         keys.add(key);
-//        int index = englishToInt((String)key);
-//        buckets[index] = createNode(key, value);
+        int index = Math.floorMod(asciiToInt((String)key), buckets.length);
+        if (index > buckets.length) {
+            resize(index);
+        }
+        Collection<Node> bucket = buckets[index];
+        for (Node node : bucket) {
+            if (key.equals(node.key)) {
+                node.value = value;
+                return;
+            }
+        }
+        Node nodeToPut = createNode(key, value);
+        bucket.add(nodeToPut);
+    }
 
+    private void resize(int size) {
+        Collection<Node>[] newBuckets = createTable(size * 2);
+        System.arraycopy(buckets, 0, newBuckets, 0, buckets.length);
+        buckets = newBuckets;
     }
 
     @Override
@@ -158,20 +192,11 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         return null;
     }
 
-    /** Converts ith character of String to a letter number.
-     * e.g. 'a' -> 1, 'b' -> 2, 'z' -> 26 */
-    public static int letterNum(String s, int i) {
-        int ithChar = s.charAt(i);
-        if ((ithChar < 'a') || (ithChar > 'z'))
-        { throw new IllegalArgumentException(); }
-        return ithChar - 'a' + 1;
-    }
-
-    public static int englishToInt(String s) {
+    public static int asciiToInt(String s) {
         int intRep = 0;
         for (int i = 0; i < s.length(); i += 1) {
-            intRep = intRep * 27;
-            intRep = intRep + letterNum(s, i);
+            intRep = intRep * 126;
+            intRep = intRep + s.charAt(i);
         }
         return intRep;
     }
