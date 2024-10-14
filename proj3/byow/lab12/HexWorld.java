@@ -16,7 +16,7 @@ public class HexWorld {
         // build the world
         World world = new World(WIDTH, HEIGHT);
         int hexSize = 4;
-        int nbrRings = 2;
+        int nbrRings = 4;
         Posn centralPosn = new Posn(WIDTH/2 - hexSize, HEIGHT/2 - hexSize);
         world.addHexMosaic(hexSize, centralPosn, nbrRings);
 
