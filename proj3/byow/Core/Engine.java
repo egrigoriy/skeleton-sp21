@@ -2,13 +2,19 @@ package byow.Core;
 
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
+import byow.Core.World;
 
 public class Engine {
     TERenderer ter = new TERenderer();
+    private World world;
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
 
+    public Engine() {
+        ter.initialize(WIDTH, HEIGHT);
+        world = new World(WIDTH, HEIGHT);
+    }
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
@@ -46,7 +52,11 @@ public class Engine {
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
 
-        TETile[][] finalWorldFrame = null;
+        TETile[][] finalWorldFrame = world.getState();
         return finalWorldFrame;
+    }
+
+    public String toString() {
+        return world.toString();
     }
 }
