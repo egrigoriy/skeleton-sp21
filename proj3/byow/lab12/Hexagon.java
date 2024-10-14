@@ -42,6 +42,7 @@ public class Hexagon implements Figure {
     private final int height;
 
     private final Posn posn;
+    private TETile[][] tiles;
 
     public Hexagon(int size, Posn posn) {
         this.size = size;
@@ -76,16 +77,20 @@ public class Hexagon implements Figure {
 
     @Override
     public TETile[][] getTiles() {
-        TETile[][] tiles = new TETile[width][height];
+        if (tiles != null) {
+            return tiles;
+        }
+        TETile[][] newTiles = new TETile[width][height];
         TETile tile = getRandomTile();
         for (int x = 0; x < getWidth(); x++) {
             for (int y = 0; y < getHeight(); y++) {
                 if (isOccupied(x, y)) {
-                    tiles[x][y] = tile;
+                    newTiles[x][y] = tile;
                 }
             }
         }
-        return tiles;
+        tiles = newTiles;
+        return newTiles;
     }
 
     /**
