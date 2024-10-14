@@ -12,7 +12,6 @@ public class Engine {
     public static final int HEIGHT = 30;
 
     public Engine() {
-        ter.initialize(WIDTH, HEIGHT);
         world = new World(WIDTH, HEIGHT);
     }
     /**
@@ -52,6 +51,7 @@ public class Engine {
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
 
+//        ter.initialize(WIDTH, HEIGHT);
         TETile[][] finalWorldFrame = world.getState();
         return finalWorldFrame;
     }
