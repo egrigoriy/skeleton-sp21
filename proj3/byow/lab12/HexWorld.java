@@ -1,19 +1,13 @@
 package byow.lab12;
-import org.junit.Test;
-import static org.junit.Assert.*;
 
 import byow.TileEngine.TERenderer;
-import byow.TileEngine.TETile;
-import byow.TileEngine.Tileset;
-
-import java.util.Random;
 
 /**
  * Draws a world consisting of hexagonal regions.
  */
 public class HexWorld {
-    private static final int WIDTH = 30;
-    private static final int HEIGHT = 30;
+    private static final int WIDTH = 50;
+    private static final int HEIGHT = 50;
     public static void main(String[] args) {
         // initialize TERenderer
         TERenderer ter = new TERenderer();
@@ -21,9 +15,12 @@ public class HexWorld {
 
         // build the world
         World world = new World(WIDTH, HEIGHT);
-        world.addHexagon(3, new Posn(WIDTH/2, HEIGHT/2));
+        int hexSize = 4;
+        int nbrRings = 2;
+        Posn centralPosn = new Posn(WIDTH/2 - hexSize, HEIGHT/2 - hexSize);
+        world.addHexMosaic(hexSize, centralPosn, nbrRings);
 
         // render the world
-        ter.renderFrame(world.getContent());
+        ter.renderFrame(world.getState());
     }
 }

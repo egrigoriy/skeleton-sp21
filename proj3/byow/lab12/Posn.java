@@ -1,5 +1,7 @@
 package byow.lab12;
 
+import java.util.Objects;
+
 public class Posn {
     private final int x;
     private final int y;
@@ -14,5 +16,18 @@ public class Posn {
 
     public int getY() {
         return y;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Posn posn = (Posn) o;
+        return getX() == posn.getX() && getY() == posn.getY();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getX(), getY());
     }
 }
