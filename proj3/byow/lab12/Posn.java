@@ -18,6 +18,10 @@ public class Posn {
         return y;
     }
 
+    public Posn translate(int deltaX, int deltaY) {
+        return new Posn(x + deltaX, y + deltaY);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

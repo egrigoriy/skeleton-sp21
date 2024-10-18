@@ -7,10 +7,10 @@ public class World {
     private final int width;
     private final int height;
 
-    public World(int width, int height) {
+    public World(int width, int height, long seed) {
         this.width = width;
         this.height = height;
-        this.state = new MapGenerator(width, height).generate(1234L).getContent();
+        this.state = new MapGenerator(width, height).generate(seed).getContent();
     }
 
 
@@ -31,6 +31,5 @@ public class World {
     }
 
     public void generate(long seed) {
-        this.state = new MapGenerator(width, height).generate(seed).getContent();
     }
 }

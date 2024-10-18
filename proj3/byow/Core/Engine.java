@@ -12,7 +12,6 @@ public class Engine {
     public static final int HEIGHT = 30;
 
     public Engine() {
-        world = new World(WIDTH, HEIGHT);
     }
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
@@ -57,6 +56,7 @@ public class Engine {
 //        input = "n865562189400100566s";
         long seed = Long.parseLong(input.substring(1, input.length() - 1));
 //        System.out.println("SEED: " + seed);
+        world = new World(WIDTH, HEIGHT, seed);
         world.generate(seed);
         TETile[][] finalWorldFrame = world.getState();
 //        ter.renderFrame(finalWorldFrame);

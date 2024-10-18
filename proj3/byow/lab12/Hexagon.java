@@ -76,6 +76,13 @@ public class Hexagon implements Figure {
     }
 
     @Override
+    public void setTile(Posn posn) {
+        int x = this.posn.getX() - posn.getX();
+        int y = this.posn.getY() - posn.getY();
+        getTiles()[x][y] = Tileset.FLOOR;
+    }
+
+    @Override
     public TETile[][] getTiles() {
         if (tiles != null) {
             return tiles;

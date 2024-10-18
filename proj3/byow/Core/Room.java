@@ -56,7 +56,7 @@ public class Room implements Figure {
         return !isOneUpper(other) && !isOneLefter(other);
     }
 
-    public boolean isOneUpper(Figure other) {
+    private boolean isOneUpper(Figure other) {
         int thisTop = posn.getY() + height - 1;
         int thisBottom = posn.getY();
         int otherTop = other.getPosn().getY() + other.getHeight() - 1;
@@ -64,7 +64,7 @@ public class Room implements Figure {
         return thisBottom > otherTop || otherBottom > thisTop;
     }
 
-    public boolean isOneLefter(Figure other) {
+    private boolean isOneLefter(Figure other) {
         int thisLeft = posn.getX();
         int thisRight = posn.getX() + width - 1;
         int otherLeft = other.getPosn().getX();
@@ -124,24 +124,66 @@ public class Room implements Figure {
         if (tiles == null) {
             getTiles();
         }
-        punchDoor(dir);
-        nextRoom.punchDoor(dir.getOpposite());
-        int shift = (this.height - nextRoom.height) / 2;
-//        switch (dir) {
-//            case RIGHT: {
-//                punchDoor(dir);
-//                nextRoom.punchDoor(DIRECTION.LEFT);
-//                break;
-//            }
-//        }
-//        if (onRightSide(nextRoom)) {
-//            tiles[width - 1][height/2] = Tileset.MOUNTAIN;
-//            nextRoom.getTiles()[0][nextRoom.getHeight()/2] = Tileset.MOUNTAIN;
-//        }
-//        if (onLeftSide(nextRoom)) {
-//            tiles[0][height/2] = Tileset.WATER;
-//            nextRoom.getTiles()[nextRoom.getHeight() - 1][nextRoom.getHeight()/2] = Tileset.WATER;
-//        }
+
+//        punchDoor(dir);
+//        nextRoom.punchDoor(dir.getOpposite());
+        int shiftH = (this.height - nextRoom.height);
+        int shiftW = (this.width - nextRoom.width);
+        switch (dir) {
+            case RIGHT: {
+                if (shiftH % 2 == 0) {
+                    getTiles()[width - 1][height / 2] = Tileset.FLOOR;
+                    nextRoom.getTiles()[0][height/2 - shiftH/2] = Tileset.FLOOR;
+                } else if (height > nextRoom.getHeight()) {
+                    getTiles()[width - 1][height / 2 - 1 ] = Tileset.FLOOR;
+                    nextRoom.getTiles()[0][height/2 - shiftH/2 - 1] = Tileset.FLOOR;
+                } else if (height < nextRoom.getHeight()) {
+                    getTiles()[width - 1][height / 2] = Tileset.FLOOR;
+                    nextRoom.getTiles()[0][height/2 - shiftH/2] = Tileset.FLOOR;
+                }
+                break;
+            }
+            case LEFT: {
+                if (shiftH % 2 == 0) {
+                    getTiles()[0][height / 2] = Tileset.FLOOR;
+                    nextRoom.getTiles()[nextRoom.getWidth() - 1][height/2 - shiftH/2] = Tileset.FLOOR;
+               } else if (height > nextRoom.getHeight()) {
+                    getTiles()[0][height / 2 - 1 ] = Tileset.FLOOR;
+                    nextRoom.getTiles()[nextRoom.getWidth() - 1][height/2 - shiftH/2 - 1] = Tileset.FLOOR;
+                } else if (height < nextRoom.getHeight()) {
+                    getTiles()[0][height / 2] = Tileset.FLOOR;
+                    nextRoom.getTiles()[nextRoom.getWidth() - 1][height/2 - shiftH/2] = Tileset.FLOOR;
+                }
+                break;
+            }
+            case UP: {
+                if (shiftW % 2 == 0) {
+                    getTiles()[width/2][height - 1] = Tileset.FLOOR;
+                    nextRoom.getTiles()[width/2 - shiftW/2][0] = Tileset.FLOOR;
+                } else if (width > nextRoom.getWidth()) {
+                    getTiles()[width /2 - 1][height -1] = Tileset.FLOOR;
+                    nextRoom.getTiles()[width/2 - shiftW/2 - 1][0] = Tileset.FLOOR;
+                } else if (width < nextRoom.getWidth()) {
+                    getTiles()[width /2][height -1] = Tileset.FLOOR;
+                    nextRoom.getTiles()[width/2 - shiftW/2 ][0] = Tileset.FLOOR;
+                }
+                break;
+            }
+            case DOWN: {
+                if (shiftW % 2 == 0) {
+                    getTiles()[width/2][0] = Tileset.FLOOR;
+                    nextRoom.getTiles()[width/2 - shiftW/2][nextRoom.getHeight() - 1] = Tileset.FLOOR;
+                } else if (width > nextRoom.getWidth()) {
+                    getTiles()[width /2 - 1][0] = Tileset.FLOOR;
+                    nextRoom.getTiles()[width/2 - shiftW/2 - 1][nextRoom.getHeight() -1] = Tileset.FLOOR;
+                } else if (width < nextRoom.getWidth()) {
+                    getTiles()[width /2][0] = Tileset.FLOOR;
+                    nextRoom.getTiles()[width/2 - shiftW/2 ][nextRoom.getHeight() - 1] = Tileset.FLOOR;
+                }
+                break;
+            }
+        }
+
     }
 
     private void punchDoor(DIRECTION dir) {
