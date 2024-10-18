@@ -1,9 +1,5 @@
 package byow.Core;
 
-import byow.TileEngine.TETile;
-import byow.TileEngine.Tileset;
-import org.checkerframework.checker.units.qual.A;
-
 import java.util.*;
 
 public class MapGenerator {
