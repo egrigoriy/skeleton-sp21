@@ -53,6 +53,7 @@ public class Engine {
 
 //        ter.initialize(WIDTH, HEIGHT);
         TETile[][] finalWorldFrame = world.getState();
+//        ter.renderFrame(finalWorldFrame);
         return finalWorldFrame;
     }
 

@@ -28,6 +28,7 @@ public class DemoInputSource {
         while (inputSource.possibleNextInput()) {
             totalCharacters += 1;
             char c = inputSource.getNextKey();
+            System.out.print(c);
             if (c == 'M') {
                 System.out.println("moo");
             }

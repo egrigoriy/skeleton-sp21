@@ -1,7 +1,6 @@
 package byow.Core;
 
 import byow.TileEngine.TETile;
-import byow.TileEngine.Tileset;
 
 public class World {
     private final TETile[][] state;
@@ -11,18 +10,9 @@ public class World {
     public World(int width, int height) {
         this.width = width;
         this.height = height;
-        this.state = initialize(width, height);
+        this.state = new MapGenerator(width, height).generate(1234L).getContent();
     }
 
-    private TETile[][] initialize(int width, int height) {
-        TETile[][] state = new TETile[width][height];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                state[x][y] = Tileset.AVATAR;
-            }
-        }
-        return state;
-    }
 
     public TETile[][] getState() {
         return state;
@@ -31,8 +21,8 @@ public class World {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        for (int y = height - 1; y <=0; y--) {
+            for (int x = 0; x < width; x++) {
                 result.append(state[x][y].character());
             }
             result.append("\n");
