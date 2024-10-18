@@ -53,7 +53,10 @@ public class Engine {
 
 //        ter.initialize(WIDTH, HEIGHT);
 
+//        input = "n7685817615627686380s";
+//        input = "n865562189400100566s";
         long seed = Long.parseLong(input.substring(1, input.length() - 1));
+//        System.out.println("SEED: " + seed);
         world.generate(seed);
         TETile[][] finalWorldFrame = world.getState();
 //        ter.renderFrame(finalWorldFrame);

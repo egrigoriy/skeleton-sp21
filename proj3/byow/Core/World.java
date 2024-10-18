@@ -31,6 +31,6 @@ public class World {
     }
 
     public void generate(long seed) {
-        this.state = new MapGenerator(width, height).generate(1234L).getContent();
+        this.state = new MapGenerator(width, height).generate(seed).getContent();
     }
 }

@@ -58,8 +58,8 @@ public class MapGenerator {
     private Room getRandomRoom(Random random) {
         int width = RandomUtils.uniform(random, 3, 9);
         int height = RandomUtils.uniform(random, 3, 9);
-        int posnX = RandomUtils.uniform(random, width);
-        int posnY = RandomUtils.uniform(random, height);
+        int posnX = RandomUtils.uniform(random, 30);
+        int posnY = RandomUtils.uniform(random, 30);
         int choice = RandomUtils.uniform(random, 3);
         Posn posn = new Posn(posnX, posnY);
         switch (choice) {
