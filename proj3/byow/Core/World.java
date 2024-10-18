@@ -3,7 +3,7 @@ package byow.Core;
 import byow.TileEngine.TETile;
 
 public class World {
-    private final TETile[][] state;
+    private TETile[][] state;
     private final int width;
     private final int height;
 
@@ -28,5 +28,9 @@ public class World {
             result.append("\n");
         }
         return result.toString();
+    }
+
+    public void generate(long seed) {
+        this.state = new MapGenerator(width, height).generate(1234L).getContent();
     }
 }

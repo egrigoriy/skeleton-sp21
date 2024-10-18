@@ -52,6 +52,9 @@ public class Engine {
         // that works for many different input types.
 
 //        ter.initialize(WIDTH, HEIGHT);
+
+        long seed = Long.parseLong(input.substring(1, input.length() - 1));
+        world.generate(seed);
         TETile[][] finalWorldFrame = world.getState();
 //        ter.renderFrame(finalWorldFrame);
         return finalWorldFrame;
