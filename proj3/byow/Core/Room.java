@@ -9,12 +9,13 @@ public class Room implements Figure {
     private final int width;
     private final int height;
     private Posn posn;
-    private TETile[][] tiles;
+    private final TETile[][] tiles;
 
     public Room(int width, int height, Posn posn) {
         this.width = width;
         this.height = height;
         this.posn = posn;
+        this.tiles = fillTiles();
     }
     public int getWidth() {
         return width;
@@ -28,11 +29,7 @@ public class Room implements Figure {
         return posn;
     }
 
-    public TETile[][] getTiles() {
-        if (tiles != null) {
-            return tiles;
-        }
-
+    public TETile[][] fillTiles() {
         TETile[][] newTiles = new TETile[width][height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -43,10 +40,18 @@ public class Room implements Figure {
                 }
             }
         }
-        tiles = newTiles;
+        return newTiles;
+    }
+
+    @Override
+    public TETile[][] getTiles() {
         return tiles;
     }
 
+    @Override
+    public void setTile(int x, int y) {
+        tiles[x][y] = Tileset.FLOOR;
+    }
 
     private boolean isFloor(int x, int y) {
         return (0 < x) && (x < width - 1) && (0 < y) && (y < height - 1);
@@ -87,92 +92,76 @@ public class Room implements Figure {
     }
 
     public void makeNeighbor(Room nextRoom, DIRECTION dir) {
-        Posn newPosn;
-        int alignV = this.posn.getY() + (this.height - nextRoom.height) / 2;
-        int alignH = this.posn.getX() + (this.width - nextRoom.width) / 2;
-        switch (dir) {
-            case RIGHT:
-                newPosn = new Posn(this.posn.getX() + this.width, alignV);
-                nextRoom.setPosn(newPosn);
-                break;
-            case LEFT:
-                newPosn = new Posn(this.posn.getX() - nextRoom.getWidth(), alignV);
-                nextRoom.setPosn(newPosn);
-                break;
-            case UP:
-                newPosn = new Posn(alignH, this.posn.getY() + this.height);
-                nextRoom.setPosn(newPosn);
-                break;
-            case DOWN:
-                newPosn = new Posn(alignH, this.posn.getY() - nextRoom.getHeight());
-                nextRoom.setPosn(newPosn);
-                break;
-        }
+        Posn newNextPosn = getAlignedNextPosn(nextRoom, dir);
+        nextRoom.setPosn(newNextPosn);
     }
 
+    private Posn getAlignedNextPosn(Room nextRoom, DIRECTION dir) {
+        Posn newNextPosn = null;
+        int shiftV = (this.height - nextRoom.getHeight()) / 2;
+        int shiftH = (this.width - nextRoom.getWidth()) / 2;
+        switch (dir) {
+            case RIGHT:
+                newNextPosn = this.posn.translate(this.width, shiftV);
+                break;
+            case LEFT:
+                newNextPosn = this.posn.translate(-nextRoom.getWidth(), shiftV);
+                break;
+            case UP:
+                newNextPosn = this.posn.translate(shiftH, this.height);
+                break;
+            case DOWN:
+                newNextPosn = this.posn.translate(shiftH, -nextRoom.getHeight());
+                break;
+        }
+        return newNextPosn;
+    }
 
     public void punchDoorTo(Room nextRoom, DIRECTION dir) {
-        if (tiles == null) {
-            getTiles();
-        }
-
         int shiftH = (this.height - nextRoom.height);
         int shiftW = (this.width - nextRoom.width);
         switch (dir) {
             case RIGHT: {
-                if (shiftH % 2 == 0) {
-                    getTiles()[width - 1][height / 2] = Tileset.FLOOR;
-                    nextRoom.getTiles()[0][height/2 - shiftH/2] = Tileset.FLOOR;
+                if (shiftH % 2 == 0 || height < nextRoom.getHeight()) {
+                    this.setTile(width - 1, height / 2);
+                    nextRoom.setTile(0, height/2 - shiftH/2);
                 } else if (height > nextRoom.getHeight()) {
-                    getTiles()[width - 1][height / 2 - 1 ] = Tileset.FLOOR;
-                    nextRoom.getTiles()[0][height/2 - shiftH/2 - 1] = Tileset.FLOOR;
-                } else if (height < nextRoom.getHeight()) {
-                    getTiles()[width - 1][height / 2] = Tileset.FLOOR;
-                    nextRoom.getTiles()[0][height/2 - shiftH/2] = Tileset.FLOOR;
+                    this.setTile(width - 1, height / 2 - 1);
+                    nextRoom.setTile(0, height/2 - shiftH/2 - 1);
                 }
                 break;
             }
             case LEFT: {
-                if (shiftH % 2 == 0) {
-                    getTiles()[0][height / 2] = Tileset.FLOOR;
-                    nextRoom.getTiles()[nextRoom.getWidth() - 1][height/2 - shiftH/2] = Tileset.FLOOR;
+                if (shiftH % 2 == 0 || height < nextRoom.getHeight()) {
+                    this.setTile(0,height / 2);
+                    nextRoom.setTile(nextRoom.getWidth() - 1,height/2 - shiftH/2);
                } else if (height > nextRoom.getHeight()) {
-                    getTiles()[0][height / 2 - 1 ] = Tileset.FLOOR;
-                    nextRoom.getTiles()[nextRoom.getWidth() - 1][height/2 - shiftH/2 - 1] = Tileset.FLOOR;
-                } else if (height < nextRoom.getHeight()) {
-                    getTiles()[0][height / 2] = Tileset.FLOOR;
-                    nextRoom.getTiles()[nextRoom.getWidth() - 1][height/2 - shiftH/2] = Tileset.FLOOR;
+                    this.setTile(0, height / 2 - 1);
+                    nextRoom.setTile(nextRoom.getWidth() - 1, height/2 - shiftH/2 - 1);
                 }
                 break;
             }
             case UP: {
-                if (shiftW % 2 == 0) {
-                    getTiles()[width/2][height - 1] = Tileset.FLOOR;
-                    nextRoom.getTiles()[width/2 - shiftW/2][0] = Tileset.FLOOR;
+                if (shiftW % 2 == 0 || width < nextRoom.getWidth()) {
+                    this.setTile(width/2, height - 1);
+                    nextRoom.setTile(width/2 - shiftW/2, 0);
                 } else if (width > nextRoom.getWidth()) {
-                    getTiles()[width /2 - 1][height -1] = Tileset.FLOOR;
-                    nextRoom.getTiles()[width/2 - shiftW/2 - 1][0] = Tileset.FLOOR;
-                } else if (width < nextRoom.getWidth()) {
-                    getTiles()[width /2][height -1] = Tileset.FLOOR;
-                    nextRoom.getTiles()[width/2 - shiftW/2 ][0] = Tileset.FLOOR;
+                    this.setTile(width /2 - 1, height -1);
+                    nextRoom.setTile(width/2 - shiftW/2 - 1, 0);
                 }
                 break;
             }
             case DOWN: {
-                if (shiftW % 2 == 0) {
-                    getTiles()[width/2][0] = Tileset.FLOOR;
-                    nextRoom.getTiles()[width/2 - shiftW/2][nextRoom.getHeight() - 1] = Tileset.FLOOR;
+                if (shiftW % 2 == 0 || width < nextRoom.getWidth()) {
+                    this.setTile(width/2, 0);
+                    nextRoom.setTile(width/2 - shiftW/2, nextRoom.getHeight() - 1);
                 } else if (width > nextRoom.getWidth()) {
-                    getTiles()[width /2 - 1][0] = Tileset.FLOOR;
-                    nextRoom.getTiles()[width/2 - shiftW/2 - 1][nextRoom.getHeight() -1] = Tileset.FLOOR;
-                } else if (width < nextRoom.getWidth()) {
-                    getTiles()[width /2][0] = Tileset.FLOOR;
-                    nextRoom.getTiles()[width/2 - shiftW/2 ][nextRoom.getHeight() - 1] = Tileset.FLOOR;
+                    this.setTile(width /2 - 1, 0);
+                    nextRoom.setTile(width/2 - shiftW/2 - 1, nextRoom.getHeight() -1);
                 }
                 break;
             }
         }
-
     }
 }
 

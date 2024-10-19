@@ -50,15 +50,15 @@ public class Engine {
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
 
-        ter.initialize(WIDTH, HEIGHT);
+//        ter.initialize(WIDTH, HEIGHT);
 
-        input = "n7685817615627686380s";
+//        input = "n7685817615627686380s";
 //        input = "n865562189400100566s";
         long seed = Long.parseLong(input.substring(1, input.length() - 1));
 //        System.out.println("SEED: " + seed);
         world = new World(WIDTH, HEIGHT, seed);
         TETile[][] finalWorldFrame = world.getState();
-        ter.renderFrame(finalWorldFrame);
+//        ter.renderFrame(finalWorldFrame);
         return finalWorldFrame;
     }
 

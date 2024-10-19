@@ -15,6 +15,8 @@ public interface Figure {
     /** Returns the tile representation of the figure **/
     TETile[][] getTiles();
 
+    void setTile(int x, int y);
+
     default void print() {
         System.out.println(getPosn());
         for (int x = getWidth() - 1; x >= 0; x--) {
