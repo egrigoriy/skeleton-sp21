@@ -82,15 +82,6 @@ public class Room implements Figure {
         return false;
     }
 
-    @Override
-    public boolean contains(Posn p) {
-        int x = p.getX();
-        int y = p.getY();
-        int posnX = posn.getX();
-        int posnY = posn.getY();
-        return (posnX <= x && x <= posnX + width - 1) && (posnY <= y && y <= posnY + height - 1);
-    }
-
     public void setPosn(Posn posn) {
         this.posn = posn;
     }
@@ -125,8 +116,6 @@ public class Room implements Figure {
             getTiles();
         }
 
-//        punchDoor(dir);
-//        nextRoom.punchDoor(dir.getOpposite());
         int shiftH = (this.height - nextRoom.height);
         int shiftW = (this.width - nextRoom.width);
         switch (dir) {
@@ -185,38 +174,5 @@ public class Room implements Figure {
         }
 
     }
-
-    private void punchDoor(DIRECTION dir) {
-        int x = 0;
-        int y = 0;
-        switch (dir) {
-            case RIGHT:
-                x = width - 1;
-                if (height % 2 == 0) {
-                    y = height/2 -1;
-                } else {
-                    y = height/2;
-                }
-                break;
-            case LEFT:
-                x = 0;
-                if (height % 2 == 0) {
-                    y = height/2 -1;
-                } else {
-                    y = height/2;
-                }
-                break;
-
-        }
-        getTiles()[x][y] = Tileset.MOUNTAIN;
-    }
-
-
-
-    private boolean onRightSide(Room nextRoom) {
-        return nextRoom.getPosn().getX() == this.posn.getX() + width;
-    }
-    private boolean onLeftSide(Room nextRoom) {
-        return this.posn.getX() == nextRoom.getPosn().getX() + nextRoom.getWidth();
-    }
 }
+

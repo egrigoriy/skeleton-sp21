@@ -15,8 +15,6 @@ public interface Figure {
     /** Returns the tile representation of the figure **/
     TETile[][] getTiles();
 
-    boolean contains(Posn posn);
-
     default void print() {
         System.out.println(getPosn());
         for (int x = getWidth() - 1; x >= 0; x--) {

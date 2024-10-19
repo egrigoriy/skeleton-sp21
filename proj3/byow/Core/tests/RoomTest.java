@@ -25,62 +25,6 @@ public class RoomTest {
     }
 
     @Test
-    public void containsTrueWhenInside() {
-        Room room = new Room(5, 4, new Posn(10, 10));
-        assertTrue(room.contains(new Posn(12, 13)));
-    }
-
-    @Test
-    public void containsTrueWhenOnBottomBoundary() {
-        Room room = new Room(5, 4, new Posn(10, 10));
-        assertTrue(room.contains(new Posn(13, 10)));
-    }
-
-    @Test
-    public void containsFalseWhenJustBellowBottomBoundary() {
-        Room room = new Room(5, 4, new Posn(10, 10));
-        assertFalse(room.contains(new Posn(13, 9)));
-    }
-    @Test
-    public void containsTrueWhenOnTopBoundary() {
-        Room room = new Room(5, 4, new Posn(10, 10));
-        assertTrue(room.contains(new Posn(13, 13)));
-    }
-
-    @Test
-    public void containsFalseWhenJustOverTopBoundary() {
-        Room room = new Room(5, 4, new Posn(10, 10));
-        assertFalse(room.contains(new Posn(13, 14)));
-    }
-    @Test
-    public void containsTrueWhenOnLeftBoundary() {
-        Room room = new Room(5, 4, new Posn(10, 10));
-        assertTrue(room.contains(new Posn(10, 12)));
-    }
-
-    @Test
-    public void containsFalseWhenOverLeftBoundary() {
-        Room room = new Room(5, 4, new Posn(10, 10));
-        assertFalse(room.contains(new Posn(9, 12)));
-    }
-    @Test
-    public void containsTrueWhenOnRightBoundary() {
-        Room room = new Room(5, 4, new Posn(10, 10));
-        assertTrue(room.contains(new Posn(14, 13)));
-    }
-
-    @Test
-    public void containsFalseWhenOverRightBoundary() {
-        Room room = new Room(5, 4, new Posn(10, 10));
-        assertFalse(room.contains(new Posn(15, 13)));
-    }
-    @Test
-    public void containsFalseWhenFarOutside() {
-        Room room = new Room(5, 4, new Posn(10, 10));
-        assertFalse(room.contains(new Posn(16, 32)));
-    }
-
-    @Test
     public void overlapsTrueLeftBottomCornerInside() {
         Room room = new Room(5, 4, new Posn(10, 10));
         Room otherRoom = new Room(4, 5, new Posn(13, 12));

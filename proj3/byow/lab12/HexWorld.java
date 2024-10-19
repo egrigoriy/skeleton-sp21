@@ -14,7 +14,7 @@ public class HexWorld {
         ter.initialize(WIDTH, HEIGHT);
 
         // build the world
-        World world = new World(WIDTH, HEIGHT);
+        byow.lab12.World world = new World(WIDTH, HEIGHT);
         int hexSize = 4;
         int nbrRings = 4;
         Posn centralPosn = new Posn(WIDTH/2 - hexSize, HEIGHT/2 - hexSize);

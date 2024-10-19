@@ -29,7 +29,4 @@ public class World {
         }
         return result.toString();
     }
-
-    public void generate(long seed) {
-    }
 }

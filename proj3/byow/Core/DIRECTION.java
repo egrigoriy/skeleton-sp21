@@ -16,11 +16,21 @@ public enum DIRECTION {
     }
 
     public DIRECTION getOpposite() {
-        return switch (this) {
-            case DOWN -> UP;
-            case UP -> DOWN;
-            case LEFT -> RIGHT;
-            case RIGHT -> LEFT;
-        };
+        switch (this) {
+            case DOWN: {
+                return UP;
+            }
+            case UP: {
+                return DOWN;
+            }
+            case LEFT: {
+                return RIGHT;
+            }
+            case RIGHT: {
+                return LEFT;
+            }
+            default:
+                throw new IllegalStateException("Unexpected value: " + this);
+        }
     }
 }

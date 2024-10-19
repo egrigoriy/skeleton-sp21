@@ -3,13 +3,9 @@ package byow.Core;
 import java.util.*;
 
 public class MapGenerator {
-    private final int width;
-    private final int height;
     private final Map map;
 
     public MapGenerator(int width, int height) {
-        this.width = width;
-        this.height = height;
         map = new Map(width, height);
     }
 
@@ -28,9 +24,9 @@ public class MapGenerator {
         queue.add(startingRoom);
         while (!queue.isEmpty()) {
             Room currentRoom = queue.poll();
-            for (DIRECTION dir: DIRECTION.values()) {
-//                System.out.println(dir);
-//                currentRoom.print();
+            DIRECTION[] dirs = DIRECTION.values();
+            RandomUtils.shuffle(RANDOM, dirs);
+            for (DIRECTION dir: dirs) {
                 Room nextRoom = getRandomRoom(RANDOM);
                 currentRoom.makeNeighbor(nextRoom, dir);
                 if (map.canContain(nextRoom) && !nextRoom.overlaps(rooms)) {
@@ -43,37 +39,25 @@ public class MapGenerator {
         return rooms;
     }
 
-    private DIRECTION getRandomDirection(Random random) {
-        int num = RandomUtils.uniform(random, 5);
-        switch (num) {
-            case 0: return DIRECTION.UP;
-            case 1: return DIRECTION.DOWN;
-            case 2: return DIRECTION.LEFT;
-            case 3: return DIRECTION.RIGHT;
-            default:
-                return DIRECTION.RIGHT;
-        }
-    }
-
     private Room getRandomRoom(Random random) {
-        int width = RandomUtils.uniform(random, 3, 9);
-        int height = RandomUtils.uniform(random, 3, 9);
+        int width = RandomUtils.uniform(random, 4, 9);
+        int height = RandomUtils.uniform(random, 4, 9);
         int posnX = RandomUtils.uniform(random, 30);
         int posnY = RandomUtils.uniform(random, 30);
-        int choice = RandomUtils.uniform(random, 3);
+        int choice = RandomUtils.uniform(random, 5);
         Posn posn = new Posn(posnX, posnY);
         switch (choice) {
             case 0: {
-                return new Room(width, 3,  posn);
+                return new RoomH(width, posn);
             }
             case 1: {
-                return new Room(3, height,  posn);
+                return new RoomV(height,  posn);
             }
             case 2: {
                 return new Room(width, height, posn);
             }
             default:
-                return new Room(width, 3,  posn);
+                return new Room(width, height, posn);
         }
     }
 
