@@ -124,40 +124,40 @@ public class Room implements Figure {
             case RIGHT: {
                 if (shiftH % 2 == 0 || height < nextRoom.getHeight()) {
                     this.setTile(width - 1, height / 2);
-                    nextRoom.setTile(0, height/2 - shiftH/2);
+                    nextRoom.setTile(0, height / 2 - shiftH / 2);
                 } else if (height > nextRoom.getHeight()) {
                     this.setTile(width - 1, height / 2 - 1);
-                    nextRoom.setTile(0, height/2 - shiftH/2 - 1);
+                    nextRoom.setTile(0, height/2 - shiftH / 2 - 1);
                 }
                 break;
             }
             case LEFT: {
                 if (shiftH % 2 == 0 || height < nextRoom.getHeight()) {
                     this.setTile(0,height / 2);
-                    nextRoom.setTile(nextRoom.getWidth() - 1,height/2 - shiftH/2);
+                    nextRoom.setTile(nextRoom.getWidth() - 1,height / 2 - shiftH / 2);
                } else if (height > nextRoom.getHeight()) {
                     this.setTile(0, height / 2 - 1);
-                    nextRoom.setTile(nextRoom.getWidth() - 1, height/2 - shiftH/2 - 1);
+                    nextRoom.setTile(nextRoom.getWidth() - 1, height / 2 - shiftH / 2 - 1);
                 }
                 break;
             }
             case UP: {
                 if (shiftW % 2 == 0 || width < nextRoom.getWidth()) {
-                    this.setTile(width/2, height - 1);
+                    this.setTile(width / 2, height - 1);
                     nextRoom.setTile(width/2 - shiftW/2, 0);
                 } else if (width > nextRoom.getWidth()) {
-                    this.setTile(width /2 - 1, height -1);
-                    nextRoom.setTile(width/2 - shiftW/2 - 1, 0);
+                    this.setTile(width / 2 - 1, height - 1);
+                    nextRoom.setTile(width / 2 - shiftW/2 - 1, 0);
                 }
                 break;
             }
             case DOWN: {
                 if (shiftW % 2 == 0 || width < nextRoom.getWidth()) {
                     this.setTile(width/2, 0);
-                    nextRoom.setTile(width/2 - shiftW/2, nextRoom.getHeight() - 1);
+                    nextRoom.setTile(width / 2 - shiftW / 2, nextRoom.getHeight() - 1);
                 } else if (width > nextRoom.getWidth()) {
-                    this.setTile(width /2 - 1, 0);
-                    nextRoom.setTile(width/2 - shiftW/2 - 1, nextRoom.getHeight() -1);
+                    this.setTile(width / 2 - 1, 0);
+                    nextRoom.setTile(width / 2 - shiftW / 2 - 1, nextRoom.getHeight() -1);
                 }
                 break;
             }

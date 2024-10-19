@@ -18,19 +18,23 @@ public class Posn {
         return y;
     }
 
-    public Posn translate(int x, int y) {
-        return new Posn(this.x +x, this.y + y);
+    public Posn translate(int a, int b) {
+        return new Posn(this.x + a, this.y + b);
     }
 
     @Override
     public String toString() {
-        return "<" + x + "," + y +">";
+        return "<" + x + "," + y + ">";
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Posn posn = (Posn) o;
         return getX() == posn.getX() && getY() == posn.getY();
     }

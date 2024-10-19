@@ -16,18 +16,18 @@ public class MapGenerator {
     }
 
     private List<Figure> generateRandomRooms(long seed) {
-        Random RANDOM = new Random(seed);
+        Random randomProvider = new Random(seed);
         List<Figure> rooms = new ArrayList<>();
-        Room startingRoom = getRandomRoom(RANDOM);
+        Room startingRoom = getRandomRoom(randomProvider);
         Queue<Room> queue = new LinkedList<>();
         rooms.add(startingRoom);
         queue.add(startingRoom);
         while (!queue.isEmpty()) {
             Room currentRoom = queue.poll();
             DIRECTION[] dirs = DIRECTION.values();
-            RandomUtils.shuffle(RANDOM, dirs);
+            RandomUtils.shuffle(randomProvider, dirs);
             for (DIRECTION dir: dirs) {
-                Room nextRoom = getRandomRoom(RANDOM);
+                Room nextRoom = getRandomRoom(randomProvider);
                 currentRoom.makeNeighbor(nextRoom, dir);
                 if (map.canContain(nextRoom) && !nextRoom.overlaps(rooms)) {
                     currentRoom.punchDoorTo(nextRoom, dir);

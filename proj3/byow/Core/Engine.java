@@ -2,7 +2,6 @@ package byow.Core;
 
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
-import byow.Core.World;
 
 public class Engine {
     TERenderer ter = new TERenderer();

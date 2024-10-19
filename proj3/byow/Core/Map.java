@@ -17,10 +17,10 @@ public class Map {
         this.height = height;
     }
 
-    private TETile[][] initialize(int width, int height) {
-        TETile[][] state = new TETile[width][height];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+    private TETile[][] initialize(int w, int h) {
+        TETile[][] state = new TETile[w][h];
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
                 state[x][y] = Tileset.NOTHING;
             }
         }
@@ -70,7 +70,8 @@ public class Map {
     public boolean canContain(Figure figure) {
         int figX = figure.getPosn().getX();
         int figY = figure.getPosn().getY();
-        return canContain(figX, figY) && canContain(figX + figure.getWidth(), figY + figure.getHeight());
+        return canContain(figX, figY)
+                && canContain(figX + figure.getWidth(), figY + figure.getHeight());
     }
 
 
