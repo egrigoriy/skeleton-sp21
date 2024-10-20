@@ -69,12 +69,11 @@ public class MemoryGame {
     }
 
     public void drawFrame(String s) {
-//        System.out.println("String to draw: " + s);
         StdDraw.clear(Color.BLACK);
         StdDraw.setPenColor(Color.WHITE);
         //TOD: Take the string and display it in the center of the screen
         StdDraw.text(width/2, height/2, s);
-        //TODO: If game is not over, display relevant game information at the top of the screen
+        //TOD: If game is not over, display relevant game information at the top of the screen
         if (!gameOver) {
             int paddingTop = 2;
             int paddingSide = 1;
@@ -90,58 +89,59 @@ public class MemoryGame {
         //TOD: Display each character in letters, making sure to blank the screen between letters
         for (char c: letters.toCharArray()) {
             drawFrame(Character.toString(c));
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (Exception e) {
-            }
+            sleep(1000);
             drawFrame("");
-            try {
-                TimeUnit.MILLISECONDS.sleep(500);
-            } catch (Exception e) {
-            }
+            sleep(500);
         }
-        gameOver = true;
     }
 
     public String solicitNCharsInput(int n) {
         drawFrame("Your turn:");
-        try {
-            TimeUnit.SECONDS.sleep(2);
-        } catch (Exception e) {
-        }
-        drawFrame("");
-        //TODO: Read n letters of player input
+        sleep(2000);
+        //TOD: Read n letters of player input
         String s = "";
         int count = 0;
-        while (StdDraw.hasNextKeyTyped() && count <= n) {
+        while (StdDraw.hasNextKeyTyped() && count < n) {
             char typedChar = StdDraw.nextKeyTyped();
             s += typedChar;
             count++;
             drawFrame(s);
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (Exception e) {
-            }
+            sleep(1000);
         }
         return s;
     }
 
+    private void sleep(int timeout) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(timeout);
+        } catch (Exception e) {
+        }
+
+    }
     public void startGame() {
         //TODO: Set any relevant variables before the game starts
-        int n = 3;
-        String s = generateRandomString(n);
 //        drawFrame(s);
         //TODO: Establish Engine loop
         gameOver = false;
         round = 1;
-        while (!gameOver) {
+        while (!gameOver && round <= 5) {
+            drawFrame("Round: " + round);
+            sleep(2000);
+            String s = generateRandomString(round);
             flashSequence(s);
-            String typedString = solicitNCharsInput(n);
-            if (typedString != s) {
+            String typedString = solicitNCharsInput(round);
+            System.out.println("HAHA: " + typedString);
+            if (!typedString.equals(s)) {
+                System.out.println("S was: " + s);
                 gameOver = true;
             }
+            round++;
         }
-        drawFrame("GAME OVER! You made it to round: " + round);
+        if (gameOver) {
+            drawFrame("GAME OVER! You made it to round: " + round);
+        } else {
+            drawFrame("YOU WON!!!");
+        }
     }
 
 }
