@@ -3,6 +3,9 @@ package byow.lab13;
 import byow.Core.RandomUtils;
 import edu.princeton.cs.introcs.StdDraw;
 
+import java.sql.Time;
+import java.util.concurrent.TimeUnit;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.util.Random;
@@ -46,39 +49,99 @@ public class MemoryGame {
         this.width = width;
         this.height = height;
         StdDraw.setCanvasSize(this.width * 16, this.height * 16);
-        Font font = new Font("Monaco", Font.BOLD, 30);
+        Font font = new Font("Calibri", Font.BOLD, 30);
         StdDraw.setFont(font);
         StdDraw.setXscale(0, this.width);
         StdDraw.setYscale(0, this.height);
         StdDraw.clear(Color.BLACK);
         StdDraw.enableDoubleBuffering();
-
-        //TODO: Initialize random number generator
+        //TOD: Initialize random number generator
+        rand = new Random(seed);
     }
 
     public String generateRandomString(int n) {
-        //TODO: Generate random string of letters of length n
-        return null;
+        //TOD: Generate random string of letters of length n
+        String s = "";
+        for (int i = 0; i < n; i++) {
+            s += CHARACTERS[rand.nextInt(CHARACTERS.length)];
+        }
+        return s;
     }
 
     public void drawFrame(String s) {
-        //TODO: Take the string and display it in the center of the screen
+//        System.out.println("String to draw: " + s);
+        StdDraw.clear(Color.BLACK);
+        StdDraw.setPenColor(Color.WHITE);
+        //TOD: Take the string and display it in the center of the screen
+        StdDraw.text(width/2, height/2, s);
         //TODO: If game is not over, display relevant game information at the top of the screen
+        if (!gameOver) {
+            int paddingTop = 2;
+            int paddingSide = 1;
+            int hudHeight = 3;
+            StdDraw.textLeft(paddingSide,height - paddingTop, "Round: " + 1);
+            StdDraw.textRight(width - paddingSide, height - paddingTop, ENCOURAGEMENT[rand.nextInt(ENCOURAGEMENT.length)]);
+            StdDraw.line(0, height - hudHeight, width, height - hudHeight);
+        }
+        StdDraw.show();
     }
 
     public void flashSequence(String letters) {
-        //TODO: Display each character in letters, making sure to blank the screen between letters
+        //TOD: Display each character in letters, making sure to blank the screen between letters
+        for (char c: letters.toCharArray()) {
+            drawFrame(Character.toString(c));
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (Exception e) {
+            }
+            drawFrame("");
+            try {
+                TimeUnit.MILLISECONDS.sleep(500);
+            } catch (Exception e) {
+            }
+        }
+        gameOver = true;
     }
 
     public String solicitNCharsInput(int n) {
+        drawFrame("Your turn:");
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (Exception e) {
+        }
+        drawFrame("");
         //TODO: Read n letters of player input
-        return null;
+        String s = "";
+        int count = 0;
+        while (StdDraw.hasNextKeyTyped() && count <= n) {
+            char typedChar = StdDraw.nextKeyTyped();
+            s += typedChar;
+            count++;
+            drawFrame(s);
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (Exception e) {
+            }
+        }
+        return s;
     }
 
     public void startGame() {
         //TODO: Set any relevant variables before the game starts
-
+        int n = 3;
+        String s = generateRandomString(n);
+//        drawFrame(s);
         //TODO: Establish Engine loop
+        gameOver = false;
+        round = 1;
+        while (!gameOver) {
+            flashSequence(s);
+            String typedString = solicitNCharsInput(n);
+            if (typedString != s) {
+                gameOver = true;
+            }
+        }
+        drawFrame("GAME OVER! You made it to round: " + round);
     }
 
 }
