@@ -1,14 +1,17 @@
 package byow.lab13;
 
-import byow.Core.RandomUtils;
-import edu.princeton.cs.introcs.StdDraw;
-
-import java.sql.Time;
-import java.util.concurrent.TimeUnit;
-
-import java.awt.Color;
-import java.awt.Font;
 import java.util.Random;
+
+enum Mode {
+    WELCOME("Welcome"),
+    WATCH("Watch"),
+    TYPE("Type");
+
+    private final String mode;
+    Mode(String mode) {
+        this.mode = mode;
+    }
+}
 
 public class MemoryGame {
     private static final int MAX_ROUNDS = 5;
@@ -48,6 +51,12 @@ public class MemoryGame {
         rand = new Random(seed);
     }
 
+
+    /**
+     * Returns a string with given length n, where each letter is random.
+     * @param n
+     * @return a string
+     */
     public String generateRandomString(int n) {
         String s = "";
         for (int i = 0; i < n; i++) {
@@ -56,31 +65,39 @@ public class MemoryGame {
         return s;
     }
 
+    /**
+     * Returns a randomly chosen encouragement
+     * @return String
+     */
     public String getRandomEncouragement() {
         return ENCOURAGEMENT[rand.nextInt(ENCOURAGEMENT.length)];
     }
 
+    /**
+     * Runs main game loop
+     */
     public void startGame() {
         gameOver = false;
         round = 0;
         ui.drawWelcome();
-        while (!gameOver) {
+        while (!gameOver && round < MAX_ROUNDS) {
             round++;
             ui.setRound(round);
-            ui.drawRoundWelcome(round, getRandomEncouragement());
+            ui.setMode(Mode.WELCOME);
+            ui.drawRoundWelcome(getRandomEncouragement());
             String stringToGuess = generateRandomString(round);
-            ui.setMode("Watch!");
+            ui.setMode(Mode.WATCH);
             ui.flashSequence(stringToGuess, getRandomEncouragement());
-            ui.setMode("Type");
+            ui.setMode(Mode.TYPE);
             String playerString = ui.solicitNCharsInput(round, getRandomEncouragement());
-            if (!playerString.equals(stringToGuess) || round > MAX_ROUNDS) {
+            if (!playerString.equals(stringToGuess)) {
                 gameOver = true;
             }
         }
         if (gameOver) {
-            ui.drawText("GAME OVER! You made it to round: " + round);
+            ui.drawFinalFailureMessage("GAME OVER! You made it to round: " + round);
         } else {
-            ui.drawText("YOU WON!!!");
+            ui.drawFinalSuccessMessage("YOU WON!!!");
         }
     }
 
