@@ -1,2 +1,5 @@
-package byow.Core.commands;public interface Command {
+package byow.Core.commands;
+
+public interface Command {
+    void execute();
 }

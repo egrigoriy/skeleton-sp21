@@ -1,5 +1,6 @@
 package byow.Core;
 
+import afu.org.checkerframework.checker.oigj.qual.O;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
@@ -87,6 +88,7 @@ public class Room implements Figure {
         return false;
     }
 
+    @Override
     public void setPosn(Posn posn) {
         this.posn = posn;
     }

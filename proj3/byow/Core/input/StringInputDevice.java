@@ -1,9 +1,9 @@
-package byow.InputDemo;
+package byow.Core.input;
 
 /**
  * Created by hug.
  */
-public class StringInputDevice implements InputSource  {
+public class StringInputDevice implements InputSource {
     private String input;
     private int index;
 

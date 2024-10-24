@@ -96,5 +96,39 @@ public class Map {
         }
         return result.toString();
     }
+
+    public void placeAtRandomPosn(Figure figure) {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                figure.setPosn(new Posn(x, y));
+                if (canContain(figure) && content[x][y].equals(Tileset.FLOOR)) {
+                    addFigure(figure);
+                    return;
+                }
+            }
+        }
+    }
+
+    public void moveFigure(Figure figure, DIRECTION dir) {
+        Posn currentPosn = figure.getPosn();
+        Posn neighbor = currentPosn.getNeighbor(dir);
+        if (isFree(neighbor)) {
+            figure.setPosn(neighbor);
+            addFigure(figure);
+            makeFloor(currentPosn);
+        }
+    }
+
+    public boolean isFree(Posn posn) {
+        int x = posn.getX();
+        int y = posn.getY();
+        return content[x][y].equals(Tileset.FLOOR);
+    }
+
+    public void makeFloor(Posn posn) {
+        int x = posn.getX();
+        int y = posn.getY();
+        content[x][y] = Tileset.FLOOR;
+    }
 }
 

@@ -22,6 +22,20 @@ public class Posn {
         return new Posn(this.x + a, this.y + b);
     }
 
+    public Posn getNeighbor(DIRECTION dir) {
+        switch (dir) {
+            case UP:
+                return translate(0, 1);
+            case DOWN:
+                return translate(0, -1);
+            case RIGHT:
+                return translate(1, 0);
+            case LEFT:
+                return translate(-1, 0);
+            default:
+                return translate(0, 0);
+        }
+    }
     @Override
     public String toString() {
         return "<" + x + "," + y + ">";
