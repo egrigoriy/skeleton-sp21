@@ -4,11 +4,11 @@ import java.io.File;
 
 public class History {
     private static final File CWD = new File(System.getProperty("user.dir"));
-    private static final File historyFile = Utils.join(CWD, "history.txt");
+    private static final File HISTORY_FILE = Utils.join(CWD, "history.txt");
     private String history = "";
 
     public String load() {
-        return Utils.readContentsAsString(historyFile);
+        return Utils.readContentsAsString(HISTORY_FILE);
     }
 
     public void update(String s) {
@@ -16,6 +16,6 @@ public class History {
     }
 
     public void save() {
-        Utils.writeContents(historyFile, history);
+        Utils.writeContents(HISTORY_FILE, history);
     }
 }
