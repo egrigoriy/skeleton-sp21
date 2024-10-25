@@ -53,7 +53,7 @@ public class InputParser {
                     result.addAll(parse());
                     break;
                 case ":":
-                    result.addAll(handleQuit());
+                    result.addAll(handleSave());
                     break;
                 default:
 //                    throw new IllegalArgumentException("Input string is invalid");
@@ -62,7 +62,7 @@ public class InputParser {
         return result;
     }
 
-    private List<Command> handleQuit() {
+    private List<Command> handleSave() {
         List<Command> result = new ArrayList<>();
         if (nextKeyLowerCase().equals("q")) {
             result.add(new SaveCommand(engine));

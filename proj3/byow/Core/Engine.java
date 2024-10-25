@@ -17,21 +17,37 @@ public class Engine {
     public static final int HEIGHT = 30;
     private EngineUI ui;
 
-    private String history = "";
-    private static final File CWD = new File(System.getProperty("user.dir"));
-    private static final File historyFile = Utils.join(CWD, "history.txt");
+    private History history = new History();
 
+    public String loadHistory() {
+        return history.load();
+    }
 
-    private void start(InputSource inputSource) {
+    public void updateHistory(String action) {
+        history.update(action);
+    }
+
+    public void save() {
+        history.save();
+    }
+
+    private void quit() {
+        System.exit(0);
+    }
+
+    /**
+     * Method used for exploring a fresh world. This method should handle all inputs,
+     * including inputs from the main menu.
+     */
+    public void interactWithKeyboard() {
+        InputSource keyboardInputSource = new KeyboardInputSource();
         ui = new EngineUI();
         ui.displayMenu();
-        while (inputSource.possibleNextInput()) {
-            String s = getNextKey(inputSource);
+        while (keyboardInputSource.possibleNextInput()) {
+            String s = getNextKey(keyboardInputSource);
             ui.render(interactWithInputString(s));
         }
     }
-
-
     private String getNextKey(InputSource inputSource) {
         String s = Character.toString(inputSource.getNextKey()).toLowerCase();
         if (s.equals(":")) {
@@ -47,12 +63,12 @@ public class Engine {
         }
         if (s.equals("n")) {
             // DISPLAY INPUT SEED
-            ui.displayMenuWithSeed();
+            ui.displayMenuForSeed();
             String seed = "";
             String nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
             while (!nextKey.equals("s")) {
                 seed += nextKey;
-                ui.displayMenuWithSeed(seed);
+                ui.displayMenuForSeed(seed);
                 nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
             }
             return "n" + seed + "s";
@@ -61,33 +77,6 @@ public class Engine {
             return loadHistory();
         }
         return s;
-    }
-
-
-    public void save() {
-        Utils.writeContents(historyFile, history);
-    }
-
-
-    public String loadHistory() {
-        return Utils.readContentsAsString(historyFile);
-    }
-
-    public void updateHistory(String action) {
-        history += action;
-    }
-
-    private void quit() {
-        System.exit(0);
-    }
-
-    /**
-     * Method used for exploring a fresh world. This method should handle all inputs,
-     * including inputs from the main menu.
-     */
-    public void interactWithKeyboard() {
-        InputSource keyboardInputSource = new KeyboardInputSource();
-        start(keyboardInputSource);
     }
 
     /**
