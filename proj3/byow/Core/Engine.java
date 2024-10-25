@@ -7,7 +7,6 @@ import byow.Core.input.KeyboardInputSource;
 import byow.Core.input.StringInputDevice;
 import byow.TileEngine.TETile;
 
-import java.io.File;
 import java.util.List;
 
 public class Engine {
