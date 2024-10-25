@@ -2,8 +2,6 @@ package byow.Core.commands;
 
 import byow.Core.Engine;
 
-import java.util.Objects;
-
 public class NewWorldCommand extends AbstractCommand {
     private final long seed;
 

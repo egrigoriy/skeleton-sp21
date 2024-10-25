@@ -54,6 +54,7 @@ public class InputParser {
                     break;
                 case ":":
                     result.addAll(handleQuit());
+                    break;
                 default:
 //                    throw new IllegalArgumentException("Input string is invalid");
             }
