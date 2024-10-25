@@ -27,14 +27,9 @@ public class Engine {
 
     public void start(InputSource inputSource) {
         ter.initialize(WIDTH, HEIGHT);
-        // display menu
-//        String tempHist = "L";
-//        String tempHist = "LWWWDDD";
-//        System.out.println(tempHist);
-//        ter.renderFrame(interactWithInputString(tempHist));
         while (inputSource.possibleNextInput()) {
             String s = getNextKey(inputSource);
-            System.out.println(s);
+//            System.out.println(s);
             ter.renderFrame(interactWithInputString(s));
         }
     }
