@@ -21,11 +21,9 @@ public class Engine {
     private static final File CWD = new File(System.getProperty("user.dir"));
     private static final File historyFile = Utils.join(CWD, "history.txt");
 
-    public Engine() {
-        ui = new EngineUI();
-    }
 
     private void start(InputSource inputSource) {
+        ui = new EngineUI();
         ui.displayMenu();
         while (inputSource.possibleNextInput()) {
             String s = getNextKey(inputSource);
