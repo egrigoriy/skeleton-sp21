@@ -5,34 +5,34 @@ import byow.Core.input.InputParser;
 import byow.Core.input.InputSource;
 import byow.Core.input.KeyboardInputSource;
 import byow.Core.input.StringInputDevice;
-import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 
 import java.io.File;
 import java.util.List;
 
 public class Engine {
-    TERenderer ter = new TERenderer();
     private World world;
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
+    private EngineUI ui;
 
     private String history = "";
-    static final File CWD = new File(System.getProperty("user.dir"));
-
+    private static final File CWD = new File(System.getProperty("user.dir"));
+    private static final File historyFile = Utils.join(CWD, "history.txt");
 
     public Engine() {
+        ui = new EngineUI();
     }
 
-    public void start(InputSource inputSource) {
-        ter.initialize(WIDTH, HEIGHT);
+    private void start(InputSource inputSource) {
+        ui.displayMenu();
         while (inputSource.possibleNextInput()) {
             String s = getNextKey(inputSource);
-//            System.out.println(s);
-            ter.renderFrame(interactWithInputString(s));
+            ui.render(interactWithInputString(s));
         }
     }
+
 
     private String getNextKey(InputSource inputSource) {
         String s = Character.toString(inputSource.getNextKey()).toLowerCase();
@@ -48,10 +48,13 @@ public class Engine {
             }
         }
         if (s.equals("n")) {
+            // DISPLAY INPUT SEED
+            ui.displayMenuWithSeed();
             String seed = "";
             String nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
             while (!nextKey.equals("s")) {
                 seed += nextKey;
+                ui.displayMenuWithSeed(seed);
                 nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
             }
             return "n" + seed + "s";
@@ -64,21 +67,20 @@ public class Engine {
 
 
     public void save() {
-        File filePath = Utils.join(CWD, "history.txt");
-        Utils.writeContents(filePath, history);
+        Utils.writeContents(historyFile, history);
     }
 
-    public void quit() {
-        System.exit(0);
-    }
 
     public String loadHistory() {
-        File filePath = Utils.join(CWD, "history.txt");
-        return Utils.readContentsAsString(filePath);
+        return Utils.readContentsAsString(historyFile);
     }
 
     public void updateHistory(String action) {
         history += action;
+    }
+
+    private void quit() {
+        System.exit(0);
     }
 
     /**
@@ -112,15 +114,6 @@ public class Engine {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] interactWithInputString(String input) {
-        // TOD: Fill out this method so that it run the engine using the input
-        // passed in as an argument, and return a 2D tile representation of the
-        // world that would have been drawn if the same inputs had been given
-        // to interactWithKeyboard().
-        //
-        // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
-        // that works for many different input types.
-
-//        ter.initialize(WIDTH, HEIGHT);
         InputSource inputSource = new StringInputDevice(input);
         InputParser parser = new InputParser(inputSource, this);
         List<Command> commands = parser.parse();
@@ -128,17 +121,16 @@ public class Engine {
             command.execute();
         }
         TETile[][] finalWorldFrame = world.getState();
-//        ter.renderFrame(finalWorldFrame);
         return finalWorldFrame;
+    }
+
+    @Override
+    public String toString() {
+        return world.toString();
     }
 
     public void createNewWorld(long seed) {
         world = new World(WIDTH, HEIGHT, seed);
-    }
-
-
-    public String toString() {
-        return world.toString();
     }
 
     public void moveUp() {
