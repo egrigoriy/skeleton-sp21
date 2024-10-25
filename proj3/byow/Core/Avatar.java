@@ -15,9 +15,9 @@ public class Avatar implements Figure {
     }
 
     private TETile[][] fillTiles() {
-        TETile[][] tiles = new TETile[1][1];
-        tiles[0][0] =Tileset.AVATAR;
-        return tiles;
+        TETile[][] newTiles = new TETile[1][1];
+        newTiles[0][0] = Tileset.AVATAR;
+        return newTiles;
     }
 
     @Override

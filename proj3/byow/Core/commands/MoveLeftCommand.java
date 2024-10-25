@@ -9,6 +9,6 @@ public class MoveLeftCommand extends AbstractCommand {
 
     @Override
     public void execute() {
-       engine.moveLeft();
+        engine.moveLeft();
     }
 }

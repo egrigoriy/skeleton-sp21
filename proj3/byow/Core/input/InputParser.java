@@ -28,7 +28,8 @@ public class InputParser {
                     break;
                 case "l":
                     String loadedHistory = handleLoad();
-                    InputParser historyParser = new InputParser(new StringInputDevice(loadedHistory), engine);
+                    InputSource historySource = new StringInputDevice(loadedHistory);
+                    InputParser historyParser = new InputParser(historySource, engine);
                     result.addAll(historyParser.parse());
                     break;
                 case "w":
@@ -69,8 +70,6 @@ public class InputParser {
     }
 
     private String handleLoad() {
-        //return "LDDD:Q"
-//        return "LWWWDDD";
         return engine.loadHistory();
     }
 
@@ -87,8 +86,7 @@ public class InputParser {
     }
 
     private String nextKeyLowerCase() {
-        String lowerCaseInput = Character.toString(inputSource.getNextKey()).toLowerCase();
-        return lowerCaseInput;
+        return Character.toString(inputSource.getNextKey()).toLowerCase();
     }
 
 }

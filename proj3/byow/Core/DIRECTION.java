@@ -7,12 +7,13 @@ public enum DIRECTION {
     RIGHT(1);
 
     private final int num;
+
     DIRECTION(int num) {
         this.num = num;
     }
 
     public boolean isOpposite(DIRECTION other) {
-       return this.num + other.num == 0;
+        return this.num + other.num == 0;
     }
 
     public DIRECTION getOpposite() {

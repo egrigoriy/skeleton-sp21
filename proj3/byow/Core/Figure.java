@@ -13,7 +13,7 @@ public interface Figure {
     Posn getPosn();
 
     /** Sets the position of the figure */
-    public void setPosn(Posn posn);
+    void setPosn(Posn posn);
 
     /** Returns the tile representation of the figure **/
     TETile[][] getTiles();
