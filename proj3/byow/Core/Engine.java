@@ -43,39 +43,55 @@ public class Engine {
         ui = new EngineUI();
         ui.displayMenu();
         while (keyboardInputSource.possibleNextInput()) {
-            String s = getNextKey(keyboardInputSource);
-            ui.render(interactWithInputString(s));
+            String validInput = getNextValidInput(keyboardInputSource);
+            if (validInput != null) {
+                TETile[][] worldState = interactWithInputString(validInput);
+                ui.render(worldState);
+            }
         }
     }
-    private String getNextKey(InputSource inputSource) {
-        String s = Character.toString(inputSource.getNextKey()).toLowerCase();
-        if (s.equals(":")) {
-            if (inputSource.possibleNextInput()) {
-                String nextInput = Character.toString(inputSource.getNextKey()).toLowerCase();
-                if (nextInput.equals("q")) {
-                    save();
-                    quit();
-                } else {
-                    return nextInput;
-                }
+
+    private String getNextValidInput(InputSource inputSource) {
+        String inputString = Character.toString(inputSource.getNextKey()).toLowerCase();
+        switch (inputString) {
+            case "n":
+                ui.displayMenuForSeed();
+                return handleSeedInput(inputSource);
+            case "l":
+                return loadHistory();
+            case ":":
+                handleQuitInput(inputSource);
+                break;
+            case "a":
+            case "s":
+            case "d":
+            case "w":
+                return inputString;
+            default:
+                return null;
+        }
+        return null;
+    }
+
+    private void handleQuitInput(InputSource inputSource) {
+        if (inputSource.possibleNextInput()) {
+            String nextInput = Character.toString(inputSource.getNextKey()).toLowerCase();
+            if (nextInput.equals("q")) {
+                save();
+                quit();
             }
         }
-        if (s.equals("n")) {
-            // DISPLAY INPUT SEED
-            ui.displayMenuForSeed();
-            String seed = "";
-            String nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
-            while (!nextKey.equals("s")) {
-                seed += nextKey;
-                ui.displayMenuForSeed(seed);
-                nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
-            }
-            return "n" + seed + "s";
+    }
+
+    private String handleSeedInput(InputSource inputSource) {
+        String seed = "";
+        String nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
+        while (!nextKey.equals("s")) {
+            seed += nextKey;
+            ui.displayMenuForSeed(seed);
+            nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
         }
-        if (s.equals("l")) {
-            return loadHistory();
-        }
-        return s;
+        return "n" + seed + "s";
     }
 
     /**

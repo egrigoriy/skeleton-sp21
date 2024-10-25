@@ -27,7 +27,7 @@ public class InputParser {
                     result.addAll(parse());
                     break;
                 case "l":
-                    String loadedHistory = handleLoad();
+                    String loadedHistory = engine.loadHistory();
                     InputSource historySource = new StringInputDevice(loadedHistory);
                     InputParser historyParser = new InputParser(historySource, engine);
                     result.addAll(historyParser.parse());
@@ -68,10 +68,6 @@ public class InputParser {
             result.add(new SaveCommand(engine));
         }
         return result;
-    }
-
-    private String handleLoad() {
-        return engine.loadHistory();
     }
 
     private long handleSeed() {
