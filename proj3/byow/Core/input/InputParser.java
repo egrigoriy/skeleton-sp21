@@ -21,6 +21,7 @@ public class InputParser {
             String lowerCaseInput = nextKeyLowerCase();
             switch (lowerCaseInput) {
                 case "n":
+                    engine.updateHistory(lowerCaseInput);
                     long seed = handleSeed();
                     result.add(new NewWorldCommand(engine, seed));
                     result.addAll(parse());
@@ -31,18 +32,22 @@ public class InputParser {
                     result.addAll(historyParser.parse());
                     break;
                 case "w":
+                    engine.updateHistory(lowerCaseInput);
                     result.add(new MoveUpCommand(engine));
                     result.addAll(parse());
                     break;
                 case "a":
+                    engine.updateHistory(lowerCaseInput);
                     result.add(new MoveLeftCommand(engine));
                     result.addAll(parse());
                     break;
                 case "d":
+                    engine.updateHistory(lowerCaseInput);
                     result.add(new MoveRightCommand(engine));
                     result.addAll(parse());
                     break;
                 case "s":
+                    engine.updateHistory(lowerCaseInput);
                     result.add(new MoveDownCommand(engine));
                     result.addAll(parse());
                     break;
@@ -58,28 +63,32 @@ public class InputParser {
     private List<Command> handleQuit() {
         List<Command> result = new ArrayList<>();
         if (nextKeyLowerCase().equals("q")) {
-            result.add(new QuitCommand(engine));
+            result.add(new SaveCommand(engine));
         }
         return result;
     }
 
     private String handleLoad() {
         //return "LDDD:Q"
-        return "LWWWDDD";
+//        return "LWWWDDD";
+        return engine.loadHistory();
     }
 
     private long handleSeed() {
         String result = "";
         String nextKey = nextKeyLowerCase();
+        engine.updateHistory(nextKey);
         while (!nextKey.equals("s")) {
             result += nextKey;
             nextKey = nextKeyLowerCase();
+            engine.updateHistory(nextKey);
         }
         return Long.parseLong(result);
     }
 
     private String nextKeyLowerCase() {
-        return Character.toString(inputSource.getNextKey()).toLowerCase();
+        String lowerCaseInput = Character.toString(inputSource.getNextKey()).toLowerCase();
+        return lowerCaseInput;
     }
 
 }

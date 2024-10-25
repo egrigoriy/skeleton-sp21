@@ -1,7 +1,6 @@
 package byow.Core;
 
 import byow.Core.commands.Command;
-import byow.Core.commands.NewWorldCommand;
 import byow.Core.input.InputParser;
 import byow.Core.input.InputSource;
 import byow.Core.input.KeyboardInputSource;
@@ -9,6 +8,7 @@ import byow.Core.input.StringInputDevice;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 
+import java.io.File;
 import java.util.List;
 
 public class Engine {
@@ -18,6 +18,9 @@ public class Engine {
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
 
+    private String history = "";
+    static final File CWD = new File(System.getProperty("user.dir"));
+
 
     public Engine() {
     }
@@ -25,26 +28,62 @@ public class Engine {
     public void start(InputSource inputSource) {
         ter.initialize(WIDTH, HEIGHT);
         // display menu
-        ter.renderFrame(interactWithInputString("N999SDDDDWWWSSSSDDD"));
+//        String tempHist = "L";
+//        String tempHist = "LWWWDDD";
+//        System.out.println(tempHist);
+//        ter.renderFrame(interactWithInputString(tempHist));
         while (inputSource.possibleNextInput()) {
-            String s = Character.toString(inputSource.getNextKey());
+            String s = getNextKey(inputSource);
+            System.out.println(s);
             ter.renderFrame(interactWithInputString(s));
         }
     }
 
-    public void displayWorld() {
-//        while (inputSource.possibleNextInput()) {
-//            // List<EngineCommand> commands = parser.parse()
-//            // for (Command command : commands) {
-//            //          command.execute();
-//            // }
-////        ter.renderFrame(world.getState());
-//        }
+    private String getNextKey(InputSource inputSource) {
+        String s = Character.toString(inputSource.getNextKey()).toLowerCase();
+        if (s.equals(":")) {
+            if (inputSource.possibleNextInput()) {
+                String nextInput = Character.toString(inputSource.getNextKey()).toLowerCase();
+                if (nextInput.equals("q")) {
+                    save();
+                    quit();
+                } else {
+                    return nextInput;
+                }
+            }
+        }
+        if (s.equals("n")) {
+            String seed = "";
+            String nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
+            while (!nextKey.equals("s")) {
+                seed += nextKey;
+                nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
+            }
+            return "n" + seed + "s";
+        }
+        if (s.equals("l")) {
+            return loadHistory();
+        }
+        return s;
+    }
 
+
+    public void save() {
+        File filePath = Utils.join(CWD, "history.txt");
+        Utils.writeContents(filePath, history);
     }
 
     public void quit() {
         System.exit(0);
+    }
+
+    public String loadHistory() {
+        File filePath = Utils.join(CWD, "history.txt");
+        return Utils.readContentsAsString(filePath);
+    }
+
+    public void updateHistory(String action) {
+        history += action;
     }
 
     /**
@@ -97,7 +136,6 @@ public class Engine {
 //        ter.renderFrame(finalWorldFrame);
         return finalWorldFrame;
     }
-
 
     public void createNewWorld(long seed) {
         world = new World(WIDTH, HEIGHT, seed);
