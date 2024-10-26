@@ -44,9 +44,4 @@ public class Avatar implements Figure {
     public TETile[][] getTiles() {
         return tiles;
     }
-
-    @Override
-    public void setTile(int x, int y) {
-
-    }
 }

@@ -49,7 +49,6 @@ public class Room implements Figure {
         return tiles;
     }
 
-    @Override
     public void setTile(int x, int y) {
         tiles[x][y] = Tileset.FLOOR;
     }
