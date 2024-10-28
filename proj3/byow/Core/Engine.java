@@ -1,10 +1,7 @@
 package byow.Core;
 
 import byow.Core.commands.Command;
-import byow.Core.input.InputParser;
-import byow.Core.input.InputSource;
-import byow.Core.input.KeyboardInputSource;
-import byow.Core.input.StringInputDevice;
+import byow.Core.input.*;
 import byow.TileEngine.TETile;
 
 import java.util.List;
@@ -17,23 +14,6 @@ public class Engine {
     private EngineUI ui;
 
     private final History history = new History();
-
-    public String readHistory() {
-        return history.read();
-    }
-
-    public void updateHistory(String action) {
-        history.update(action);
-    }
-
-    public void save() {
-        history.save();
-    }
-
-    private void quit() {
-        System.exit(0);
-    }
-
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
@@ -42,70 +22,14 @@ public class Engine {
         InputSource keyboardInputSource = new KeyboardInputSource();
         ui = new EngineUI();
         ui.displayMenu();
+        InputKeyParser inputKeyParser = new InputKeyParser(keyboardInputSource, this);
         while (keyboardInputSource.possibleNextInput()) {
-            String validInput = getNextValidInput(keyboardInputSource);
+            String validInput = inputKeyParser.parse();
             if (validInput != null) {
                 TETile[][] worldState = interactWithInputString(validInput);
                 ui.render(worldState);
             }
         }
-    }
-
-    private String getNextValidInput(InputSource inputSource) {
-        String inputString = Character.toString(inputSource.getNextKey()).toLowerCase();
-        switch (inputString) {
-            case "n":
-                ui.displayMenuForSeed();
-                return handleSeedInput(inputSource);
-            case "l":
-                return readHistory();
-            case ":":
-                handleQuitInput(inputSource);
-                break;
-            case "a":
-            case "s":
-            case "d":
-            case "w":
-                return inputString;
-            default:
-                return null;
-        }
-        return null;
-    }
-
-    private void handleQuitInput(InputSource inputSource) {
-        if (inputSource.possibleNextInput()) {
-            String nextInput = Character.toString(inputSource.getNextKey()).toLowerCase();
-            if (nextInput.equals("q")) {
-                save();
-                quit();
-            }
-        }
-    }
-
-    private String handleSeedInput(InputSource inputSource) {
-        String seed = "";
-        boolean seedEnd = false;
-        while (!seedEnd) {
-            String nextKey = getNextDigitOrSeedEnd(inputSource);
-            seed += nextKey;
-            ui.displayMenuForSeed(seed);
-            seedEnd = isSeedEnd(nextKey);
-        }
-        return "n" + seed + "s";
-    }
-
-    private boolean isSeedEnd(String s) {
-        return s.equals("s");
-    }
-
-    private String getNextDigitOrSeedEnd(InputSource inputSource) {
-        String nextKey;
-        do {
-            nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
-        }
-        while (!(Character.isDigit(nextKey.charAt(0)) || nextKey.equals("s")));
-        return nextKey;
     }
 
     /**
@@ -131,7 +55,7 @@ public class Engine {
      */
     public TETile[][] interactWithInputString(String input) {
         InputSource inputSource = new StringInputDevice(input);
-        InputParser parser = new InputParser(inputSource, this);
+        InputStringParser parser = new InputStringParser(inputSource, this);
         List<Command> commands = parser.parse();
         for (Command command : commands) {
             command.execute();
@@ -144,6 +68,23 @@ public class Engine {
     public String toString() {
         return world.toString();
     }
+
+    public String readHistory() {
+        return history.read();
+    }
+
+    public void updateHistory(String action) {
+        history.update(action);
+    }
+
+    public void save() {
+        history.save();
+    }
+
+    public void quit() {
+        System.exit(0);
+    }
+
 
     public void createNewWorld(long seed) {
         world = new World(WIDTH, HEIGHT, seed);
@@ -163,5 +104,13 @@ public class Engine {
 
     public void moveDown() {
         world.moveDown();
+    }
+
+    public void displayMenuForSeed(String seed) {
+        ui.displayMenuForSeed(seed);
+    }
+
+    public void displayMenuForSeed() {
+        ui.displayMenuForSeed();
     }
 }

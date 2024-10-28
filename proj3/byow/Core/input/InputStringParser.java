@@ -6,13 +6,9 @@ import byow.Core.commands.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InputParser {
-    private InputSource inputSource;
-    private Engine engine;
-
-    public InputParser(InputSource source, Engine engine) {
-        this.inputSource = source;
-        this.engine = engine;
+public class InputStringParser extends AbstractInputParser {
+    public InputStringParser(InputSource source, Engine engine) {
+        super(source, engine);
     }
 
     public List<Command> parse() {
@@ -29,7 +25,7 @@ public class InputParser {
                 case "l":
                     String loadedHistory = engine.readHistory();
                     InputSource historySource = new StringInputDevice(loadedHistory);
-                    InputParser historyParser = new InputParser(historySource, engine);
+                    InputStringParser historyParser = new InputStringParser(historySource, engine);
                     result.addAll(historyParser.parse());
                     break;
                 case "w":
@@ -53,7 +49,7 @@ public class InputParser {
                     result.addAll(parse());
                     break;
                 case ":":
-                    result.addAll(handleSave());
+                    result.addAll(handleQuit());
                     break;
                 default:
 //                    throw new IllegalArgumentException("Input string is invalid");
@@ -62,9 +58,9 @@ public class InputParser {
         return result;
     }
 
-    private List<Command> handleSave() {
+    private List<Command> handleQuit() {
         List<Command> result = new ArrayList<>();
-        if (nextKeyLowerCase().equals("q")) {
+        if (isQuit(nextKeyLowerCase())) {
             result.add(new SaveCommand(engine));
         }
         return result;
@@ -74,7 +70,7 @@ public class InputParser {
         String result = "";
         String nextKey = nextKeyLowerCase();
         engine.updateHistory(nextKey);
-        while (!nextKey.equals("s")) {
+        while (!isSeedEnd(nextKey)) {
             result += nextKey;
             nextKey = nextKeyLowerCase();
             engine.updateHistory(nextKey);
@@ -82,9 +78,6 @@ public class InputParser {
         return Long.parseLong(result);
     }
 
-    private String nextKeyLowerCase() {
-        return Character.toString(inputSource.getNextKey()).toLowerCase();
-    }
 
 }
 
