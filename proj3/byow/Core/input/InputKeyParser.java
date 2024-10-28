@@ -11,11 +11,11 @@ public class InputKeyParser extends AbstractInputParser {
         switch (inputString) {
             case "n":
                 engine.displayMenuForSeed();
-                return handleSeedInput(inputSource);
+                return handleSeedInput();
             case "l":
                 return engine.readHistory();
             case ":":
-                handleQuitInput(inputSource);
+                handleQuitInput();
                 break;
             case "a":
             case "s":
@@ -28,7 +28,7 @@ public class InputKeyParser extends AbstractInputParser {
         return null;
     }
 
-    private void handleQuitInput(InputSource inputSource) {
+    private void handleQuitInput() {
         if (inputSource.possibleNextInput()) {
             String nextInput = nextKeyLowerCase();
             if (isQuit(nextInput)) {
@@ -38,11 +38,11 @@ public class InputKeyParser extends AbstractInputParser {
         }
     }
 
-    private String handleSeedInput(InputSource inputSource) {
+    private String handleSeedInput() {
         String seed = "";
         boolean seedEnd = false;
         while (!seedEnd) {
-            String nextKey = getNextDigitOrSeedEnd(inputSource);
+            String nextKey = getNextDigitOrSeedEnd();
             seed += nextKey;
             engine.displayMenuForSeed(seed);
             seedEnd = isSeedEnd(nextKey);

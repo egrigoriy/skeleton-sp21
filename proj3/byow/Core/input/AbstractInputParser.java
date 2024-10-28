@@ -13,7 +13,7 @@ public class AbstractInputParser {
     }
 
 
-    protected String getNextDigitOrSeedEnd(InputSource inputSource) {
+    protected String getNextDigitOrSeedEnd() {
         String nextKey;
         do {
             nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
