@@ -2,6 +2,8 @@ package byow.Core.input;
 
 import byow.Core.Engine;
 
+import javax.swing.table.TableRowSorter;
+
 public class InputKeyParser extends AbstractInputParser {
     public InputKeyParser(InputSource inputSource, Engine engine) {
         super(inputSource, engine);
@@ -40,13 +42,16 @@ public class InputKeyParser extends AbstractInputParser {
 
     private String handleSeedInput() {
         String seed = "";
-        boolean seedEnd = false;
-        while (!seedEnd) {
+        while (true) {
             String nextKey = getNextDigitOrSeedEnd();
+            if (isSeedEnd(nextKey)) {
+                break;
+            }
             seed += nextKey;
             engine.displayMenuForSeed(seed);
-            seedEnd = isSeedEnd(nextKey);
         }
         return "n" + seed + "s";
     }
+
+
 }

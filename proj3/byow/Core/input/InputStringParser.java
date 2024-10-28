@@ -17,8 +17,8 @@ public class InputStringParser extends AbstractInputParser {
             String lowerCaseInput = nextKeyLowerCase();
             switch (lowerCaseInput) {
                 case "n":
-                    engine.updateHistory(lowerCaseInput);
-                    long seed = handleSeed();
+                    long seed = handleSeedString();
+                    result.add(new UpdateHistoryCommand(engine,"n" + seed + "s"));
                     result.add(new NewWorldCommand(engine, seed));
                     result.addAll(parse());
                     break;
@@ -29,27 +29,27 @@ public class InputStringParser extends AbstractInputParser {
                     result.addAll(historyParser.parse());
                     break;
                 case "w":
-                    engine.updateHistory(lowerCaseInput);
+                    result.add(new UpdateHistoryCommand(engine, lowerCaseInput));
                     result.add(new MoveUpCommand(engine));
                     result.addAll(parse());
                     break;
                 case "a":
-                    engine.updateHistory(lowerCaseInput);
+                    result.add(new UpdateHistoryCommand(engine, lowerCaseInput));
                     result.add(new MoveLeftCommand(engine));
                     result.addAll(parse());
                     break;
                 case "d":
-                    engine.updateHistory(lowerCaseInput);
+                    result.add(new UpdateHistoryCommand(engine, lowerCaseInput));
                     result.add(new MoveRightCommand(engine));
                     result.addAll(parse());
                     break;
                 case "s":
-                    engine.updateHistory(lowerCaseInput);
+                    result.add(new UpdateHistoryCommand(engine, lowerCaseInput));
                     result.add(new MoveDownCommand(engine));
                     result.addAll(parse());
                     break;
                 case ":":
-                    result.addAll(handleQuit());
+                    result.addAll(handleQuitString());
                     break;
                 default:
 //                    throw new IllegalArgumentException("Input string is invalid");
@@ -58,7 +58,7 @@ public class InputStringParser extends AbstractInputParser {
         return result;
     }
 
-    private List<Command> handleQuit() {
+    private List<Command> handleQuitString() {
         List<Command> result = new ArrayList<>();
         if (isQuit(nextKeyLowerCase())) {
             result.add(new SaveCommand(engine));
@@ -66,19 +66,17 @@ public class InputStringParser extends AbstractInputParser {
         return result;
     }
 
-    private long handleSeed() {
-        String result = "";
-        String nextKey = nextKeyLowerCase();
-        engine.updateHistory(nextKey);
-        while (!isSeedEnd(nextKey)) {
-            result += nextKey;
-            nextKey = nextKeyLowerCase();
-            engine.updateHistory(nextKey);
+    private long handleSeedString() {
+        String seed = "";
+        while (true) {
+            String nextKey = getNextDigitOrSeedEnd();
+            if (isSeedEnd(nextKey)) {
+                break;
+            }
+            seed += nextKey;
         }
-        return Long.parseLong(result);
+        return Long.parseLong(seed);
     }
-
-
 }
 
 
