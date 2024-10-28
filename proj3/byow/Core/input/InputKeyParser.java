@@ -2,8 +2,6 @@ package byow.Core.input;
 
 import byow.Core.Engine;
 
-import javax.swing.table.TableRowSorter;
-
 public class InputKeyParser extends AbstractInputParser {
     public InputKeyParser(InputSource inputSource, Engine engine) {
         super(inputSource, engine);

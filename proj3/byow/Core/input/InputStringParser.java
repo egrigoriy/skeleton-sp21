@@ -18,7 +18,7 @@ public class InputStringParser extends AbstractInputParser {
             switch (lowerCaseInput) {
                 case "n":
                     long seed = handleSeedString();
-                    result.add(new UpdateHistoryCommand(engine,"n" + seed + "s"));
+                    result.add(new UpdateHistoryCommand(engine, "n" + seed + "s"));
                     result.add(new NewWorldCommand(engine, seed));
                     result.addAll(parse());
                     break;
