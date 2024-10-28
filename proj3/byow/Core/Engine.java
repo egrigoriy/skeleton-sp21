@@ -133,7 +133,7 @@ public class Engine {
 
     @Override
     public String toString() {
-        return world.getState().toString();
+        return world.toString();
     }
 
     public void createNewWorld(long seed) {

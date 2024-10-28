@@ -24,14 +24,7 @@ public class World {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
-        for (int y = height - 1; y <= 0; y--) {
-            for (int x = 0; x < width; x++) {
-                result.append(getState()[x][y].character());
-            }
-            result.append("\n");
-        }
-        return result.toString();
+        return map.toString();
     }
 
     public void moveUp() {
