@@ -27,7 +27,7 @@ public class InputParser {
                     result.addAll(parse());
                     break;
                 case "l":
-                    String loadedHistory = engine.loadHistory();
+                    String loadedHistory = engine.readHistory();
                     InputSource historySource = new StringInputDevice(loadedHistory);
                     InputParser historyParser = new InputParser(historySource, engine);
                     result.addAll(historyParser.parse());

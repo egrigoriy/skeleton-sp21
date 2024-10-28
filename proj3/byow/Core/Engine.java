@@ -16,10 +16,10 @@ public class Engine {
     public static final int HEIGHT = 30;
     private EngineUI ui;
 
-    private History history = new History();
+    private final History history = new History();
 
-    public String loadHistory() {
-        return history.load();
+    public String readHistory() {
+        return history.read();
     }
 
     public void updateHistory(String action) {
@@ -58,7 +58,7 @@ public class Engine {
                 ui.displayMenuForSeed();
                 return handleSeedInput(inputSource);
             case "l":
-                return loadHistory();
+                return readHistory();
             case ":":
                 handleQuitInput(inputSource);
                 break;
@@ -87,16 +87,25 @@ public class Engine {
         String seed = "";
         boolean seedEnd = false;
         while (!seedEnd) {
-            String nextKey;
-            do {
-                nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
-            }
-            while(!(Character.isDigit(nextKey.charAt(0)) || nextKey.equals("s")));
+            String nextKey = getNextDigitOrSeedEnd(inputSource);
             seed += nextKey;
             ui.displayMenuForSeed(seed);
-            seedEnd = nextKey.equals("s");
+            seedEnd = isSeedEnd(nextKey);
         }
         return "n" + seed + "s";
+    }
+
+    private boolean isSeedEnd(String s) {
+        return s.equals("s");
+    }
+
+    private String getNextDigitOrSeedEnd(InputSource inputSource) {
+        String nextKey;
+        do {
+            nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
+        }
+        while (!(Character.isDigit(nextKey.charAt(0)) || nextKey.equals("s")));
+        return nextKey;
     }
 
     /**

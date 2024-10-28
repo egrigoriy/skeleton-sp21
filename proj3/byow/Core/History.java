@@ -7,7 +7,7 @@ public class History {
     private static final File HISTORY_FILE = Utils.join(CWD, "history.txt");
     private String history = "";
 
-    public String load() {
+    public String read() {
         return Utils.readContentsAsString(HISTORY_FILE);
     }
 
