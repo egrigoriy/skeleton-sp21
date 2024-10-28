@@ -85,11 +85,16 @@ public class Engine {
 
     private String handleSeedInput(InputSource inputSource) {
         String seed = "";
-        String nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
-        while (!nextKey.equals("s")) {
+        boolean seedEnd = false;
+        while (!seedEnd) {
+            String nextKey;
+            do {
+                nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
+            }
+            while(!(Character.isDigit(nextKey.charAt(0)) || nextKey.equals("s")));
             seed += nextKey;
             ui.displayMenuForSeed(seed);
-            nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
+            seedEnd = nextKey.equals("s");
         }
         return "n" + seed + "s";
     }
@@ -128,7 +133,7 @@ public class Engine {
 
     @Override
     public String toString() {
-        return world.toString();
+        return world.getState().toString();
     }
 
     public void createNewWorld(long seed) {
