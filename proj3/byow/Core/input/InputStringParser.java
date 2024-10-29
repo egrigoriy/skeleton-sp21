@@ -51,6 +51,8 @@ public class InputStringParser extends AbstractInputParser {
                 case ':':
                     result.addAll(handleQuitString());
                     break;
+                case 'f':
+                    result.add(new ToggleFocusCommand(engine));
                 default:
 //                    throw new IllegalArgumentException("Input string is invalid");
             }

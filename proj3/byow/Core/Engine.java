@@ -115,4 +115,8 @@ public class Engine {
     public void displayMenuForSeed() {
         ui.displayMenuForSeed();
     }
+
+    public void toggleFocus() {
+        world.toggleFocus();
+    }
 }

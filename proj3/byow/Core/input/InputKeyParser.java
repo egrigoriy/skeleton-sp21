@@ -21,6 +21,7 @@ public class InputKeyParser extends AbstractInputParser {
             case 's':
             case 'd':
             case 'w':
+            case 'f':
                 return Character.toString(nextKeyLowerCase);
             default:
                 return null;

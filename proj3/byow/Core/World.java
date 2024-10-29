@@ -7,7 +7,7 @@ public class World {
     private final int width;
     private final int height;
 
-    private final Figure avatar;
+    private final Avatar avatar;
 
     public World(int width, int height, long seed) {
         this.width = width;
@@ -41,5 +41,9 @@ public class World {
 
     public void moveDown() {
         map.moveFigure(avatar, DIRECTION.DOWN);
+    }
+
+    public void toggleFocus() {
+        map.toggleFocus(avatar);
     }
 }

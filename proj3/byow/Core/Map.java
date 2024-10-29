@@ -9,6 +9,7 @@ public class Map {
     private final TETile[][] content;
     private final int width;
     private final int height;
+    private Avatar focus = null;
 
 
     public Map(int width, int height) {
@@ -28,7 +29,25 @@ public class Map {
     }
 
     public TETile[][] getContent() {
+        if (focus != null) {
+            return applyFocus();
+        }
         return content;
+    }
+
+    private TETile[][] applyFocus() {
+        TETile[][] newContent = new TETile[width][height];
+        int FOCUS_RADIUS = 5;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (focus.getPosn().distanceTo(new Posn(x, y)) < FOCUS_RADIUS) {
+                    newContent[x][y] = content[x][y];
+                } else {
+                    newContent[x][y] = Tileset.NOTHING;
+                }
+            }
+        }
+        return newContent;
     }
 
     public void addFigures(List<Figure> figures) {
@@ -64,6 +83,7 @@ public class Map {
 
     /**
      * Returns true if given figure is inside this world, otherwise false.
+     *
      * @param figure
      * @return
      */
@@ -77,6 +97,7 @@ public class Map {
 
     /**
      * Returns true if given x and y are both inside this world, otherwise false.
+     *
      * @param x
      * @param y
      * @return boolean
@@ -129,6 +150,14 @@ public class Map {
         int x = posn.getX();
         int y = posn.getY();
         content[x][y] = Tileset.FLOOR;
+    }
+
+    public void toggleFocus(Avatar avatar) {
+        if (focus == null) {
+            focus = avatar;
+        } else {
+            focus = null;
+        }
     }
 }
 

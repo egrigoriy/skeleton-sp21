@@ -16,7 +16,7 @@ public class EngineUI extends TERenderer {
         renderFrame(worldState);
     }
 
-    public void displayMenu() {
+     public void displayMenu() {
         StdDraw.clear(Color.BLACK);
         StdDraw.setPenColor(Color.YELLOW);
         addMenu();
