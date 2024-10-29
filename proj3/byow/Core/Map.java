@@ -37,10 +37,10 @@ public class Map {
 
     private TETile[][] applyFocus() {
         TETile[][] newContent = new TETile[width][height];
-        int FOCUS_RADIUS = 5;
+        int focusRadius = 5;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                if (focus.getPosn().distanceTo(new Posn(x, y)) < FOCUS_RADIUS) {
+                if (focus.getPosn().distanceTo(new Posn(x, y)) < focusRadius) {
                     newContent[x][y] = content[x][y];
                 } else {
                     newContent[x][y] = Tileset.NOTHING;

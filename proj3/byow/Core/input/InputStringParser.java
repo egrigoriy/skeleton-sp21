@@ -14,8 +14,8 @@ public class InputStringParser extends AbstractInputParser {
     public List<Command> parse() {
         List<Command> result = new ArrayList<>();
         while (inputSource.possibleNextInput()) {
-            char nextKeyLowerCase = nextKeyLowerCase();
-            switch (nextKeyLowerCase) {
+            char nextKey = nextKeyLowerCase();
+            switch (nextKey) {
                 case 'n':
                     long seed = handleSeedString();
                     result.add(new UpdateHistoryCommand(engine, "n" + seed + "s"));
@@ -29,22 +29,22 @@ public class InputStringParser extends AbstractInputParser {
                     result.addAll(historyParser.parse());
                     break;
                 case 'w':
-                    result.add(new UpdateHistoryCommand(engine, Character.toString(nextKeyLowerCase)));
+                    result.add(new UpdateHistoryCommand(engine, Character.toString(nextKey)));
                     result.add(new MoveUpCommand(engine));
                     result.addAll(parse());
                     break;
                 case 'a':
-                    result.add(new UpdateHistoryCommand(engine, Character.toString(nextKeyLowerCase)));
+                    result.add(new UpdateHistoryCommand(engine, Character.toString(nextKey)));
                     result.add(new MoveLeftCommand(engine));
                     result.addAll(parse());
                     break;
                 case 'd':
-                    result.add(new UpdateHistoryCommand(engine, Character.toString(nextKeyLowerCase)));
+                    result.add(new UpdateHistoryCommand(engine, Character.toString(nextKey)));
                     result.add(new MoveRightCommand(engine));
                     result.addAll(parse());
                     break;
                 case 's':
-                    result.add(new UpdateHistoryCommand(engine, Character.toString(nextKeyLowerCase)));
+                    result.add(new UpdateHistoryCommand(engine, Character.toString(nextKey)));
                     result.add(new MoveDownCommand(engine));
                     result.addAll(parse());
                     break;
@@ -53,6 +53,7 @@ public class InputStringParser extends AbstractInputParser {
                     break;
                 case 'f':
                     result.add(new ToggleFocusCommand(engine));
+                    break;
                 default:
 //                    throw new IllegalArgumentException("Input string is invalid");
             }

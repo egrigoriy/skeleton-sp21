@@ -3,7 +3,6 @@ package byow.Core;
 import byow.Core.commands.Command;
 import byow.Core.input.*;
 import byow.TileEngine.TETile;
-import edu.princeton.cs.introcs.StdDraw;
 
 import java.util.List;
 
@@ -15,6 +14,7 @@ public class Engine {
     private EngineUI ui;
 
     private final History history = new History();
+
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
@@ -117,6 +117,8 @@ public class Engine {
     }
 
     public void toggleFocus() {
-        world.toggleFocus();
+        if (world != null) {
+            world.toggleFocus();
+        }
     }
 }
