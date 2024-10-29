@@ -7,21 +7,21 @@ public class InputKeyParser extends AbstractInputParser {
         super(inputSource, engine);
     }
     public String parse() {
-        String inputString = nextKeyLowerCase();
-        switch (inputString) {
-            case "n":
+        char nextKeyLowerCase = nextKeyLowerCase();
+        switch (nextKeyLowerCase) {
+            case 'n':
                 engine.displayMenuForSeed();
                 return handleSeedInput();
-            case "l":
+            case 'l':
                 return engine.readHistory();
-            case ":":
+            case ':':
                 handleQuitInput();
                 break;
-            case "a":
-            case "s":
-            case "d":
-            case "w":
-                return inputString;
+            case 'a':
+            case 's':
+            case 'd':
+            case 'w':
+                return Character.toString(nextKeyLowerCase);
             default:
                 return null;
         }
@@ -30,7 +30,7 @@ public class InputKeyParser extends AbstractInputParser {
 
     private void handleQuitInput() {
         if (inputSource.possibleNextInput()) {
-            String nextInput = nextKeyLowerCase();
+            char nextInput = nextKeyLowerCase();
             if (isQuit(nextInput)) {
                 engine.save();
                 engine.quit();
@@ -41,7 +41,7 @@ public class InputKeyParser extends AbstractInputParser {
     private String handleSeedInput() {
         String seed = "";
         while (true) {
-            String nextKey = getNextDigitOrSeedEnd();
+            char nextKey = getNextDigitOrSeedEnd();
             if (isSeedEnd(nextKey)) {
                 break;
             }

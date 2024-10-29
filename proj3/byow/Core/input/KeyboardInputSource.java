@@ -20,6 +20,12 @@ public class KeyboardInputSource implements InputSource {
                 }
                 return c;
             }
+//            if (StdDraw.isMousePressed()) {
+//                System.out.println("HAHA");
+//                StdDraw.pause(1000);
+//                System.out.println(StdDraw.mouseX());
+//                System.out.println(StdDraw.mouseY());
+//            }
         }
     }
 

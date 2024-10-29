@@ -3,6 +3,7 @@ package byow.Core;
 import byow.Core.commands.Command;
 import byow.Core.input.*;
 import byow.TileEngine.TETile;
+import edu.princeton.cs.introcs.StdDraw;
 
 import java.util.List;
 
@@ -19,11 +20,12 @@ public class Engine {
      * including inputs from the main menu.
      */
     public void interactWithKeyboard() {
-        InputSource keyboardInputSource = new KeyboardInputSource();
         ui = new EngineUI();
         ui.displayMenu();
+        InputSource keyboardInputSource = new KeyboardInputSource();
         InputKeyParser inputKeyParser = new InputKeyParser(keyboardInputSource, this);
         while (keyboardInputSource.possibleNextInput()) {
+
             String validInput = inputKeyParser.parse();
             if (validInput != null) {
                 TETile[][] worldState = interactWithInputString(validInput);

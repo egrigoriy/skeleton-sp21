@@ -13,25 +13,26 @@ public class AbstractInputParser {
     }
 
 
-    protected String getNextDigitOrSeedEnd() {
-        String nextKey;
+
+    protected char getNextDigitOrSeedEnd() {
+        char nextKey;
         do {
-            nextKey = Character.toString(inputSource.getNextKey()).toLowerCase();
+            nextKey = nextKeyLowerCase();
         }
-        while (!(Character.isDigit(nextKey.charAt(0)) || isSeedEnd(nextKey)));
+        while (!(Character.isDigit(nextKey) || isSeedEnd(nextKey)));
         return nextKey;
     }
 
 
-    protected boolean isSeedEnd(String s) {
-        return s.equals("s");
+    protected boolean isSeedEnd(char c) {
+        return c == 's';
     }
 
-    protected boolean isQuit(String s) {
-        return s.equals("q");
+    protected boolean isQuit(char c) {
+        return c == 'q';
     }
 
-    protected String nextKeyLowerCase() {
-        return Character.toString(inputSource.getNextKey()).toLowerCase();
+    protected char nextKeyLowerCase() {
+        return Character.toLowerCase(inputSource.getNextKey());
     }
 }

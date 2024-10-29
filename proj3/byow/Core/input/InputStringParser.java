@@ -14,41 +14,41 @@ public class InputStringParser extends AbstractInputParser {
     public List<Command> parse() {
         List<Command> result = new ArrayList<>();
         while (inputSource.possibleNextInput()) {
-            String lowerCaseInput = nextKeyLowerCase();
-            switch (lowerCaseInput) {
-                case "n":
+            char nextKeyLowerCase = nextKeyLowerCase();
+            switch (nextKeyLowerCase) {
+                case 'n':
                     long seed = handleSeedString();
                     result.add(new UpdateHistoryCommand(engine, "n" + seed + "s"));
                     result.add(new NewWorldCommand(engine, seed));
                     result.addAll(parse());
                     break;
-                case "l":
+                case 'l':
                     String loadedHistory = engine.readHistory();
                     InputSource historySource = new StringInputDevice(loadedHistory);
                     InputStringParser historyParser = new InputStringParser(historySource, engine);
                     result.addAll(historyParser.parse());
                     break;
-                case "w":
-                    result.add(new UpdateHistoryCommand(engine, lowerCaseInput));
+                case 'w':
+                    result.add(new UpdateHistoryCommand(engine, Character.toString(nextKeyLowerCase)));
                     result.add(new MoveUpCommand(engine));
                     result.addAll(parse());
                     break;
-                case "a":
-                    result.add(new UpdateHistoryCommand(engine, lowerCaseInput));
+                case 'a':
+                    result.add(new UpdateHistoryCommand(engine, Character.toString(nextKeyLowerCase)));
                     result.add(new MoveLeftCommand(engine));
                     result.addAll(parse());
                     break;
-                case "d":
-                    result.add(new UpdateHistoryCommand(engine, lowerCaseInput));
+                case 'd':
+                    result.add(new UpdateHistoryCommand(engine, Character.toString(nextKeyLowerCase)));
                     result.add(new MoveRightCommand(engine));
                     result.addAll(parse());
                     break;
-                case "s":
-                    result.add(new UpdateHistoryCommand(engine, lowerCaseInput));
+                case 's':
+                    result.add(new UpdateHistoryCommand(engine, Character.toString(nextKeyLowerCase)));
                     result.add(new MoveDownCommand(engine));
                     result.addAll(parse());
                     break;
-                case ":":
+                case ':':
                     result.addAll(handleQuitString());
                     break;
                 default:
@@ -69,7 +69,7 @@ public class InputStringParser extends AbstractInputParser {
     private long handleSeedString() {
         String seed = "";
         while (true) {
-            String nextKey = getNextDigitOrSeedEnd();
+            char nextKey = getNextDigitOrSeedEnd();
             if (isSeedEnd(nextKey)) {
                 break;
             }
