@@ -21,17 +21,21 @@ public class Engine {
      */
     public void interactWithKeyboard() {
         ui = new EngineUI();
-        ui.displayMenu();
+//        ui.displayStartMenu();
         InputSource keyboardInputSource = new KeyboardInputSource();
         InputKeyParser inputKeyParser = new InputKeyParser(keyboardInputSource, this);
-        while (keyboardInputSource.possibleNextInput()) {
-
-            String validInput = inputKeyParser.parse();
-            if (validInput != null) {
-                TETile[][] worldState = interactWithInputString(validInput);
-                ui.render(worldState);
-            }
+        List<Command> commands = inputKeyParser.parse();
+        for (Command command : commands) {
+            command.execute();
         }
+//        while (keyboardInputSource.possibleNextInput()) {
+//
+//            String validInput = inputKeyParser.parse();
+//            if (validInput != null) {
+//                TETile[][] worldState = interactWithInputString(validInput);
+//                ui.render(worldState);
+//            }
+//        }
     }
 
     /**
@@ -58,7 +62,7 @@ public class Engine {
     public TETile[][] interactWithInputString(String input) {
         InputSource inputSource = new StringInputDevice(input);
         InputStringParser parser = new InputStringParser(inputSource, this);
-        List<Command> commands = parser.parse1();
+        List<Command> commands = parser.parse();
         for (Command command : commands) {
             command.execute();
         }
@@ -120,5 +124,9 @@ public class Engine {
         if (world != null) {
             world.toggleFocus();
         }
+    }
+
+    public void displayStartMenu() {
+        ui.displayStartMenu();
     }
 }

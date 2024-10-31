@@ -16,7 +16,7 @@ public abstract class AbstractInputParser {
         this.engine = engine;
     }
 
-    public List<Command> parse1() {
+    public List<Command> parse() {
         List<Command> result = new ArrayList<>();
         while (inputSource.possibleNextInput()) {
             char nextKey = nextKeyLowerCase();

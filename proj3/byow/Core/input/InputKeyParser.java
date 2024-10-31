@@ -2,17 +2,38 @@ package byow.Core.input;
 
 import byow.Core.Engine;
 import byow.Core.commands.Command;
+import byow.Core.commands.NewWorldCommand;
+import byow.Core.commands.UpdateHistoryCommand;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class InputKeyParser extends AbstractInputParser {
+    protected final int START_MENU = 0;
+    protected final int SEED = 1;
+    protected int state;
     public InputKeyParser(InputSource inputSource, Engine engine) {
         super(inputSource, engine);
+        this.state = START_MENU;
     }
 
     @Override
     protected List<Command> handleNewGame() {
-        return null;
+        List<Command> result = new ArrayList<>();
+        switch (state) {
+            case START_MENU:
+                engine.displayStartMenu();
+
+        }
+
+        if (state == START_MENU) {
+            engine.displayMenuForSeed();
+        }
+        String seed = handleSeedInput();
+        System.out.println(seed);
+        result.add(new UpdateHistoryCommand(engine, "n" + seed + "s"));
+        result.add(new NewWorldCommand(engine, Long.parseLong(seed)));
+        return result;
     }
 
     @Override
@@ -50,7 +71,7 @@ public class InputKeyParser extends AbstractInputParser {
         return null;
     }
 
-    public String parse() {
+    public String parse1() {
         char nextKeyLowerCase = nextKeyLowerCase();
         switch (nextKeyLowerCase) {
             case 'n':
@@ -95,6 +116,16 @@ public class InputKeyParser extends AbstractInputParser {
         }
         return "n" + seed + "s";
     }
-
-
+    private long handleSeedInput2() {
+        String seed = "";
+        while (true) {
+            char nextKey = getNextDigitOrSeedEnd();
+            if (isSeedEnd(nextKey)) {
+                break;
+            }
+            seed += nextKey;
+            engine.displayMenuForSeed(seed);
+        }
+        return Long.parseLong(seed);
+    }
 }
