@@ -34,6 +34,7 @@ public class InputStringParser extends AbstractInputParser {
                             break;
                         case 'l':
                             state = LOADING;
+                            result.addAll(handleLoad());
                             break;
                         case ':':
                             result.addAll(handleQuit());
