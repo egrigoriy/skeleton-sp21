@@ -33,8 +33,8 @@ public class InputStringParser extends AbstractInputParser {
                             state = SEEDING;
                             break;
                         case 'l':
-                            state = LOADING;
                             result.addAll(handleLoad());
+                            state = PLAYING;
                             break;
                         case ':':
                             result.addAll(handleQuit());

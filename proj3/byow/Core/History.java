@@ -18,4 +18,8 @@ public class History {
     public void save() {
         Utils.writeContents(HISTORY_FILE, history);
     }
+
+    public void clear() {
+        history = "";
+    }
 }

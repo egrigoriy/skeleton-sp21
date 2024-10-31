@@ -60,6 +60,7 @@ public class Engine {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] interactWithInputString(String input) {
+        history.clear();
         InputSource inputSource = new StringInputDevice(input);
         InputStringParser parser = new InputStringParser(inputSource, this);
         List<Command> commands = parser.parse();
