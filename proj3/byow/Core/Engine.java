@@ -58,7 +58,7 @@ public class Engine {
     public TETile[][] interactWithInputString(String input) {
         InputSource inputSource = new StringInputDevice(input);
         InputStringParser parser = new InputStringParser(inputSource, this);
-        List<Command> commands = parser.parse();
+        List<Command> commands = parser.parse1();
         for (Command command : commands) {
             command.execute();
         }
