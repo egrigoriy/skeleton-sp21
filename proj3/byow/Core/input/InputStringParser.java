@@ -49,6 +49,7 @@ public class InputStringParser extends AbstractInputParser {
                         state = SEEDING;
                     }
                     if (nextKey == 's') {
+                        result.add(new UpdateHistoryCommand(engine, "n" + seed + "s"));
                         result.add(new NewWorldCommand(engine, Long.parseLong(seed)));
                         state = PLAYING;
                     }
@@ -136,7 +137,6 @@ public class InputStringParser extends AbstractInputParser {
         List<Command> result = new ArrayList<>();
         result.add(new UpdateHistoryCommand(engine, Character.toString(nextKey)));
         result.add(new MoveLeftCommand(engine));
-        result.addAll(parse());
         return result;
     }
 
@@ -145,7 +145,6 @@ public class InputStringParser extends AbstractInputParser {
         List<Command> result = new ArrayList<>();
         result.add(new UpdateHistoryCommand(engine, Character.toString(nextKey)));
         result.add(new MoveRightCommand(engine));
-        result.addAll(parse());
         return result;
     }
 
@@ -154,7 +153,6 @@ public class InputStringParser extends AbstractInputParser {
         List<Command> result = new ArrayList<>();
         result.add(new UpdateHistoryCommand(engine, Character.toString(nextKey)));
         result.add(new MoveUpCommand(engine));
-        result.addAll(parse());
         return result;
     }
 
@@ -163,7 +161,6 @@ public class InputStringParser extends AbstractInputParser {
         List<Command> result = new ArrayList<>();
         result.add(new UpdateHistoryCommand(engine, Character.toString(nextKey)));
         result.add(new MoveDownCommand(engine));
-        result.addAll(parse());
         return result;
     }
 
