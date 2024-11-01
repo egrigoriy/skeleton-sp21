@@ -18,6 +18,10 @@ public class InputKeyParser extends AbstractInputParser {
     }
 
     @Override
+    protected List<Command> handleNewGame(String seed) {
+        return null;
+    }
+
     protected List<Command> handleNewGame() {
         List<Command> result = new ArrayList<>();
         switch (state) {

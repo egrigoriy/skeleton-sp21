@@ -8,6 +8,7 @@ public class History {
     private String history = "";
 
     public String read() {
+        history = "";
         return Utils.readContentsAsString(HISTORY_FILE);
     }
 

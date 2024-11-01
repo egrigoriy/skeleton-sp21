@@ -27,7 +27,7 @@ public class InteractWithStringTest {
     }
 
     @Test
-    public void test1() {
+    public void testSplitInputToMultipleWithSaveLoad() {
         // Game: Test splitting an input into multiple inputs with save/loads results in same array as single input (0/33.333)
         String totalInput = "n7193300625454684331saaawasdaawdwsd";
         String inputStart = "n7193300625454684331saaawasdaawd:q";
