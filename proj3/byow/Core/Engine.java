@@ -1,7 +1,10 @@
 package byow.Core;
 
 import byow.Core.commands.Command;
+import byow.Core.fsm.StringSM;
 import byow.Core.input.*;
+import byow.Core.fsm.StartingState;
+import byow.Core.fsm.State;
 import byow.TileEngine.TETile;
 
 import java.util.List;
@@ -24,6 +27,7 @@ public class Engine {
 //        ui.displayStartMenu();
         InputSource keyboardInputSource = new KeyboardInputSource();
         InputKeyParser inputKeyParser = new InputKeyParser(keyboardInputSource, this);
+        ui.displayStartMenu();
         List<Command> commands = inputKeyParser.parse();
         for (Command command : commands) {
             command.execute();
@@ -61,9 +65,9 @@ public class Engine {
      */
     public TETile[][] interactWithInputString(String input) {
         history.clear();
-        InputSource inputSource = new StringInputDevice(input);
-        InputStringParser parser = new InputStringParser(inputSource, this);
-        List<Command> commands = parser.parse();
+        StringSM stringSM = new StringSM();
+        stringSM.start(new StartingState());
+        List<Command> commands = stringSM.transduce(this, input.toCharArray());
         for (Command command : commands) {
             command.execute();
         }

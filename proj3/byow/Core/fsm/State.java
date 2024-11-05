@@ -1,4 +1,4 @@
-package byow.Core.states;
+package byow.Core.fsm;
 
 import byow.Core.Engine;
 import byow.Core.commands.Command;
@@ -6,5 +6,5 @@ import byow.Core.commands.Command;
 import java.util.List;
 
 public interface State {
-    List<Command> handle(Engine engine, char input);
+    State handle(Engine engine, char input, List<Command> result);
 }

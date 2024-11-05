@@ -4,17 +4,18 @@ import byow.Core.Engine;
 import byow.Core.commands.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class InputStringParser extends AbstractInputParser {
-    protected final int STARTING = 0;
-    protected final int SEEDING = 1;
-    protected final int PLAYING = 3;
-    protected int state;
-
 
     public InputStringParser(InputSource source, Engine engine) {
         super(source, engine);
+    }
+
+    @Override
+    protected List<Command> prepareForSeeding() {
+        return null;
     }
 
 //    @Override
