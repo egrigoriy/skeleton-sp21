@@ -23,12 +23,15 @@ public class InteractWithStringTest {
         String input = "n8004217737854698935s";
         String otherInput = "n7341909481878015308s";
         Engine engine = new Engine();
-        assertNotEquals(engine.interactWithInputString(input), engine.interactWithInputString(otherInput));
+        TETile[][] actual = engine.interactWithInputString(input) ;
+        TETile[][] expected = engine.interactWithInputString(otherInput) ;
+        assertNotEquals(expected, actual);
     }
 
     @Test
     public void testSplitInputToMultipleWithSaveLoad() {
-        // Game: Test splitting an input into multiple inputs with save/loads results in same array as single input (0/33.333)
+        // Game: Test splitting an input into multiple inputs with save/loads results
+        // in same array as single input (0/33.333)
         String totalInput = "n7193300625454684331saaawasdaawdwsd";
         String inputStart = "n7193300625454684331saaawasdaawd:q";
         String inputEnd = "lwsd";

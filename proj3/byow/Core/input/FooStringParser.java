@@ -49,7 +49,7 @@ public class FooStringParser {
                     state = SEEDING;
                 }
                 if (isSeedEnd(input)) {
-                    result.addAll(handleNewGame(seed));
+                    result.addAll(handleNewGame());
                     state = PLAYING;
                 }
                 break;
@@ -82,7 +82,7 @@ public class FooStringParser {
         return result;
     }
 
-    protected List<Command> handleNewGame(String seed) {
+    protected List<Command> handleNewGame() {
         List<Command> result = new ArrayList<>();
         result.add(new UpdateHistoryCommand(engine, "n" + seed + "s"));
         result.add(new NewWorldCommand(engine, Long.parseLong(seed)));
