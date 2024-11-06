@@ -34,7 +34,9 @@ public class InteractWithStringTest {
         String inputEnd = "lwsd";
         Engine engine = new Engine();
         TETile[][] expected = engine.interactWithInputString(totalInput);
+        engine = new Engine();
         engine.interactWithInputString(inputStart);
+        engine = new Engine();
         TETile[][] actual = engine.interactWithInputString(inputEnd);
         assertEquals(expected, actual);
     }

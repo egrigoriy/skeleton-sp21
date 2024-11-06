@@ -19,6 +19,7 @@ public class FooStringParser {
     public FooStringParser(Engine engine) {
         this.engine = engine;
     }
+
     public List<Command> parse(char input) {
         List<Command> result = new ArrayList<>();
         switch (state) {
@@ -40,6 +41,7 @@ public class FooStringParser {
                 }
                 break;
             case QUITING:
+                result.addAll(handleQuit(input));
                 break;
             case SEEDING:
                 if (Character.isDigit(input)) {
@@ -66,7 +68,7 @@ public class FooStringParser {
                         result.addAll(handleMoveDown(input));
                         break;
                     case ':':
-                        result.addAll(handleQuit(input));
+                        state = QUITING;
                         break;
                     case 'f':
                         result.addAll(handleToggleFocus());

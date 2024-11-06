@@ -2,7 +2,6 @@ package byow.Core;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 
 public class History {
@@ -11,9 +10,9 @@ public class History {
     private String history = "";
 
     public History() {
-       try {
-           Files.createFile(HISTORY_FILE.toPath());
-       } catch (IOException ignored) {}
+//       try {
+//           Files.createFile(HISTORY_FILE.toPath());
+//       } catch (IOException ignored) {}
     }
     public String read() {
         history = "";
