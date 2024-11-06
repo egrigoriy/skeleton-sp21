@@ -7,6 +7,7 @@ import byow.Core.fsm.StartingState;
 import byow.Core.fsm.State;
 import byow.TileEngine.TETile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Engine {
@@ -65,9 +66,14 @@ public class Engine {
      */
     public TETile[][] interactWithInputString(String input) {
         history.clear();
-        StringSM stringSM = new StringSM();
-        stringSM.start(new StartingState());
-        List<Command> commands = stringSM.transduce(this, input.toCharArray());
+//        StringSM stringSM = new StringSM();
+//        stringSM.start(new StartingState());
+//        List<Command> commands = stringSM.transduce(this, input.toCharArray());
+        FooStringParser foo = new FooStringParser(this);
+        List<Command> commands = new ArrayList<>();
+        for (char c : input.toCharArray()) {
+            commands.addAll(foo.parse(c));
+        }
         for (Command command : commands) {
             command.execute();
         }
