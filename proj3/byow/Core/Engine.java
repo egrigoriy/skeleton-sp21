@@ -31,11 +31,7 @@ public class Engine {
         while (true) {
             if (keyboardInputSource.possibleNextInput()) {
                 char keyInput = Character.toLowerCase(keyboardInputSource.getNextKey());
-                List<Command> commands = new ArrayList<>();
-                commands.addAll(inputKeyParser.parse(keyInput));
-                for (Command command : commands) {
-                    command.execute();
-                }
+                inputKeyParser.execute(keyInput);
                 if (world != null) {
                     ui.render(world.getState());
                 }
@@ -67,15 +63,8 @@ public class Engine {
     public TETile[][] interactWithInputString(String input) {
         history.clear();
         InputStringParser inputStringParser = new InputStringParser(this);
-        List<Command> commands = new ArrayList<>();
-        for (char c : input.toCharArray()) {
-            commands.addAll(inputStringParser.parse(c));
-        }
-        for (Command command : commands) {
-            command.execute();
-        }
-        TETile[][] finalWorldFrame = world.getState();
-        return finalWorldFrame;
+        inputStringParser.execute(input);
+        return world.getState();
     }
 
     @Override

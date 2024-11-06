@@ -82,6 +82,18 @@ public class InputStringParser {
         return result;
     }
 
+    public void execute(char input) {
+        List<Command> commands = parse(input);
+        for (Command command : commands) {
+            command.execute();
+        }
+    }
+
+    public void execute(String input) {
+        for (char c : input.toCharArray()) {
+            execute(c);
+        }
+    }
     protected List<Command> handleSeed() {
         return new ArrayList<>();
     }
