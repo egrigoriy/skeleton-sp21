@@ -1,6 +1,6 @@
 package byow.Core.engine.commands;
 
-import byow.Core.engine.Engine;
+import byow.Core.Engine;
 
 public class DisplayMenuForSeedCommand extends AbstractCommand {
     private Engine engine;

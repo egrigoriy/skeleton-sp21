@@ -1,6 +1,6 @@
 package byow.Core.engine.commands;
 
-import byow.Core.engine.Engine;
+import byow.Core.Engine;
 
 public class MoveLeftCommand extends AbstractCommand {
     public MoveLeftCommand(Engine engine) {

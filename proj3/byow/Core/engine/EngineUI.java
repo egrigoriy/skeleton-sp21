@@ -1,6 +1,6 @@
 package byow.Core.engine;
 
-import byow.Core.engine.Engine;
+import byow.Core.Engine;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import edu.princeton.cs.introcs.StdDraw;
