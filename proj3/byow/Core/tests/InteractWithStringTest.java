@@ -23,8 +23,8 @@ public class InteractWithStringTest {
         String input = "n8004217737854698935s";
         String otherInput = "n7341909481878015308s";
         Engine engine = new Engine();
-        TETile[][] actual = engine.interactWithInputString(input) ;
-        TETile[][] expected = engine.interactWithInputString(otherInput) ;
+        TETile[][] actual = engine.interactWithInputString(input);
+        TETile[][] expected = engine.interactWithInputString(otherInput);
         assertNotEquals(expected, actual);
     }
 
