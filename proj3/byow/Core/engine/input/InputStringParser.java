@@ -185,6 +185,6 @@ public class InputStringParser {
     }
 
     protected boolean isQuit(char c) {
-        return Character.toUpperCase(c)== 'Q';
+        return Character.toUpperCase(c) == 'Q';
     }
 }

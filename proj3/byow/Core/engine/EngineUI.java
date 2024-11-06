@@ -60,7 +60,7 @@ public class EngineUI extends TERenderer {
         int height = Engine.HEIGHT;
         int paddingTop = 2;
         int paddingSide = 1;
-        StdDraw.textLeft(paddingSide,height - paddingTop, "Round: " );
+        StdDraw.textLeft(paddingSide, height - paddingTop, "Round: ");
         StdDraw.text(width / 2.0, height - paddingTop, "Playing");
         StdDraw.textRight(width - paddingSide, height - paddingTop, info);
         int hudHeight = 3;
