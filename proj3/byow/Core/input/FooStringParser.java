@@ -90,9 +90,10 @@ public class FooStringParser {
     protected List<Command> handleLoad() {
         List<Command> result = new ArrayList<>();
         String loadedHistory = engine.readHistory();
-        InputSource historySource = new StringInputDevice(loadedHistory);
-        InputStringParser historyParser = new InputStringParser(historySource, engine);
-        result.addAll(historyParser.parse());
+        FooStringParser foo = new FooStringParser(engine);
+        for (char c : loadedHistory.toCharArray()) {
+            result.addAll(foo.parse(c));
+        }
         return result;
     }
 
