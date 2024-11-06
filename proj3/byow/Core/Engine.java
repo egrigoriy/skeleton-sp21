@@ -22,16 +22,14 @@ public class Engine {
      */
     public void interactWithKeyboard() {
         ui = new EngineUI();
-        BarKeyParser barKeyParser = new BarKeyParser(this);
+        InputKeyParser inputKeyParser = new InputKeyParser(this);
         InputSource keyboardInputSource = new KeyboardInputSource();
         ui.displayStartMenu();
         while (true) {
             if (keyboardInputSource.possibleNextInput()) {
                 char keyInput = Character.toLowerCase(keyboardInputSource.getNextKey());
-//                System.out.println(keyInput);
                 List<Command> commands = new ArrayList<>();
-                commands.addAll(barKeyParser.parse(keyInput));
-//                System.out.println(commands);
+                commands.addAll(inputKeyParser.parse(keyInput));
                 for (Command command : commands) {
                     command.execute();
                 }
@@ -65,10 +63,10 @@ public class Engine {
      */
     public TETile[][] interactWithInputString(String input) {
         history.clear();
-        FooStringParser foo = new FooStringParser(this);
+        InputStringParser inputStringParser = new InputStringParser(this);
         List<Command> commands = new ArrayList<>();
         for (char c : input.toCharArray()) {
-            commands.addAll(foo.parse(c));
+            commands.addAll(inputStringParser.parse(c));
         }
         for (Command command : commands) {
             command.execute();
