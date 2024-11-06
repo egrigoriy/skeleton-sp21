@@ -3,12 +3,9 @@ package byow.Core;
 import byow.Core.engine.EngineUI;
 import byow.Core.engine.History;
 import byow.Core.world.World;
-import byow.Core.engine.commands.Command;
 import byow.Core.engine.input.*;
 import byow.TileEngine.TETile;
-
-import java.util.ArrayList;
-import java.util.List;
+import edu.princeton.cs.introcs.StdDraw;
 
 public class Engine {
     private World world;
@@ -25,16 +22,21 @@ public class Engine {
      */
     public void interactWithKeyboard() {
         InputKeyParser inputKeyParser = new InputKeyParser(this);
-        InputSource keyboardInputSource = new KeyboardInputSource();
         ui = new EngineUI();
         ui.displayStartMenu();
         while (true) {
-            if (keyboardInputSource.possibleNextInput()) {
-                char keyInput = Character.toLowerCase(keyboardInputSource.getNextKey());
+            if (StdDraw.hasNextKeyTyped()) {
+                char keyInput = Character.toUpperCase(StdDraw.nextKeyTyped());
                 inputKeyParser.execute(keyInput);
                 if (world != null) {
                     ui.render(world.getState());
                 }
+            }
+            if (StdDraw.isMousePressed()) {
+                System.out.println("HAHA");
+                StdDraw.pause(1000);
+                System.out.println(StdDraw.mouseX());
+                System.out.println(StdDraw.mouseY());
             }
         }
     }

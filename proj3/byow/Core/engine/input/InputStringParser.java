@@ -21,63 +21,81 @@ public class InputStringParser {
 
     public List<Command> parse(char input) {
         List<Command> result = new ArrayList<>();
+        input = Character.toUpperCase(input);
         switch (state) {
             case STARTING:
-                switch (input) {
-                    case 'n':
-                        result.addAll(prepareForSeeding());
-                        state = SEEDING;
-                        break;
-                    case 'l':
-                        result.addAll(handleLoad());
-                        state = PLAYING;
-                        break;
-                    case ':':
-                        state = QUITING;
-                        break;
-                    default:
-
-                }
+                result.addAll(handleStarting(input));
                 break;
             case QUITING:
                 result.addAll(handleQuit(input));
                 break;
             case SEEDING:
-                if (Character.isDigit(input)) {
-                    seed += input;
-                    result.addAll(handleSeed());
-                    state = SEEDING;
-                }
-                if (isSeedEnd(input)) {
-                    result.addAll(handleNewGame());
-                    state = PLAYING;
-                }
+                result.addAll(handleSeeding(input));
                 break;
             case PLAYING:
-                switch (input) {
-                    case ':':
-                        state = QUITING;
-                        break;
-                    case 'w':
-                        result.addAll(handleMoveUp(input));
-                        break;
-                    case 'a':
-                        result.addAll(handleMoveLeft(input));
-                        break;
-                    case 'd':
-                        result.addAll(handleMoveRight(input));
-                        break;
-                    case 's':
-                        result.addAll(handleMoveDown(input));
-                        break;
-                    case 'f':
-                        result.addAll(handleToggleFocus());
-                        break;
-                    default:
-                }
+                result.addAll(handlePlaying(input));
                 break;
             default:
 
+        }
+        return result;
+    }
+
+    private List<Command> handlePlaying(char input) {
+        List<Command> result = new ArrayList<>();
+        switch (input) {
+            case ':':
+                state = QUITING;
+                break;
+            case 'W':
+                result.addAll(handleMoveUp(input));
+                break;
+            case 'A':
+                result.addAll(handleMoveLeft(input));
+                break;
+            case 'D':
+                result.addAll(handleMoveRight(input));
+                break;
+            case 'S':
+                result.addAll(handleMoveDown(input));
+                break;
+            case 'F':
+                result.addAll(handleToggleFocus());
+                break;
+            default:
+        }
+        return result;
+    }
+
+    private List<Command> handleSeeding(char input) {
+        List<Command> result = new ArrayList<>();
+        if (Character.isDigit(input)) {
+            seed += input;
+            result.addAll(handleSeed());
+            state = SEEDING;
+        }
+        if (isSeedEnd(input)) {
+            result.addAll(handleNewGame());
+            state = PLAYING;
+        }
+        return result;
+    }
+
+    private List<Command> handleStarting(char input) {
+        List<Command> result = new ArrayList<>();
+        switch (input) {
+            case 'N':
+                result.addAll(prepareForSeeding());
+                state = SEEDING;
+                break;
+            case 'L':
+                result.addAll(handleLoad());
+                state = PLAYING;
+                break;
+            case ':':
+                state = QUITING;
+                break;
+            default:
         }
         return result;
     }
@@ -104,7 +122,7 @@ public class InputStringParser {
 
     protected List<Command> handleNewGame() {
         List<Command> result = new ArrayList<>();
-        result.add(new UpdateHistoryCommand(engine, "n" + seed + "s"));
+        result.add(new UpdateHistoryCommand(engine, "N" + seed + "S"));
         result.add(new NewWorldCommand(engine, Long.parseLong(seed)));
         return result;
     }
@@ -163,10 +181,10 @@ public class InputStringParser {
 
 
     protected boolean isSeedEnd(char c) {
-        return c == 's';
+        return Character.toUpperCase(c) == 'S';
     }
 
     protected boolean isQuit(char c) {
-        return c == 'q';
+        return Character.toUpperCase(c)== 'Q';
     }
 }

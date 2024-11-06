@@ -10,11 +10,11 @@ import java.awt.*;
 public class EngineUI extends TERenderer {
 
     public EngineUI() {
-        initialize(Engine.WIDTH, Engine.HEIGHT);
+        initialize(Engine.WIDTH, Engine.HEIGHT, 0, 0);
     }
 
-    public void render(TETile[][] worldState) {
-        renderFrame(worldState);
+    public void render(TETile[][] world) {
+        renderFrame(world);
     }
 
     public void displayStartMenu() {
@@ -53,5 +53,17 @@ public class EngineUI extends TERenderer {
     private void addMenuWithSeed() {
         addMenu();
         StdDraw.text(Engine.WIDTH / 2, Engine.HEIGHT / 2 - 6, "Enter seed and press (S):");
+    }
+
+    private void drawHUD(String info) {
+        int width = Engine.WIDTH;
+        int height = Engine.HEIGHT;
+        int paddingTop = 2;
+        int paddingSide = 1;
+        StdDraw.textLeft(paddingSide,height - paddingTop, "Round: " );
+        StdDraw.text(width / 2.0, height - paddingTop, "Playing");
+        StdDraw.textRight(width - paddingSide, height - paddingTop, info);
+        int hudHeight = 3;
+        StdDraw.line(0, height - hudHeight, width, height - hudHeight);
     }
 }
