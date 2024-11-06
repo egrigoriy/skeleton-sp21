@@ -1,6 +1,6 @@
 package byow.Core.tests;
 
-import byow.Core.Engine;
+import byow.Core.engine.Engine;
 import byow.TileEngine.TETile;
 import org.junit.Test;
 

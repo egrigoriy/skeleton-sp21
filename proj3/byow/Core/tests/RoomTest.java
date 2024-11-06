@@ -1,8 +1,8 @@
 package byow.Core.tests;
 
-import byow.Core.Figure;
-import byow.Core.Posn;
-import byow.Core.Room;
+import byow.Core.world.figures.Figure;
+import byow.Core.world.figures.Posn;
+import byow.Core.world.figures.Room;
 import org.junit.Test;
 
 import java.util.ArrayList;
