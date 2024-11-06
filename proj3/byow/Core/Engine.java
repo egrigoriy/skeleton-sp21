@@ -22,22 +22,24 @@ public class Engine {
      */
     public void interactWithKeyboard() {
         ui = new EngineUI();
-//        ui.displayStartMenu();
+        BarKeyParser barKeyParser = new BarKeyParser(this);
         InputSource keyboardInputSource = new KeyboardInputSource();
-        InputKeyParser inputKeyParser = new InputKeyParser(keyboardInputSource, this);
         ui.displayStartMenu();
-        List<Command> commands = inputKeyParser.parse();
-        for (Command command : commands) {
-            command.execute();
+        while (true) {
+            if (keyboardInputSource.possibleNextInput()) {
+                char keyInput = Character.toLowerCase(keyboardInputSource.getNextKey());
+//                System.out.println(keyInput);
+                List<Command> commands = new ArrayList<>();
+                commands.addAll(barKeyParser.parse(keyInput));
+//                System.out.println(commands);
+                for (Command command : commands) {
+                    command.execute();
+                }
+                if (world != null) {
+                    ui.render(world.getState());
+                }
+            }
         }
-//        while (keyboardInputSource.possibleNextInput()) {
-//
-//            String validInput = inputKeyParser.parse();
-//            if (validInput != null) {
-//                TETile[][] worldState = interactWithInputString(validInput);
-//                ui.render(worldState);
-//            }
-//        }
     }
 
     /**
@@ -63,9 +65,6 @@ public class Engine {
      */
     public TETile[][] interactWithInputString(String input) {
         history.clear();
-//        StringSM stringSM = new StringSM();
-//        stringSM.start(new StartingState());
-//        List<Command> commands = stringSM.transduce(this, input.toCharArray());
         FooStringParser foo = new FooStringParser(this);
         List<Command> commands = new ArrayList<>();
         for (char c : input.toCharArray()) {

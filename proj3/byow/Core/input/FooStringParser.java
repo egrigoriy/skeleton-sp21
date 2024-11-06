@@ -4,6 +4,7 @@ import byow.Core.Engine;
 import byow.Core.commands.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class FooStringParser {
@@ -25,7 +26,7 @@ public class FooStringParser {
             case STARTING:
                 switch (input) {
                     case 'n':
-//                        result.addAll(prepareForSeeding());
+                        result.addAll(prepareForSeeding());
                         state = SEEDING;
                         break;
                     case 'l':
@@ -78,6 +79,11 @@ public class FooStringParser {
             default:
 
         }
+        return result;
+    }
+
+    protected Collection<Command> prepareForSeeding() {
+        List<Command> result = new ArrayList<>();
         return result;
     }
 
