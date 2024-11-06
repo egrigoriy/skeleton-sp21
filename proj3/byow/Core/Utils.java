@@ -19,7 +19,7 @@ class Utils {
      *  in case of problems. */
     static byte[] readContents(File file) {
         if (!file.isFile()) {
-            throw new IllegalArgumentException("must be a normal file");
+            throw new IllegalArgumentException(file + ": must be a normal file");
         }
         try {
             return Files.readAllBytes(file.toPath());

@@ -1,10 +1,7 @@
 package byow.Core;
 
 import byow.Core.commands.Command;
-import byow.Core.fsm.StringSM;
 import byow.Core.input.*;
-import byow.Core.fsm.StartingState;
-import byow.Core.fsm.State;
 import byow.TileEngine.TETile;
 
 import java.util.ArrayList;
