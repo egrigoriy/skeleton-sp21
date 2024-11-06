@@ -80,7 +80,10 @@ public class Engine {
 
     @Override
     public String toString() {
-        return world.toString();
+        if (world != null) {
+            return world.toString();
+        }
+        return "empty world";
     }
 
     public String readHistory() {

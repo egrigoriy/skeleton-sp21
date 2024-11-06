@@ -3,7 +3,6 @@ package byow.Core.engine.commands;
 import byow.Core.Engine;
 
 public class DisplayMenuForSeedCommand extends AbstractCommand {
-    private Engine engine;
     private String seed = null;
     public DisplayMenuForSeedCommand(Engine engine) {
         super(engine);

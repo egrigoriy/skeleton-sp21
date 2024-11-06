@@ -14,21 +14,21 @@ public class InputKeyParser extends InputStringParser {
     @Override
     protected List<Command> prepareForSeeding() {
         List<Command> result = new ArrayList<>();
-        result.add(new DisplayMenuForSeedCommand(engine));
+        result.add(new DisplayMenuForSeedCommand(this.engine));
         return result;
     }
 
     @Override
     protected List<Command> handleSeed() {
         List<Command> result = new ArrayList<>();
-        result.add(new DisplayMenuForSeedCommand(engine, this.seed));
+        result.add(new DisplayMenuForSeedCommand(this.engine, this.seed));
         return result;
     }
 
     @Override
     protected List<Command> handleQuit(char input) {
         List<Command> result = super.handleQuit(input);
-        result.add(new QuitCommand(engine));
+        result.add(new QuitCommand(this.engine));
         return result;
     }
 
