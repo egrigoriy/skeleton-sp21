@@ -28,9 +28,9 @@ public class InputKeyParser extends InputStringParser {
     @Override
     protected List<Command> handleQuit(char input) {
         List<Command> result = super.handleQuit(input);
-        result.add(new QuitCommand(this.engine));
+        if (isQuit(input)) {
+            result.add(new QuitCommand(this.engine));
+        }
         return result;
     }
-
-
 }

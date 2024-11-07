@@ -8,13 +8,52 @@ import edu.princeton.cs.introcs.StdDraw;
 import java.awt.*;
 
 public class EngineUI extends TERenderer {
-
+    private final int HUD_HEIGHT = 2;
     public EngineUI() {
-        initialize(Engine.WIDTH, Engine.HEIGHT, 0, 0);
+        initialize(Engine.WIDTH, Engine.HEIGHT + HUD_HEIGHT, 0, 0);
+    }
+
+    public void drawWorld(TETile[][] world) {
+        int numXTiles = world.length;
+        int numYTiles = world[0].length;
+        Font font = new Font("Monaco", Font.BOLD, 14);
+        StdDraw.setFont(font);
+        StdDraw.setPenColor(Color.YELLOW);
+        for (int x = 0; x < numXTiles; x += 1) {
+            for (int y = 0; y < numYTiles; y += 1) {
+                if (world[x][y] == null) {
+                    throw new IllegalArgumentException("Tile at position x=" + x + ", y=" + y
+                            + " is null.");
+                }
+                world[x][y].draw(x, y);
+            }
+        }
+    }
+
+
+    private void drawHUD(String info) {
+        Font font = new Font("Monaco", Font.BOLD, 14);
+        StdDraw.setFont(font);
+        StdDraw.setPenColor(Color.WHITE);
+        int width = Engine.WIDTH;
+        int height = Engine.HEIGHT;
+        double paddingTop = 1.0;
+        double paddingSide = 1.0;
+        StdDraw.textLeft(paddingSide, height + paddingTop, "Round: ");
+        StdDraw.text(width / 2.0, height + paddingTop, "Playing");
+        StdDraw.textRight(width - paddingSide, height + paddingTop, info);
+        StdDraw.line(0, height, width, height);
+    }
+
+    public void render(TETile[][] world, String hoverText) {
+        StdDraw.clear(Color.BLACK);
+        drawWorld(world);
+        drawHUD(hoverText);
+        StdDraw.show();
     }
 
     public void render(TETile[][] world) {
-        renderFrame(world);
+        render(world, "");
     }
 
     public void displayStartMenu() {
@@ -55,15 +94,4 @@ public class EngineUI extends TERenderer {
         StdDraw.text(Engine.WIDTH / 2, Engine.HEIGHT / 2 - 6, "Enter seed and press (S):");
     }
 
-    private void drawHUD(String info) {
-        int width = Engine.WIDTH;
-        int height = Engine.HEIGHT;
-        int paddingTop = 2;
-        int paddingSide = 1;
-        StdDraw.textLeft(paddingSide, height - paddingTop, "Round: ");
-        StdDraw.text(width / 2.0, height - paddingTop, "Playing");
-        StdDraw.textRight(width - paddingSide, height - paddingTop, info);
-        int hudHeight = 3;
-        StdDraw.line(0, height - hudHeight, width, height - hudHeight);
-    }
 }

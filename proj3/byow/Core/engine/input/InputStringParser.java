@@ -4,6 +4,7 @@ import byow.Core.Engine;
 import byow.Core.engine.commands.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class InputStringParser {

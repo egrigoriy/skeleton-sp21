@@ -162,5 +162,14 @@ public class Map {
             focus = null;
         }
     }
+
+    public String getTileDescription(double x, double y) {
+        int tileX = (int) x;
+        int tileY = (int) y;
+        if (x < width && y < height) {
+            return content[tileX][tileY].description();
+        }
+        return "";
+    }
 }
 

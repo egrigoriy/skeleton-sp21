@@ -48,4 +48,8 @@ public class World {
     public void toggleFocus() {
         map.toggleFocus(avatar);
     }
+
+    public String getTileDescription(double x, double y) {
+        return map.getTileDescription(x, y);
+    }
 }

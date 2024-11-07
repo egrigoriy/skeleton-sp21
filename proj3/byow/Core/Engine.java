@@ -33,11 +33,13 @@ public class Engine {
                 }
             }
             if (StdDraw.isMousePressed()) {
-                System.out.println("HAHA");
-                StdDraw.pause(1000);
-                System.out.println(StdDraw.mouseX());
-                System.out.println(StdDraw.mouseY());
+                StdDraw.pause(40);
+                double x = StdDraw.mouseX();
+                double y = StdDraw.mouseY();
+                String description = world.getTileDescription(x, y);
+                ui.render(world.getState(), description);
             }
+            StdDraw.pause(40);
         }
     }
 
