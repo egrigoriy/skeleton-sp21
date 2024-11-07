@@ -5,7 +5,6 @@ import byow.Core.engine.History;
 import byow.Core.world.World;
 import byow.Core.engine.input.*;
 import byow.TileEngine.TETile;
-import edu.princeton.cs.introcs.StdDraw;
 
 public class Engine {
     private World world;
@@ -25,21 +24,20 @@ public class Engine {
         ui = new EngineUI();
         ui.displayStartMenu();
         while (true) {
-            if (StdDraw.hasNextKeyTyped()) {
-                char keyInput = Character.toUpperCase(StdDraw.nextKeyTyped());
+            if (ui.hasNextKeyTyped()) {
+                char keyInput = Character.toUpperCase(ui.nextKeyTyped());
                 inputKeyParser.execute(keyInput);
                 if (world != null) {
                     ui.render(world.getState());
                 }
             }
-            if (StdDraw.isMousePressed()) {
-                StdDraw.pause(40);
-                double x = StdDraw.mouseX();
-                double y = StdDraw.mouseY();
+            if (ui.isMousePressed()) {
+                double x = ui.mouseX();
+                double y = ui.mouseY();
                 String description = world.getTileDescription(x, y);
                 ui.render(world.getState(), description);
             }
-            StdDraw.pause(40);
+            ui.pause(40);
         }
     }
 

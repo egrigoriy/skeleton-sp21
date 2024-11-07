@@ -30,7 +30,6 @@ public class EngineUI extends TERenderer {
         }
     }
 
-
     private void drawHUD(String info) {
         Font font = new Font("Monaco", Font.BOLD, 14);
         StdDraw.setFont(font);
@@ -94,4 +93,35 @@ public class EngineUI extends TERenderer {
         StdDraw.text(Engine.WIDTH / 2, Engine.HEIGHT / 2 - 6, "Enter seed and press (S):");
     }
 
+    public boolean hasNextKeyTyped() {
+        return StdDraw.hasNextKeyTyped();
+    }
+
+    public char nextKeyTyped() {
+        return StdDraw.nextKeyTyped();
+    }
+
+    public boolean isMousePressed() {
+        return StdDraw.isMousePressed();
+    }
+
+    public void pause(int i) {
+        StdDraw.pause(i);
+    }
+
+    public double mouseX() {
+        if (StdDraw.isMousePressed()) {
+            StdDraw.pause(40);
+            return StdDraw.mouseX();
+        }
+        return 0.0;
+    }
+
+    public double mouseY() {
+        if (StdDraw.isMousePressed()) {
+            StdDraw.pause(40);
+            return StdDraw.mouseY();
+        }
+        return 0.0;
+    }
 }
