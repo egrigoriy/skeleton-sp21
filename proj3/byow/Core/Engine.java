@@ -6,9 +6,11 @@ import byow.Core.world.World;
 import byow.Core.engine.input.*;
 import byow.TileEngine.TETile;
 
+/**
+ * Represents the Engine
+ */
 public class Engine {
     private World world;
-    /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
     private EngineUI ui;
@@ -77,65 +79,101 @@ public class Engine {
         return "empty world";
     }
 
+    /**
+     * Reads the history as a string of entries
+     * @return string
+     */
     public String readHistory() {
         return history.read();
     }
 
+    /**
+     * Updates the history with given action
+     * @param action
+     */
     public void updateHistory(String action) {
         history.update(action);
     }
 
+    /**
+     * Saves the history
+     */
     public void save() {
         history.save();
     }
 
+    /**
+     * Quits the program
+     */
     public void quit() {
         System.exit(0);
     }
 
+    /**
+     * Creates a new world from given seed
+     * @param seed
+     */
     public void createNewWorld(long seed) {
         world = new World(WIDTH, HEIGHT, seed);
     }
 
+    /**
+     * Moves the hero up
+     */
     public void moveUp() {
         if (world != null) {
             world.moveUp();
         }
     }
 
+    /**
+     * Moves the hero left
+     */
     public void moveLeft() {
         if (world != null) {
             world.moveLeft();
         }
     }
 
+    /**
+     * Moves the hero right
+     */
     public void moveRight() {
         if (world != null) {
             world.moveRight();
         }
     }
 
+    /**
+     * Moves the hero down
+     */
     public void moveDown() {
         if (world != null) {
             world.moveDown();
         }
     }
 
+    /**
+     * Displays menu for seed with given seed
+     * @param seed
+     */
     public void displayMenuForSeed(String seed) {
         ui.displayMenuForSeed(seed);
     }
 
+    /**
+     * Displays menu for seed
+     */
     public void displayMenuForSeed() {
         ui.displayMenuForSeed();
     }
 
+    /**
+     * Toggles the focus around the hero
+     */
     public void toggleFocus() {
         if (world != null) {
             world.toggleFocus();
         }
-    }
-
-    public void displayStartMenu() {
-        ui.displayStartMenu();
     }
 }

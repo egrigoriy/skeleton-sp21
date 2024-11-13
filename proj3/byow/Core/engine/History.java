@@ -2,6 +2,9 @@ package byow.Core.engine;
 
 import java.io.File;
 
+/**
+ * Represents a history as string, that can be stored within a file
+ */
 public class History {
     private static final File CWD = new File(System.getProperty("user.dir"));
     private static final File HISTORY_FILE = Utils.join(CWD, "history.txt");
