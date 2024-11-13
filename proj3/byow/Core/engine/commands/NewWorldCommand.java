@@ -2,6 +2,9 @@ package byow.Core.engine.commands;
 
 import byow.Core.Engine;
 
+/**
+ * Command for creating new world
+ */
 public class NewWorldCommand extends AbstractCommand {
     private final long seed;
 

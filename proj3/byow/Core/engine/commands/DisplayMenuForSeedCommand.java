@@ -2,6 +2,9 @@ package byow.Core.engine.commands;
 
 import byow.Core.Engine;
 
+/**
+ * Represents a command for displaying menu for seed
+ */
 public class DisplayMenuForSeedCommand extends AbstractCommand {
     private String seed = null;
     public DisplayMenuForSeedCommand(Engine engine) {
@@ -13,6 +16,9 @@ public class DisplayMenuForSeedCommand extends AbstractCommand {
         this.seed = seed;
     }
 
+    /**
+     * Executes the command for displaying menu for seed
+     */
     @Override
     public void execute() {
         if (seed == null) {

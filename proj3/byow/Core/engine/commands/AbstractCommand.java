@@ -2,6 +2,9 @@ package byow.Core.engine.commands;
 
 import byow.Core.Engine;
 
+/**
+ * Represents a command to engine
+ */
 public abstract class AbstractCommand implements Command {
     protected Engine engine;
 

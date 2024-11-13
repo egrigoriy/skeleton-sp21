@@ -2,6 +2,9 @@ package byow.Core.engine.commands;
 
 import byow.Core.Engine;
 
+/**
+ * Command for updating the history
+ */
 public class UpdateHistoryCommand extends AbstractCommand {
     private final String action;
 
