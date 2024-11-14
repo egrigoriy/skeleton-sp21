@@ -135,7 +135,7 @@ public class Room implements Figure {
      */
     public boolean overlaps(List<Figure> figures) {
         for (Figure figure : figures) {
-            if (overlaps((Room)figure)) {
+            if (overlaps((Room) figure)) {
                 return true;
             }
         }
