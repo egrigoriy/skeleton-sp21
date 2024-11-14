@@ -30,14 +30,14 @@ public class Engine {
                 char keyInput = Character.toUpperCase(ui.nextKeyTyped());
                 inputKeyParser.execute(keyInput);
                 if (world != null) {
-                    ui.render(world.getState());
+                    ui.render(world.getContent());
                 }
             }
             if (ui.isMousePressed()) {
                 double x = ui.mouseX();
                 double y = ui.mouseY();
                 String description = world.getTileDescription(x, y);
-                ui.render(world.getState(), description);
+                ui.render(world.getContent(), description);
             }
             ui.pause(40);
         }
@@ -68,7 +68,7 @@ public class Engine {
         history.clear();
         InputStringParser inputStringParser = new InputStringParser(this);
         inputStringParser.execute(input);
-        return world.getState();
+        return world.getContent();
     }
 
     @Override

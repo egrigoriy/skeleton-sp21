@@ -4,19 +4,32 @@ import byow.Core.world.figures.*;
 
 import java.util.*;
 
-public class MapGenerator {
-    private final byow.Core.world.Map map;
+/**
+ * Represents a map generator
+ */
+public class WorldMapGenerator {
+    private final WorldMap worldMap;
 
-    public MapGenerator(int width, int height) {
-        map = new byow.Core.world.Map(width, height);
+    public WorldMapGenerator(int width, int height) {
+        worldMap = new WorldMap(width, height);
     }
 
-    public byow.Core.world.Map generate(long seed) {
+    /**
+     * Returns a randomly generated world map from given seed
+     * @param seed
+     * @return world map
+     */
+    public WorldMap generate(long seed) {
         List<Figure> rooms = generateRandomRooms(seed);
-        map.addFigures(rooms);
-        return map;
+        worldMap.addFigures(rooms);
+        return worldMap;
     }
 
+    /**
+     * Returns a list of randomly generated rooms
+     * @param seed
+     * @return a list of rooms
+     */
     private List<Figure> generateRandomRooms(long seed) {
         Random randomProvider = new Random(seed);
         List<Figure> rooms = new ArrayList<>();
@@ -31,7 +44,7 @@ public class MapGenerator {
             for (DIRECTION dir: dirs) {
                 Room nextRoom = getRandomRoom(randomProvider);
                 currentRoom.makeNeighbor(nextRoom, dir);
-                if (map.canContain(nextRoom) && !nextRoom.overlaps(rooms)) {
+                if (worldMap.canContain(nextRoom) && !nextRoom.overlaps(rooms)) {
                     currentRoom.punchDoorTo(nextRoom, dir);
                     rooms.add(nextRoom);
                     queue.add(nextRoom);
@@ -41,6 +54,13 @@ public class MapGenerator {
         return rooms;
     }
 
+    /**
+     * Returns a room with random width, height and position or
+     * horizontal hallway with random width and position or
+     * vertical hallway with random height and position
+     * @param random
+     * @return
+     */
     private Room getRandomRoom(Random random) {
         int width = RandomUtils.uniform(random, 4, 9);
         int height = RandomUtils.uniform(random, 4, 9);
@@ -64,9 +84,9 @@ public class MapGenerator {
     }
 
     public static void main(String[] args) {
-        MapGenerator mapGenerator = new MapGenerator(80, 30);
-        Map map = mapGenerator.generate(123456789L);
+        WorldMapGenerator mapGenerator = new WorldMapGenerator(80, 30);
+        WorldMap worldMap = mapGenerator.generate(123456789L);
         System.out.println("================== MAP ===================");
-        System.out.println(map);
+        System.out.println(worldMap);
     }
 }

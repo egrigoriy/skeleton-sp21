@@ -1,55 +1,77 @@
 package byow.Core.world;
 
-import byow.Core.world.figures.Avatar;
+import byow.Core.world.figures.Hero;
 import byow.Core.world.figures.Posn;
 import byow.TileEngine.TETile;
 
+/**
+ * Represents a world
+ */
 public class World {
-    private final Map map;
-    private final int width;
-    private final int height;
-
-    private final Avatar avatar;
+    private final WorldMap worldMap;
+    private final Hero hero;
 
     public World(int width, int height, long seed) {
-        this.width = width;
-        this.height = height;
-        this.map = new MapGenerator(width, height).generate(seed);
-        avatar = new Avatar(new Posn(0, 0));
-        this.map.placeAtRandomPosn(avatar);
+        this.worldMap = new WorldMapGenerator(width, height).generate(seed);
+        hero = new Hero(new Posn(0, 0));
+        this.worldMap.placeAtRandomPosn(hero);
     }
 
-
-    public TETile[][] getState() {
-        return map.getContent();
+    /**
+     * Returns the content of the world
+     * @return array of tiles
+     */
+    public TETile[][] getContent() {
+        return worldMap.getContent();
     }
 
     @Override
     public String toString() {
-        return map.toString();
+        return worldMap.toString();
     }
 
+    /**
+     * Moves the hero on the map up
+     */
     public void moveUp() {
-        map.moveFigure(avatar, DIRECTION.UP);
+        worldMap.moveFigure(hero, DIRECTION.UP);
     }
 
+    /**
+     * Moves the hero on the map left
+     */
     public void moveLeft() {
-        map.moveFigure(avatar, DIRECTION.LEFT);
+        worldMap.moveFigure(hero, DIRECTION.LEFT);
     }
 
+    /**
+     * Moves the hero on the map right
+     */
     public void moveRight() {
-        map.moveFigure(avatar, DIRECTION.RIGHT);
+        worldMap.moveFigure(hero, DIRECTION.RIGHT);
     }
 
+    /**
+     * Moves the hero on the map down
+     */
     public void moveDown() {
-        map.moveFigure(avatar, DIRECTION.DOWN);
+        worldMap.moveFigure(hero, DIRECTION.DOWN);
     }
 
+    /**
+     * Toggles the focus around the hero
+     */
     public void toggleFocus() {
-        map.toggleFocus(avatar);
+        worldMap.toggleFocus(hero);
     }
 
+    /**
+     * Returns the description of the tile placed at given x and y
+     * @param x
+     * @param y
+     * @return tile description
+     */
     public String getTileDescription(double x, double y) {
-        return map.getTileDescription(x, y);
+        return worldMap.getTileDescription(x, y);
     }
 }

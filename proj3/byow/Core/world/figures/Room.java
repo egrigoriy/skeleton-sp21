@@ -6,6 +6,9 @@ import byow.TileEngine.Tileset;
 
 import java.util.List;
 
+/**
+ * Represents a room at position (tile 0, 0) with width and height
+ */
 public class Room implements Figure {
     private final int width;
     private final int height;
@@ -19,19 +22,35 @@ public class Room implements Figure {
         this.tiles = fillTiles();
     }
 
+    /**
+     * Returns the width of this room
+     * @return width
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Returns the height of this room
+     * @return height
+     */
     public int getHeight() {
         return height;
     }
 
+    /**
+     * Returns this room position
+     * @return position
+     */
     public Posn getPosn() {
         return posn;
     }
 
-    public TETile[][] fillTiles() {
+    /**
+     * Returns an array of floor tiles surrounded by wall tiles
+     * @return array of tiles
+     */
+    private TETile[][] fillTiles() {
         TETile[][] newTiles = new TETile[width][height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -45,24 +64,49 @@ public class Room implements Figure {
         return newTiles;
     }
 
+    /**
+     * Returns this room's arrays of tiles
+     * @return array of tiles
+     */
     @Override
     public TETile[][] getTiles() {
         return tiles;
     }
 
-    public void setTile(int x, int y) {
+    /**
+     * Sets the floor tile at this room (x, y)
+     * @param x
+     * @param y
+     */
+    private void setTile(int x, int y) {
         tiles[x][y] = Tileset.FLOOR;
     }
 
+    /**
+     * Returns true if given internal position is floor, otherwise false
+     * @param x
+     * @param y
+     * @return boolean
+     */
     private boolean isFloor(int x, int y) {
         return (0 < x) && (x < width - 1) && (0 < y) && (y < height - 1);
     }
 
-    public boolean overlaps(Figure other) {
+    /**
+     * Returns true if given room overlaps with this one
+     * @param other
+     * @return boolean
+     */
+    private boolean overlaps(Room other) {
         return !isOneUpper(other) && !isOneLefter(other);
     }
 
-    private boolean isOneUpper(Figure other) {
+    /**
+     * Returns true if one of this or given room is upper, otherwise false
+     * @param other
+     * @return boolean
+     */
+    private boolean isOneUpper(Room other) {
         int thisTop = posn.getY() + height - 1;
         int thisBottom = posn.getY();
         int otherTop = other.getPosn().getY() + other.getHeight() - 1;
@@ -70,6 +114,11 @@ public class Room implements Figure {
         return thisBottom > otherTop || otherBottom > thisTop;
     }
 
+    /**
+     * Returns true if one of this or given room is lefter, otherwise false
+     * @param other
+     * @return boolean
+     */
     private boolean isOneLefter(Figure other) {
         int thisLeft = posn.getX();
         int thisRight = posn.getX() + width - 1;
@@ -79,25 +128,45 @@ public class Room implements Figure {
     }
 
 
+    /**
+     * Returns true if this room overlaps with given figures, otherwise false
+     * @param figures
+     * @return boolean
+     */
     public boolean overlaps(List<Figure> figures) {
         for (Figure figure : figures) {
-            if (overlaps(figure)) {
+            if (overlaps((Room)figure)) {
                 return true;
             }
         }
         return false;
     }
 
+    /**
+     * Sets the position of this room
+     * @param posn
+     */
     @Override
     public void setPosn(Posn posn) {
         this.posn = posn;
     }
 
+    /**
+     * Makes the given room neighbor to this one in given direction
+     * @param nextRoom
+     * @param dir
+     */
     public void makeNeighbor(Room nextRoom, DIRECTION dir) {
         Posn newNextPosn = getAlignedNextPosn(nextRoom, dir);
         nextRoom.setPosn(newNextPosn);
     }
 
+    /**
+     * Returns the position of given next room aligned to this room in given direction
+     * @param nextRoom
+     * @param dir
+     * @return position
+     */
     private Posn getAlignedNextPosn(Room nextRoom, DIRECTION dir) {
         Posn newNextPosn = null;
         int shiftV = (this.height - nextRoom.getHeight()) / 2;
@@ -120,6 +189,11 @@ public class Room implements Figure {
         return newNextPosn;
     }
 
+    /**
+     * Punches a door from this room to given one aligned in given direction
+     * @param nextRoom
+     * @param dir
+     */
     public void punchDoorTo(Room nextRoom, DIRECTION dir) {
         int shiftH = (this.height - nextRoom.height);
         int shiftW = (this.width - nextRoom.width);
